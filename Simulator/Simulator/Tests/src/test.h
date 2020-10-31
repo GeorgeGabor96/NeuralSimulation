@@ -3,8 +3,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
-#include "debug.h"
+
+typedef int8_t (*TestFunction)();
+
+typedef struct TestInfo {
+	TestFunction function;
+	char* name;
+} TestInfo;
+
 
 #define mu_suite_start() char* message = NULL
 
