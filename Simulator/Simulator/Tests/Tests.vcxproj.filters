@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Simulator\simulator_generic_generator_tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\debug.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\testing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
