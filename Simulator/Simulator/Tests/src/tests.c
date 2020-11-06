@@ -3,15 +3,33 @@
 #include "testing.h"
 #include "debug.h"
 
-#include "Simulator/simulator_generic_generator_tests.h"
-
+#include "Simulator/array_tests.h"
+#include "Simulator/stack_tests.h"
+#include "Simulator/queue_tests.h"
 
 
 TestInfo tests[] = {
-	{ simulator_generic_generator_create_test, "simulator_generic_generator_create_test" },
-	{ simulator_generic_array_get_at_index_test, "simulator_generic_array_get_at_index_test" },
-	{ simulator_generic_array_set_at_index, "simulator_generic_array_set_at_index" },
-	{ simulator_generic_array_append, "simulator_generic_array_append" }
+	
+	// ARRAY
+	{ array_create_test, "array_create_test" },
+	{ array_destroy_test, "array_destroy_test" },
+	{ array_get_test, "array_get_test" },
+	{ array_set_test, "array_set_test" },
+	{ array_expand_test, "array_expand_test" },
+
+	// STACK
+	{ stack_create_test, "stack_create_test" },
+	{ stack_destroy_test, "stack_destroy_test" },
+	{ stack_push_test, "stack_push_test" },
+	{ stack_pop_test, "stack_pop_test" },
+	{ stack_top_test, "stack_top_test" },
+
+	// QUEUE
+	{ queue_create_test, "queue_create_test" },
+	{ queue_destroy_test, "queue_destroy_test" },
+	{ queue_enqueue_test, "queue_enqueue_test" },
+	{ queue_dequeue_test, "queue_dequeue_test" },
+	{ queue_head_test, "queue_head_test" },
 };
 
 

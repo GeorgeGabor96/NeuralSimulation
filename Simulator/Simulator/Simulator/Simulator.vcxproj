@@ -146,11 +146,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\GenericArray.c" />
+    <ClCompile Include="src\Array.c" />
+    <ClCompile Include="src\Queue.c" />
+    <ClCompile Include="src\Stack.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\debug.h" />
-    <ClInclude Include="src\GenericArray.h" />
+    <ClInclude Include="src\Containers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

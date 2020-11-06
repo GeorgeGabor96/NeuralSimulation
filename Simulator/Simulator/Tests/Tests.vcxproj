@@ -160,11 +160,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\debug.h" />
-    <ClInclude Include="src\Simulator\simulator_generic_generator_tests.h" />
+    <ClInclude Include="src\Simulator\array_tests.h" />
+    <ClInclude Include="src\Simulator\queue_tests.h" />
+    <ClInclude Include="src\Simulator\stack_tests.h" />
     <ClInclude Include="src\testing.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Simulator\simulator_generic_generator_tests.c" />
+    <ClCompile Include="src\Simulator\array_tests.c" />
+    <ClCompile Include="src\Simulator\queue_tests.c" />
+    <ClCompile Include="src\Simulator\stack_tests.c" />
     <ClCompile Include="src\tests.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
