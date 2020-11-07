@@ -33,18 +33,21 @@ typedef struct Array {
 Array* array_create(uint32_t length, size_t element_size);
 
 /*
-Preconditions: @array != NULL
+Preconditions:	@array != NULL
+				@array->data != NULL
 */
 void array_destroy(Array* array);
 
 /*
 Preconditions: @array != NULL
                @index < @array->max_length
+			   @array->data != NULL
 */
 void* array_get(Array* array, uint32_t index);
 
 /*
 Preconditions: @array != NULL
+			   @array->data != NULL
 			   @index < @array->max_length
 			   @data != NULL
 */
@@ -52,6 +55,7 @@ Status array_set(Array* array, uint32_t index, void* data);
 
 /*
 Preconditions: @array != NULL
+			   @array->data != NULL
 */
 Status array_expand(Array* array);
 
@@ -72,23 +76,27 @@ typedef struct Stack {
 Stack* stack_create(uint32_t length, size_t element_size);
 
 /*
-Preconditions: @stack != NULL
+Preconditions:	@stack != NULL
+				@stack->array.data != NULL
 */
 void stack_destroy(Stack* stack);
 
 /*
-Preconditions: @stack != NULL
-			   @data != NULL
+Preconditions:	@stack != NULL
+				@stack->array.data != NULL
+				@data != NULL
 */
 Status stack_push(Stack* stack, void* data);
 
 /*
-Preconditions: @stack != NULL
+Preconditions:	@stack != NULL
+				@stack->array.data != NULL
 */
 void* stack_pop(Stack* stack);
 
 /*
-Preconditions: @stack != NULL
+Preconditions:	@stack != NULL
+				@stack->array.data != NULL
 */
 void* stack_top(Stack* stack);
 
@@ -111,23 +119,27 @@ typedef struct Queue {
 Queue* queue_create(uint32_t length, size_t element_size);
 
 /*
-Preconditions: @queue != NULL
+Preconditions:	@queue != NULL
+				@queue->array.data != NULL
 */
 void queue_destroy(Queue* queue);
 
 /*
 Preconditions:	@queue != NULL
+				@queue->array.data != NULL
 				@data != NULL
 */
 Status queue_enqueue(Queue* queue, void* data);
 
 /*
 Preconditions:	@queue != NULL
+				@queue->array.data != NULL
 */
 void* queue_dequeue(Queue* queue);
 
 /*
 Preconditions:	@queue != NULL
+				@queue->array.data != NULL
 */
 void* queue_head(Queue* queue);
 

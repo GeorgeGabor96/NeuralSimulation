@@ -14,6 +14,8 @@ Queue* queue_create(uint32_t length, size_t element_size) {
 	queue->length = 0;
 	queue->head = 0;
 	queue->tail = 0;
+	queue->array.length = length;
+	queue->array.element_size = element_size;
 
 	return queue;
 
@@ -27,9 +29,7 @@ error:
 
 void queue_destroy(Queue* queue) {
 	check(queue != NULL, "NULL value for @queue");
-	if (queue->array.data != NULL) {
-		free(queue->array.data);
-	}
+	check(queue->array.data != NULL, "NULL value for @queue->array.data");
 	free(queue);
 
 error:
@@ -40,6 +40,7 @@ error:
 Status queue_enqueue(Queue* queue, void* data) {
 	Status status = FAIL;
 	check(queue != NULL, "NULL value for @queue");
+	check(queue->array.data != NULL, "NULL value for @queue");
 	check(data != NULL, "NULL value for @data");
 
 	if (queue_is_full(queue)) {
@@ -47,7 +48,7 @@ Status queue_enqueue(Queue* queue, void* data) {
 		check(array_expand(&(queue->array)) == SUCCESS, "Queue is full and could not allocate more memory");
 		// reorder the queue if necessary
 		if (queue->head != 0) {
-			memcpy(array_get_fast(&(queue->array), old_array_length), &(queue->array), queue->array.element_size * queue->head);
+			memcpy(array_get_fast(&(queue->array), old_array_length), queue->array.data, queue->array.element_size * queue->head);
 			queue->tail = old_array_length + queue->head;
 		}
 		else {
@@ -71,12 +72,15 @@ error:
 void* queue_dequeue(Queue* queue) {
 	void* element = NULL;
 	check(queue != NULL, "NULL value for queue");
+	check(queue->array.data != NULL, "NULL value for @queue");
 
-	element = array_get_fast(&(queue->array), (queue->head)++);
-	if (queue->head == queue->array.length) {
-		queue->head = 0;
+	if (!queue_is_empty(queue)) {
+		element = array_get_fast(&(queue->array), (queue->head)++);
+			if (queue->head == queue->array.length) {
+				queue->head = 0;
+			}
+		(queue->length)--;
 	}
-	(queue->length)--;
 
 error:
 	return element;
@@ -86,8 +90,11 @@ error:
 void* queue_head(Queue* queue) {
 	void* element = NULL;
 	check(queue != NULL, "NULL value for @queue");
+	check(queue->array.data != NULL, "NULL value for @queue");
 
-	element = array_get_fast(&(queue->array), queue->head);
+	if (!queue_is_empty(queue)) {
+		element = array_get_fast(&(queue->array), queue->head);
+	}
 
 error:
 	return element;

@@ -25,9 +25,8 @@ error:
 
 void array_destroy(Array* array) {
 	check(array != NULL, "NULL value for @array");
-	if (array->data != NULL) {
-		free(array->data);
-	}
+	check(array->data != NULL, "NULL value for @array->data");
+	free(array->data);
 	free(array);
 
 error:
@@ -38,6 +37,7 @@ error:
 void* array_get(Array* array, uint32_t index) {
 	void* out = NULL;
 	check(array != NULL, "NULL value for @array");
+	check(array->data != NULL, "NULL value for @array->data");
 	check(index < array->length, "Out of bound value for @index: %u; @array->max_length: %u", index, array->length);
 	
 	out = array_get_fast(array, index);
@@ -50,6 +50,7 @@ error:
 Status array_set(Array* array, uint32_t index, void* data) {
 	Status status = FAIL;
 	check(array != NULL, "NULL value for @array");
+	check(array->data != NULL, "NULL value for @array->data");
 	check(data != NULL, "NULL value for @src_data");
 	check(index < array->length, "Out of bound value for @index: %u; @array->max_lenght: %u", index, array->length);
 	
@@ -64,6 +65,7 @@ error:
 Status array_expand(Array* array) {
 	Status status = FAIL;
 	check(array != NULL, "NULL value for @array");
+	check(array->data != NULL, "NULL value for @array->data");
 
 	uint32_t new_length = array->length + ARRAY_EXPAND_RATE;
 	void* new_data = realloc(array->data, new_length * array->element_size);
