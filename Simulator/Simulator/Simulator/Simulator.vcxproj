@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="src\debug.h" />
     <ClInclude Include="src\Containers.h" />
+    <ClInclude Include="src\Synapse.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
