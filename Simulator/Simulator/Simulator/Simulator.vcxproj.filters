@@ -35,5 +35,8 @@
     <ClCompile Include="src\Queue.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Synapse.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
