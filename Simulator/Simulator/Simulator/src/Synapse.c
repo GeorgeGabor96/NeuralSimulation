@@ -1,35 +1,42 @@
 #include "Synapse.h"
 #include <math.h>
+#include <stdlib.h>
 
-
-SynapticClass* synaptic_class_create(float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms) {
+/*************************************************************
+* SynapseClass Functionality
+*************************************************************/
+SynapseClass* synapse_class_create(float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms) {
 	check(tau_ms > 0.0, "@tau_ms should be > 0");
 	check(simulation_step_ms > 0.0, "@simulation_step_ms should be > 0");
-	
-	SynapticClass* synaptic_class = (SynapticClass*)malloc(sizeof(SynapticClass));
-	check_memory(synaptic_class);
+	check(type == CONDUCTANCE_SYNAPCE || type == VOLTAGE_DEPENDENT_SYNAPSE, "@type has invalid valud");
 
-	synaptic_class->e = rev_potential;
-	synaptic_class->tau_exp = (float)(exp(- (double)simulation_step_ms / tau_ms));
-	synaptic_class->delay = delay;
-	synaptic_class->type = type;
+	SynapseClass* synapse_class = (SynapseClass*)malloc(sizeof(SynapseClass));
+	check_memory(synapse_class);
 
-	return synaptic_class;
+	synapse_class->E = rev_potential;
+	synapse_class->tau_exp = (float)(exp(- (double)simulation_step_ms / tau_ms));
+	synapse_class->delay = delay;
+	synapse_class->type = type;
+
+	return synapse_class;
 error:
 	return NULL;
 }
 
 
-void synaptic_class_destroy(SynapticClass* synaptic_class) {
-	check(synaptic_class != NULL, "@synaptic_class should not be NULL");
-	free(synaptic_class);
+void synapse_class_destroy(SynapseClass* synapse_class) {
+	check(synapse_class != NULL, "@synaptic_class should not be NULL");
+	free(synapse_class);
 
 error:
 	return;
 }
 
 
-Synapse* synapse_create(SynapticClass* s_class, float w) {
+/*************************************************************
+* Synapse Functionality
+*************************************************************/
+Synapse* synapse_create(SynapseClass* s_class, float w) {
 	Synapse* synapse = NULL;
 	check(s_class != NULL, "@s_class should not be NULL");
 
@@ -40,7 +47,7 @@ Synapse* synapse_create(SynapticClass* s_class, float w) {
 	check_memory(synapse->spike_times);
 	synapse->s_class = s_class;
 	synapse->w = w;
-	synapse->g = 0;
+	synapse->g = 0.0f;
 
 	return synapse;
 
@@ -84,7 +91,7 @@ error:
 }
 
 
-float synapse_compute_psc(Synapse* synapse, float u) {
+float synapse_compute_PSC(Synapse* synapse, float u) {
 	float I = 0;
 	check(synapse != NULL, "@synapse should not be NULL");
 	check(synapse->s_class != NULL, "@synapse->s_class should not be NULL");
@@ -97,7 +104,7 @@ float synapse_compute_psc(Synapse* synapse, float u) {
 		break;
 
 	case VOLTAGE_DEPENDENT_SYNAPSE:
-		I = synapse->w * synapse->g * (u - synapse->s_class->e);
+		I = synapse->w * synapse->g * (u - synapse->s_class->E);
 		break;
 
 	default:
@@ -119,15 +126,22 @@ Status synapse_step(Synapse* synapse, uint32_t simulation_time) {
 	// check if their is a spike that arrives at this time step
 	uint32_t* next_spike_time = queue_head(synapse->spike_times);
 	if (*next_spike_time == simulation_time) {
-		synapse->g += 1.0;
+		synapse->g += 1.0f;
 		queue_dequeue(synapse->spike_times);
 	}
 	else {
-		// Raul had here some clipping for very small g
-		// can the conductance be < 0??
-		check(synapse->g >= 0.0, "@synapse->g is negative");
-		synapse->g *= synapse->s_class->tau_exp;
+		/* The conductance should never be negative, at least this is what I understand now */
+		/* The else clips the conductance because currently I don't care for that much precision*/
+		check(synapse->g >= 0.0f, "@synapse->g is negative");
+		if (synapse->g > 0.00001f) {
+			synapse->g *= synapse->s_class->tau_exp;
+		} 
+		else {
+			synapse->g = 0;
+		}
 	}
+
+	status = SUCCESS;
 
 error:
 	return status;

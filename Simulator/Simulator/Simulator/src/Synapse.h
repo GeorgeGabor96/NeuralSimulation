@@ -7,53 +7,80 @@
 // TO DO: a synapse should keep in order the spikes it received
 
 
+/*************************************************************
+* SynapseClass Functionality
+*************************************************************/
+
 typedef enum { CONDUCTANCE_SYNAPCE, VOLTAGE_DEPENDENT_SYNAPSE } SynapseType;
 
 
-typedef struct SynapticClass {
-	float e; // reversal potential
+typedef struct SynapseClass {
+	float E; // reversal potential
 	float tau_exp; 
 	uint32_t delay; // all spikes are delayed
 	SynapseType type;
 	// integration step -> don't know whats with that yet
-} SynapticClass;
+} SynapseClass;
 
 /*
 Preconditions: @tau_ms > 0
 			   @simulation_step_ms > 0
-TODO: should simulation_step_ms be a float???
+			   @type == CONDUCTANCE_SYNPASE || @type == VOLTAGE_DEPENDENT_SYNAPSE
 */
-SynapticClass* synaptic_class_create(float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms);
-void synaptic_class_destroy(SynapticClass* synaptic_class);
+SynapseClass* synapse_class_create(float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms);
 
+/*
+Preconditions: @synapse_class != NULL
+*/
+void synapse_class_destroy(SynapseClass* synapse_class);
+
+
+/*************************************************************
+* Synapse Functionality
+*************************************************************/
 
 typedef struct Synapse {
-	SynapticClass* s_class;
-	float w; // synaptic wieght
+	SynapseClass* s_class;
+	float w; // synaptic weight
 	float g; // synaptic conductance
-	Array* spike_times;
+	Queue* spike_times;
 } Synapse;
 
 #define SYNAPSE_INITIAL_SPIKE_CAPACITY 10
 
+/*
+Preconditions: @s_class != NULL
+*/
+Synapse* synapse_create(SynapseClass* s_class, float w);
 
-// s_class != NULL
-Synapse* synapse_create(SynapticClass* s_class, float w);
-
-// synapse != NULL, synapse->s_class != NULL, synapse->spike_times != NULL
+/*
+Preconditions: @synapse != NULL 
+			   @synapse->s_class != NULL
+			   @synapse->spike_times != NULL
+*/
 void synapse_destroy(Synapse* synapse);
 
-// synapse != NULL, synapse->s_class != NULL, synapse->spike_times != NULL
+/*
+Preconditions: @synapse != NULL
+			   @synapse->s_class != NULL
+			   @synapse->spike_times != NULL
+*/
 Status synapse_add_spike_time(Synapse* synapse, uint32_t spike_time);
 
-float synapse_compute_psc(float u); // here is I = g * (u - e) * w * A for VOLTAGE dependent
-                           // I = g * w * A for CONDUCTANCE only
+/*
+Preconditions: @synapse != NULL
+			   @synapse->s_class != NULL
+			   @synapse->spike_times != NULL
 
-// in cod Raul g este intre [0, 1] pt un skipe, numulativ e mai mult
+Maybe add some u checks (if its in a expected range)
+*/
+float synapse_compute_PSC(Synapse* synapse, float u);
 
-// g_syn cu bara cred ca e 1 in cazul lui Raul si daca vrei mai mult ai A ul ala din synaptic class
-
+/*
+Preconditions: @synapse != NULL
+			   @synapse->s_class != NULL
+			   @synapse->spike_times != NULL
+*/
 Status synapse_step(Synapse* synapse, uint32_t simulation_time);
-
 
 #endif  // __SYNAPSE_H__

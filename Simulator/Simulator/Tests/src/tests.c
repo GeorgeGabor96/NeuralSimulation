@@ -6,6 +6,7 @@
 #include "Simulator/array_tests.h"
 #include "Simulator/stack_tests.h"
 #include "Simulator/queue_tests.h"
+#include "Simulator/synapse_tests.h"
 
 
 TestInfo tests[] = {
@@ -30,6 +31,15 @@ TestInfo tests[] = {
 	{ queue_enqueue_test, "queue_enqueue_test" },
 	{ queue_dequeue_test, "queue_dequeue_test" },
 	{ queue_head_test, "queue_head_test" },
+
+	// SYNAPSE
+	{ synapse_class_create_test, "synapse_class_create_test" },
+	{ synapse_class_destroy_test, "synapse_class_destroy_test" },
+	{ synapse_create_test, "synapse_create_test" },
+	{ synapse_destroy_test, "synapse_destroy_test" },
+	{ synapse_add_spike_time_test, "synapse_add_spike_time_test" },
+	{ synapse_compute_PSC_test, "synapse_compute_PSC_test" },
+	{ synapse_step_test, "synapse_step_test" },
 };
 
 
