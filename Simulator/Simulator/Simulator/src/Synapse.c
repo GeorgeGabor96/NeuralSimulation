@@ -79,7 +79,7 @@ Status synapse_add_spike_time(Synapse* synapse, uint32_t spike_time) {
 	check(synapse != NULL, "@synapse should not be NULL");
 	check(synapse->s_class != NULL, "@synapse->s_class should not be NULL");
 	check(synapse->spike_times != NULL, "@synapse->spike_times should not be NULL");
-
+	if_check(!queue_is_empty(synapse->spike_times), *(uint32_t*)queue_head(synapse->spike_times) < spike_time, "Spike should not be older then the head");
 	// add synaptic delay
 	spike_time += synapse->s_class->delay;
 	queue_enqueue(synapse->spike_times, &spike_time);
@@ -92,7 +92,7 @@ error:
 
 
 float synapse_compute_PSC(Synapse* synapse, float u) {
-	float I = 0;
+	float I = 0.0f;
 	check(synapse != NULL, "@synapse should not be NULL");
 	check(synapse->s_class != NULL, "@synapse->s_class should not be NULL");
 	check(synapse->spike_times != NULL, "@synapse->spike_times should not be NULL");
@@ -124,8 +124,7 @@ Status synapse_step(Synapse* synapse, uint32_t simulation_time) {
 	check(synapse->spike_times != NULL, "@synapse->spike_times should not be NULL");
 
 	// check if their is a spike that arrives at this time step
-	uint32_t* next_spike_time = queue_head(synapse->spike_times);
-	if (*next_spike_time == simulation_time) {
+	if (!queue_is_empty(synapse->spike_times) && *(uint32_t*)queue_head(synapse->spike_times) == simulation_time) {
 		synapse->g += 1.0f;
 		queue_dequeue(synapse->spike_times);
 	}
@@ -137,7 +136,7 @@ Status synapse_step(Synapse* synapse, uint32_t simulation_time) {
 			synapse->g *= synapse->s_class->tau_exp;
 		} 
 		else {
-			synapse->g = 0;
+			synapse->g = 0.0f;
 		}
 	}
 

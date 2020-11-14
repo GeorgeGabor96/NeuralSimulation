@@ -64,6 +64,7 @@ void synapse_destroy(Synapse* synapse);
 Preconditions: @synapse != NULL
 			   @synapse->s_class != NULL
 			   @synapse->spike_times != NULL
+			   @spike_time > queue_head(synapse->spike_times) - should never receive a spike older that I already have
 */
 Status synapse_add_spike_time(Synapse* synapse, uint32_t spike_time);
 
