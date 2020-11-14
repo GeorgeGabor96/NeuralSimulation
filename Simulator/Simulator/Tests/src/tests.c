@@ -7,6 +7,8 @@
 #include "Simulator/stack_tests.h"
 #include "Simulator/queue_tests.h"
 #include "Simulator/synapse_tests.h"
+#include "Simulator/vector_tests.h"
+#include "Simulator/neuron_tests.h"
 
 
 TestInfo tests[] = {
@@ -32,6 +34,11 @@ TestInfo tests[] = {
 	{ queue_dequeue_test, "queue_dequeue_test" },
 	{ queue_head_test, "queue_head_test" },
 
+	// VECTOR
+	{ vector_create_test, "vector_create_test" },
+	{ vector_destroy_test, "vector_destroy_test" },
+	{ vector_append_test, "vector_append_test" },
+
 	// SYNAPSE
 	{ synapse_class_create_test, "synapse_class_create_test" },
 	{ synapse_class_destroy_test, "synapse_class_destroy_test" },
@@ -40,6 +47,16 @@ TestInfo tests[] = {
 	{ synapse_add_spike_time_test, "synapse_add_spike_time_test" },
 	{ synapse_compute_PSC_test, "synapse_compute_PSC_test" },
 	{ synapse_step_test, "synapse_step_test" },
+
+	// NEURON
+	{ neuron_class_create_test, "neuron_class_create_test" },
+	{ neuron_class_destroy_test, "neuron_class_destroy_test" },
+	{ neuron_class_set_LIF_parameters_test, "neuron_class_set_LIF_parameters_test" },
+	{ neuron_create_test, "neuron_create_test" },
+	{ neuron_destroy_test, "neuron_destroy_test" },
+	{ neuron_add_in_synapse_test, "neuron_add_in_synapse_test" },
+	{ neuron_add_out_synapse_test, "neuron_add_out_synapse_test" },
+	{ neuron_step_test, "neuron_step_test" },
 };
 
 

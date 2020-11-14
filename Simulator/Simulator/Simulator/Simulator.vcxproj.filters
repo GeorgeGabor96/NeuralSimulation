@@ -24,6 +24,9 @@
     <ClInclude Include="src\Synapse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Neuron.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Array.c">
@@ -36,6 +39,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Synapse.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Neuron.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Vector.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -6,14 +6,6 @@
 
 #include "debug.h"
 
-/*
-* TO DO: comment only what is wierd and special, the code should speack for himself
-* TO DO: Arange in order of logic
-* TO DO: Do we need aditional return values for success of fail?
-* TO DO: Check the Circular queue from raul
-*/
-
-
 
 /*************************************************************
 * Array Functionality
@@ -142,5 +134,48 @@ Preconditions:	@queue != NULL
 				@queue->array.data != NULL
 */
 void* queue_head(Queue* queue);
+
+
+/*************************************************************
+* Vector Functionality
+*************************************************************/
+typedef struct Vector {
+	uint32_t length;
+	Array array;
+} Vector;
+
+#define VECTOR_EXPAND_RATE 10
+
+#define vector_is_full(q) ((q)->length == (q)->array.length)
+
+
+Vector* vector_create(uint32_t length, size_t element_size);
+
+/*
+Preconditions:	@vector != NULL
+				@vector->array.data != NULL
+*/
+void vector_destroy(Vector* vector);
+
+/*
+Preconditions:	@vector != NULL
+				@vector->array.data != NULL
+				@data != NULL
+*/
+Status vector_set(Vector* vector, uint32_t index, void* data);
+
+/*
+Preconditions:	@vector != NULL
+				@vector->array.data != NULL
+				@data != NULL
+*/
+Status vector_append(Vector* vector, void* data);
+
+/*
+Preconditions:	@vector != NULL
+				@vector->array.data != NULL;
+*/
+void* vector_get(Vector* vector, uint32_t index);
+
 
 #endif // __GENERIC_ARRAY_H__

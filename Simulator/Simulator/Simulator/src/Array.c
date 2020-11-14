@@ -1,7 +1,6 @@
 #include <stdlib.h>
 
 #include "Containers.h"
-#include "debug.h"
 
 
 Array* array_create(uint32_t length, size_t element_size) {
@@ -62,6 +61,7 @@ error:
 }
 
 
+// POSSIBLE OPTIMIZATION, add parameter for expand rate, not every container needs the same amount
 Status array_expand(Array* array) {
 	Status status = FAIL;
 	check(array != NULL, "NULL value for @array");

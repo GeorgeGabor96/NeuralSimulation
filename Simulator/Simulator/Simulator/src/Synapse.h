@@ -3,15 +3,13 @@
 
 #include "Containers.h"
 #include "debug.h"
-// TO DO: a synapse should have a pointer to a header that defines its class properties
-// TO DO: a synapse should keep in order the spikes it received
 
 
 /*************************************************************
 * SynapseClass Functionality
 *************************************************************/
 
-typedef enum { CONDUCTANCE_SYNAPCE, VOLTAGE_DEPENDENT_SYNAPSE } SynapseType;
+typedef enum { CONDUCTANCE_SYNAPCE = 0, VOLTAGE_DEPENDENT_SYNAPSE = 1 } SynapseType;
 
 
 typedef struct SynapseClass {
