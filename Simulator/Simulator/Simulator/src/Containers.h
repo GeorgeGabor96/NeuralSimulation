@@ -6,6 +6,9 @@
 
 #include "debug.h"
 
+/*-----------TO DO-----------------*/
+// La unele teste vezi ca ai dat destroy direct daca setai ceva intern pe NULL sa verifici o preconditie, daca chiar nu era ok ar pusca
+
 
 /*************************************************************
 * Array Functionality
