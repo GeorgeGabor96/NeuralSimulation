@@ -8,9 +8,10 @@
 *************************************************************/
 
 NeuronClass* neuron_class_create(NeuronType type) {
+	NeuronClass* neuron_class = NULL;
 	check(type == LIF_NEURON, "@type has invalid value");
 	
-	NeuronClass* neuron_class = (NeuronClass*)malloc(sizeof(NeuronClass));
+	neuron_class = (NeuronClass*)malloc(sizeof(NeuronClass));
 	check_memory(neuron_class);
 
 	neuron_class->type = type;
@@ -21,12 +22,16 @@ NeuronClass* neuron_class_create(NeuronType type) {
 		neuron_class_set_LIF_parameters(neuron_class, LIF_U_TH, LIF_U_REST, LIF_R, LIF_C);
 		break;
 	default:
+		log_error("Unkown neuron type");
 		break;
 	}
 
 	return neuron_class;
 
 error:
+	if (neuron_class != NULL) {
+		free(neuron_class);
+	}
 	return NULL;
 }
 

@@ -149,8 +149,7 @@ typedef struct Vector {
 
 #define VECTOR_EXPAND_RATE 10
 
-#define vector_is_full(q) ((q)->length == (q)->array.length)
-
+#define vector_is_full(v) ((v)->length == (v)->array.length)
 
 Vector* vector_create(uint32_t length, size_t element_size);
 
