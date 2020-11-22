@@ -54,17 +54,28 @@ typedef struct Neuron {
 	NeuronClass* n_class;
 	float u;
 	uint32_t spike;
-	Vector* in_synapses_refs; // pointers to the INPUT synapses
-	Vector* out_synapses_refs; // pointers to the OUTPUT synapses
+	Vector* in_synapses_refs; // array of INPUT synapses
+	Vector* out_synapses_refs; // array of pointer to OUTPUT synapses
 } Neuron;
 
+/*
+Synapses are kept by the neuron for which they are input
+The ouput synapses are only kept as references
+*/
+
 #define NEURON_INITIAL_SYNAPSE_LENGHT 10u
+
+// TODO: need to be able to fill a Neuron structure that is already allocated in memory
+Status neuron_init(Neuron* neuron, NeuronClass* neuron_class);
 
 /*
 Preconditions:	@neuron_class != NULL
 */
 Neuron* neuron_create(NeuronClass* neuron_class);
 
+
+// release information stored in neuron
+void neuron_reset(Neuron* neuron);
 /*
 Preconditions:	@neuron != NULL
 				@neuron->in_synapses != NULL

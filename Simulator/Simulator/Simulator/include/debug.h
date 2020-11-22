@@ -5,7 +5,7 @@
 #include <errno.h>
 #include <string.h>
 
-typedef enum { SUCCESS = 0, FAIL = 1 } Status;
+typedef enum { SUCCESS = 0, FAIL = 1, FALSE = 0, TRUE = 1} Status;
 
 #define errno_text() (errno == 0 ? "None" : strerror(errno))
 

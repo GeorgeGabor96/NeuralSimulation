@@ -67,12 +67,10 @@ error:
 * Neuron Functionality
 *************************************************************/
 
-Neuron* neuron_create(NeuronClass* neuron_class) {
-	Neuron* neuron = NULL;
+Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
+	Status status = FAIL;
+	check(neuron != NULL, "NULL value for @neuron");
 	check(neuron_class != NULL, "NULL value for @neuron_class");
-
-	neuron = (Neuron*)malloc(sizeof(Neuron));
-	check_memory(neuron);
 
 	neuron->in_synapses_refs = vector_create(NEURON_INITIAL_SYNAPSE_LENGHT, sizeof(Synapse*));
 	check_memory(neuron->in_synapses_refs);
@@ -83,8 +81,6 @@ Neuron* neuron_create(NeuronClass* neuron_class) {
 	neuron->n_class = neuron_class;
 	neuron->u = neuron_class->u_rest;
 
-	return neuron;
-
 error:
 	// @neuron->in_synapses FAIL
 	if (neuron != NULL) {
@@ -92,19 +88,49 @@ error:
 		if (neuron->in_synapses_refs != NULL) {
 			vector_destroy(neuron->in_synapses_refs);
 		}
+	}
+	return status;
+}
+
+
+
+Neuron* neuron_create(NeuronClass* neuron_class) {
+	Neuron* neuron = NULL;
+	check(neuron_class != NULL, "NULL value for @neuron_class");
+
+	neuron = (Neuron*)malloc(sizeof(Neuron));
+	check_memory(neuron);
+
+	check(neuron_init(neuron, neuron_class) == SUCCESS, "Could not initialize @neuron");
+
+	return neuron;
+
+error:
+	if (neuron != NULL) {
+		// could not init @neuron
 		free(neuron);
 	}
 	return NULL;
 }
 
-
-void neuron_destroy(Neuron* neuron) {
+void neuron_reset(Neuron* neuron) {
 	check(neuron != NULL, "NULL value for @neuron");
 	check(neuron->in_synapses_refs != NULL, "NULL value for @neuron->in_synapses");
 	check(neuron->out_synapses_refs != NULL, "NULL value for @neuron->out_synapses");
 
 	vector_destroy(neuron->in_synapses_refs);
 	vector_destroy(neuron->out_synapses_refs);
+
+error:
+	return;
+}
+
+void neuron_destroy(Neuron* neuron) {
+	check(neuron != NULL, "NULL value for @neuron");
+	check(neuron->in_synapses_refs != NULL, "NULL value for @neuron->in_synapses");
+	check(neuron->out_synapses_refs != NULL, "NULL value for @neuron->out_synapses");
+
+	neuron_reset(neuron);
 	free(neuron);
 
 error:
