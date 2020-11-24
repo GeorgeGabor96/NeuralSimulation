@@ -107,3 +107,18 @@ Status network_compile(Network* network) {
 
 error:
 }
+
+
+Spike* network_step(Network* network, Spike* spikes, uint32_t time) {
+
+	network_set_input(network, spikes);
+
+	uint32_t i = 0;
+	for (i = 0; i < network->n_layers; ++i) {
+		layer_step(network->layers + i, time);
+	}
+
+	Spike* out_spikes = network_get_output(network);
+
+	return out_spikes;
+}
