@@ -55,6 +55,7 @@ Preconditions: @array != NULL
 Status array_expand(Array* array);
 
 
+
 /*************************************************************
 * Stack Functionality
 *************************************************************/

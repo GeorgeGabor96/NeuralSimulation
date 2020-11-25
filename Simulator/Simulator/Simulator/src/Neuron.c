@@ -72,7 +72,8 @@ Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
 	check(neuron != NULL, "NULL value for @neuron");
 	check(neuron_class != NULL, "NULL value for @neuron_class");
 
-	neuron->in_synapses_refs = vector_create(NEURON_INITIAL_SYNAPSE_LENGHT, sizeof(Synapse*));
+	// TODO: keep the memory for the input synapses in the neuron, this will reduce memory
+	neuron->in_synapses_refs = vector_create(NEURON_INITIAL_SYNAPSE_LENGHT, sizeof(Synapse));
 	check_memory(neuron->in_synapses_refs);
 
 	neuron->out_synapses_refs = vector_create(NEURON_INITIAL_SYNAPSE_LENGHT, sizeof(Synapse*));
