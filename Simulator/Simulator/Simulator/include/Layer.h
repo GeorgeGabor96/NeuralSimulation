@@ -14,6 +14,7 @@ typedef struct Layer Layer;
 // TODO is it posible for a layer to not succed on the forward, the memory is allocated, its just calculations
 typedef Status (*Layer_step)(Layer*, uint32_t);
 typedef Status(*Layer_backward)(Layer*, uint32_t);
+typedef Status(*Layer_link)(Layer* afferent_layer, Layer* efferent_layer);
 
 // Need a type of the layer, this will define how synapses are connected between neurons
 typedef enum { LAYER_INPUT = 0, LAYER_FULLY_CONNECTED = 1 } LayerType;
@@ -23,10 +24,10 @@ struct Layer {
 	LayerType type;
 	Neuron* neurons; // will be allocated in one malloc
 	uint32_t n_neurons;
-	Layer_step* step; // pointer to forward function
+	Layer_link* link; // pointer to forward function
 	// Layer_backward* backward;
-	NeuronClass* neuron_class; // need to know what type of neurons to have
-	SynapseClass* synapse_class; // need to know what type of synapse the neurons will have
+	NeuronClass* neuron_class;   // this will be managed by the simulator
+	SynapseClass* synapse_class; // this will be managed by the simulator
 };
 
 
@@ -40,5 +41,7 @@ Status layer_is_valid(Layer* layer);
 Status layer_link(Layer* afferent_layer, Layer* efferent_layer);
 Status layer_step(Layer* layer, uint32_t time);
 
+// link functions
+Status layer_link_fc(Layer* afferent_layer, Layer* efferent_layer);
 
 #endif // __LAYER_H__

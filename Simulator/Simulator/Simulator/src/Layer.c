@@ -21,7 +21,17 @@ Status layer_init(Layer* layer, LayerType type, uint32_t n_neurons, NeuronClass*
 		check(SUCCESS == neuron_init(layer->neurons + i, neuron_class), "Failed to init neuron");
 	}
 
-
+	switch (type)
+	{
+	case LAYER_FULLY_CONNECTED:
+		layer->link = layer_link_fc;
+		break;
+	case LAYER_INPUT:
+		// not sure yet;
+		break;
+	default:
+		break;
+	}
 
 	return SUCCESS;
 
@@ -34,4 +44,28 @@ error:
 	free(layer->neurons);
 
 	return FAIL;
+}
+
+
+Status layer_is_valid(Layer* layer) {
+	check(layer != NULL, "NULL value for @layer");
+	check(layer->link != NULL, "NULL value for @layer->link");
+	check(layer->neurons != NULL, "NULL value for @layer->neurons");
+	check(layer->neuron_class != NULL, "NULL value for @layer->neuron_class");
+	check(layer->synapse_class != NULL, "NULL value for @layer->synapse_class");
+
+	return TRUE;
+
+error:
+	return FALSE;
+}
+
+
+void layer_reset(Layer* layer) {
+	check(layer_is_valid(layer) == TRUE, "@layer is not valid");
+
+
+
+error:
+	return;
 }
