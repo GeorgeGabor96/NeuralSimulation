@@ -46,6 +46,9 @@ typedef struct Synapse {
 
 #define SYNAPSE_INITIAL_SPIKE_CAPACITY 10
 
+
+Status synapse_is_valid(Synapse* synapse);
+
 /*
 Preconditions: @s_class != NULL
 */

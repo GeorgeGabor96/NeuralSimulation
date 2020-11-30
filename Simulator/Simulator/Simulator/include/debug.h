@@ -5,7 +5,14 @@
 #include <errno.h>
 #include <string.h>
 
+
 typedef enum { SUCCESS = 0, FAIL = 1, FALSE = 0, TRUE = 1} Status;
+
+// Helper error string generators
+#define invalid_argument(a) "INVALID @" a
+#define null_argument(a)	"NULL value for @" a
+#define init_argument(a)	"Could not initialize @" a
+
 
 #define errno_text() (errno == 0 ? "None" : strerror(errno))
 
