@@ -2,6 +2,22 @@
 #include <math.h>
 #include <stdlib.h>
 
+
+/*************************************************************
+* CHECKS FUNCTIONS and ERROR MESSAGES
+*************************************************************/
+Status synapse_is_valid(Synapse* synapse) {
+	check(synapse != NULL, null_argument("synapse"));
+	check(synapse->s_class != NULL, null_argument("synapse->s_class"));
+	check(synapse->spike_times != NULL, null_argument("synapse->spike_times"));
+
+	return TRUE;
+
+error:
+	return FALSE;
+}
+
+
 /*************************************************************
 * SynapseClass Functionality
 *************************************************************/
@@ -38,7 +54,7 @@ error:
 *************************************************************/
 Synapse* synapse_create(SynapseClass* s_class, float w) {
 	Synapse* synapse = NULL;
-	check(s_class != NULL, "@s_class should not be NULL");
+	check(s_class != NULL, null_argument("s_class"));
 
 	synapse = (Synapse*)malloc(sizeof(Synapse));
 	check_memory(synapse);
@@ -62,9 +78,7 @@ error:
 
 
 void synapse_destroy(Synapse* synapse) {
-	check(synapse != NULL, "@synapse should not be NULL");
-	check(synapse->s_class != NULL, "@synapse->s_class should not be NULL");
-	check(synapse->spike_times != NULL, "@synapse->spike_times should not be NULL");
+	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 
 	// because the synaptic_class will be shared, to save memory, we cannot free it here
 	queue_destroy(synapse->spike_times);
@@ -74,12 +88,12 @@ error:
 	return;
 }
 
+
 Status synapse_add_spike_time(Synapse* synapse, uint32_t spike_time) {
 	Status status = FAIL;
-	check(synapse != NULL, "@synapse should not be NULL");
-	check(synapse->s_class != NULL, "@synapse->s_class should not be NULL");
-	check(synapse->spike_times != NULL, "@synapse->spike_times should not be NULL");
+	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 	if_check(!queue_is_empty(synapse->spike_times), *(uint32_t*)queue_head(synapse->spike_times) < spike_time, "Spike should not be older then the head");
+	
 	// add synaptic delay
 	spike_time += synapse->s_class->delay;
 	queue_enqueue(synapse->spike_times, &spike_time);
@@ -93,9 +107,7 @@ error:
 
 float synapse_compute_PSC(Synapse* synapse, float u) {
 	float I = 0.0f;
-	check(synapse != NULL, "@synapse should not be NULL");
-	check(synapse->s_class != NULL, "@synapse->s_class should not be NULL");
-	check(synapse->spike_times != NULL, "@synapse->spike_times should not be NULL");
+	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 
 	switch (synapse->s_class->type)
 	{
@@ -119,9 +131,7 @@ error:
 
 Status synapse_step(Synapse* synapse, uint32_t simulation_time) {
 	Status status = FAIL;
-	check(synapse != NULL, "@synapse should not be NULL");
-	check(synapse->s_class != NULL, "@synapse->s_class should not be NULL");
-	check(synapse->spike_times != NULL, "@synapse->spike_times should not be NULL");
+	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 
 	// check if their is a spike that arrives at this time step
 	if (!queue_is_empty(synapse->spike_times) && *(uint32_t*)queue_head(synapse->spike_times) == simulation_time) {

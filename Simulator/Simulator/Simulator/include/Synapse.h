@@ -4,6 +4,8 @@
 #include "Containers.h"
 #include "debug.h"
 
+// TODO: Update documentation
+
 
 /*************************************************************
 * SynapseClass Functionality
@@ -46,43 +48,33 @@ typedef struct Synapse {
 
 #define SYNAPSE_INITIAL_SPIKE_CAPACITY 10
 
-
+/*
+* General function to verify that a synapse is valid
+* A @synapse is valid if:
+* 1. @synapse != NULL
+* 2. @synapse->s_class != NULL
+* 3. @synapse->spike_times != NULL
+*/
 Status synapse_is_valid(Synapse* synapse);
 
+// USed to fill a neuron structure already allocated
+Status synapse_init(Synapse* synapse, SynapseClass* s_class, float w);
 /*
 Preconditions: @s_class != NULL
 */
 Synapse* synapse_create(SynapseClass* s_class, float w);
-
-/*
-Preconditions: @synapse != NULL 
-			   @synapse->s_class != NULL
-			   @synapse->spike_times != NULL
-*/
 void synapse_destroy(Synapse* synapse);
 
 /*
-Preconditions: @synapse != NULL
-			   @synapse->s_class != NULL
-			   @synapse->spike_times != NULL
-			   @spike_time > queue_head(synapse->spike_times) - should never receive a spike older that I already have
+Preconditions: @spike_time > queue_head(synapse->spike_times) - should never receive a spike older that I already have
 */
 Status synapse_add_spike_time(Synapse* synapse, uint32_t spike_time);
 
 /*
-Preconditions: @synapse != NULL
-			   @synapse->s_class != NULL
-			   @synapse->spike_times != NULL
-
 Maybe add some u checks (if its in a expected range)
 */
 float synapse_compute_PSC(Synapse* synapse, float u);
 
-/*
-Preconditions: @synapse != NULL
-			   @synapse->s_class != NULL
-			   @synapse->spike_times != NULL
-*/
 Status synapse_step(Synapse* synapse, uint32_t simulation_time);
 
 #endif  // __SYNAPSE_H__

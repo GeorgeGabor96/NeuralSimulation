@@ -35,14 +35,8 @@ typedef struct NeuronClass {
 #define LIF_R		10.0f
 #define LIF_C		1.0f
 
-/*
-General function to verify that a neuron_class is valid
-A @neuron_class is valid if:
-1. @neuron_class != NULL
-2. @neuron_class->type == LIF_NEURON
-*/
-Status neuron_is_valid(Neuron* neuron);
 
+Status neuron_class_is_valid(NeuronClass* neuron_class);
 NeuronClass* neuron_class_create(NeuronType type);
 void neuron_class_destroy(NeuronClass* neuron_class);
 Status neuron_class_set_LIF_parameters(NeuronClass* neuron_class, float u_th, float u_rest, float r, float c);
@@ -63,7 +57,7 @@ typedef struct Neuron {
 
 #define NEURON_INITIAL_SYNAPSE_LENGHT 10u
 
-/*
+/* TODO: De ce nu verific si n_class??????
 General function to verify that a neuron is valid
 A @neuron is valid if:
 1. @neuron != NULL
