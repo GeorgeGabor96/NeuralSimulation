@@ -4,7 +4,7 @@
 
 
 /*************************************************************
-* CHECKS FUNCTIONS and ERROR MESSAGES
+* CHECKS FUNCTIONS
 *************************************************************/
 Status neuron_class_is_valid(NeuronClass* neuron_class) {
 	check(neuron_class != NULL, null_argument("neuron_class"));
@@ -158,6 +158,8 @@ Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
 	neuron->n_class = neuron_class;
 	neuron->u = neuron_class->u_rest;
 
+	status = SUCCESS;
+
 error:
 	// @neuron->in_synapses FAIL
 	if (neuron != NULL) {
@@ -176,6 +178,7 @@ void neuron_reset(Neuron* neuron) {
 
 	vector_destroy(neuron->in_synapses);
 	vector_destroy(neuron->out_synapses_refs);
+	neuron->n_class = NULL;
 	// NOTE: neuron_class should be managed by the called, may be common to multiple neurons
 
 error:
@@ -185,8 +188,6 @@ error:
 
 Neuron* neuron_create(NeuronClass* neuron_class) {
 	Neuron* neuron = NULL;
-	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
-
 	neuron = (Neuron*)malloc(sizeof(Neuron));
 	check_memory(neuron);
 
@@ -204,8 +205,6 @@ error:
 
 
 void neuron_destroy(Neuron* neuron) {
-	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
-
 	neuron_reset(neuron);
 	free(neuron);
 

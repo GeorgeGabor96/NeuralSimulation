@@ -7,9 +7,13 @@
 
 #include <stdint.h>
 
+// Config Files:- este mai greu de lucrat cu ele, imi trebuie parsare, definirea unui format, etc
+// Keras Approach - add layers one by one, input/output by name
 
 // TO DO: need a structure for input/output spikes, input Current, output voltages per neuron???
 typedef float Spike;
+
+// TO DO: so if we want non linear networks, need a way to reference a layer by name/index
 
 typedef struct Network {
 	Layer* layers; // will be allocated with one alloc

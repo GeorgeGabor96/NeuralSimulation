@@ -4,8 +4,20 @@
 
 
 /*************************************************************
-* CHECKS FUNCTIONS and ERROR MESSAGES
+* CHECKS FUNCTIONS
 *************************************************************/
+Status synapse_class_is_valid(SynapseClass* synapse_class) {
+	check(synapse_class != NULL, null_argument("neuron_class"));
+	// NOTE: If you add more types this check needs to be updated
+	check(synapse_class->type == CONDUCTANCE_SYNAPCE || synapse_class->type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("neuron_class->type"));
+
+	return TRUE;
+
+error:
+	return FALSE;
+}
+
+
 Status synapse_is_valid(Synapse* synapse) {
 	check(synapse != NULL, null_argument("synapse"));
 	check(synapse->s_class != NULL, null_argument("synapse->s_class"));
@@ -24,7 +36,7 @@ error:
 SynapseClass* synapse_class_create(float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms) {
 	check(tau_ms > 0.0, "@tau_ms should be > 0");
 	check(simulation_step_ms > 0.0, "@simulation_step_ms should be > 0");
-	check(type == CONDUCTANCE_SYNAPCE || type == VOLTAGE_DEPENDENT_SYNAPSE, "@type has invalid valud");
+	check(type == CONDUCTANCE_SYNAPCE || type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("type"));
 
 	SynapseClass* synapse_class = (SynapseClass*)malloc(sizeof(SynapseClass));
 	check_memory(synapse_class);
@@ -41,7 +53,7 @@ error:
 
 
 void synapse_class_destroy(SynapseClass* synapse_class) {
-	check(synapse_class != NULL, "@synaptic_class should not be NULL");
+	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
 	free(synapse_class);
 
 error:
@@ -52,12 +64,9 @@ error:
 /*************************************************************
 * Synapse Functionality
 *************************************************************/
-Synapse* synapse_create(SynapseClass* s_class, float w) {
-	Synapse* synapse = NULL;
-	check(s_class != NULL, null_argument("s_class"));
-
-	synapse = (Synapse*)malloc(sizeof(Synapse));
-	check_memory(synapse);
+Status synapse_init(Synapse* synapse, SynapseClass* s_class, float w) {
+	check(synapse != NULL, null_argument("synapse"));
+	check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
 
 	synapse->spike_times = queue_create(SYNAPSE_INITIAL_SPIKE_CAPACITY, sizeof(uint32_t));
 	check_memory(synapse->spike_times);
@@ -65,10 +74,37 @@ Synapse* synapse_create(SynapseClass* s_class, float w) {
 	synapse->w = w;
 	synapse->g = 0.0f;
 
-	return synapse;
+	return SUCCESS;
 
 error:
 	// queue allocation failed
+	return FAIL;
+}
+
+
+void synapse_reset(Synapse* synapse) {
+	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
+
+	queue_destroy(synapse->spike_times);
+	synapse->s_class = NULL;
+	// NOTE: synapse->s_class should be managed by caller
+
+error:
+	return;
+}
+
+
+Synapse* synapse_create(SynapseClass* s_class, float w) {
+	Synapse* synapse = NULL;
+
+	synapse = (Synapse*)malloc(sizeof(Synapse));
+	check_memory(synapse);
+
+	check(synapse_init(synapse, s_class, w) == SUCCESS, init_argument("synapse"));
+
+	return synapse;
+
+error:
 	if (synapse != NULL) {
 		free(synapse);
 	}
@@ -78,10 +114,7 @@ error:
 
 
 void synapse_destroy(Synapse* synapse) {
-	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
-
-	// because the synaptic_class will be shared, to save memory, we cannot free it here
-	queue_destroy(synapse->spike_times);
+	synapse_reset(synapse);
 	free(synapse);
 
 error:
@@ -90,7 +123,6 @@ error:
 
 
 Status synapse_add_spike_time(Synapse* synapse, uint32_t spike_time) {
-	Status status = FAIL;
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 	if_check(!queue_is_empty(synapse->spike_times), *(uint32_t*)queue_head(synapse->spike_times) < spike_time, "Spike should not be older then the head");
 	
@@ -98,10 +130,10 @@ Status synapse_add_spike_time(Synapse* synapse, uint32_t spike_time) {
 	spike_time += synapse->s_class->delay;
 	queue_enqueue(synapse->spike_times, &spike_time);
 
-	status = SUCCESS;
+	return SUCCESS;
 
 error:
-	return status;
+	return FAIL;
 }
 
 
@@ -130,10 +162,9 @@ error:
 
 
 Status synapse_step(Synapse* synapse, uint32_t simulation_time) {
-	Status status = FAIL;
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 
-	// check if their is a spike that arrives at this time step
+	// check if there is a spike that arrives at this time step
 	if (!queue_is_empty(synapse->spike_times) && *(uint32_t*)queue_head(synapse->spike_times) == simulation_time) {
 		synapse->g += 1.0f;
 		queue_dequeue(synapse->spike_times);
@@ -150,9 +181,9 @@ Status synapse_step(Synapse* synapse, uint32_t simulation_time) {
 		}
 	}
 
-	status = SUCCESS;
+	return SUCCESS;
 
 error:
-	return status;
+	return FAIL;
 }
 

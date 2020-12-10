@@ -23,6 +23,14 @@ typedef struct SynapseClass {
 } SynapseClass;
 
 /*
+* General function to verify that a synapse class is valid
+* A @synapse_class is valid if:
+* 1. @synapse_class != NULL
+* 2. @synapse_class->type = CONDUCTANCE_SYNAPCE or @synapse_class->type = VOLTAGE_DEPENDENT_SYNAPSE
+*/
+Status synapse_class_is_valid(SynapseClass* synapse_class);
+
+/*
 Preconditions: @tau_ms > 0
 			   @simulation_step_ms > 0
 			   @type == CONDUCTANCE_SYNPASE || @type == VOLTAGE_DEPENDENT_SYNAPSE
@@ -58,10 +66,9 @@ typedef struct Synapse {
 Status synapse_is_valid(Synapse* synapse);
 
 // USed to fill a neuron structure already allocated
+// NOt responsible for @synapse and @s_class
 Status synapse_init(Synapse* synapse, SynapseClass* s_class, float w);
-/*
-Preconditions: @s_class != NULL
-*/
+void synapse_reset(Synapse* synapse);
 Synapse* synapse_create(SynapseClass* s_class, float w);
 void synapse_destroy(Synapse* synapse);
 
@@ -69,10 +76,6 @@ void synapse_destroy(Synapse* synapse);
 Preconditions: @spike_time > queue_head(synapse->spike_times) - should never receive a spike older that I already have
 */
 Status synapse_add_spike_time(Synapse* synapse, uint32_t spike_time);
-
-/*
-Maybe add some u checks (if its in a expected range)
-*/
 float synapse_compute_PSC(Synapse* synapse, float u);
 
 Status synapse_step(Synapse* synapse, uint32_t simulation_time);
