@@ -5,7 +5,14 @@
 #include <errno.h>
 #include <string.h>
 
-typedef enum { SUCCESS = 0, FAIL = 1 } Status;
+
+typedef enum { SUCCESS = 0, FAIL = 1, FALSE = 0, TRUE = 1 } Status;
+
+// Helper error string generators
+#define invalid_argument(a) "INVALID @" a
+#define null_argument(a)	"NULL value for @" a
+#define init_argument(a)	"Could not initialize @" a
+
 
 #define errno_text() (errno == 0 ? "None" : strerror(errno))
 
@@ -23,12 +30,14 @@ typedef enum { SUCCESS = 0, FAIL = 1 } Status;
 #define debug(M, ...)
 #define check(A, M, ...)
 #define check_memory(A)
+#define if_check(C, T)
 
 #else
 
 #define debug(M, ...) fprintf(stderr, "[DEBUG] %s:%d: " M "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 #define check(A, M, ...) if (!(A)) { log_error(M, ##__VA_ARGS__); errno=0; goto error; }
 #define check_memory(A) check((A), "Out of Memory.")
+#define if_check(C, A, M, ...) if(C) { check(A, M, ##__VA_ARGS__) }
 
 #endif // __NDEBUG__
 

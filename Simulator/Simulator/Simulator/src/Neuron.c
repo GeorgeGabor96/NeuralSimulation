@@ -144,7 +144,6 @@ error:
 
 // TODO: maybe we can allocate from start the amount of input, output synapses we need -> more efficient use of memory
 Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
-	Status status = FAIL;
 	// the neuron can be invalid
 	check(neuron != NULL, null_argument("neuron"));
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
@@ -158,7 +157,7 @@ Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
 	neuron->n_class = neuron_class;
 	neuron->u = neuron_class->u_rest;
 
-	status = SUCCESS;
+	return SUCCESS;
 
 error:
 	// @neuron->in_synapses FAIL
@@ -169,7 +168,7 @@ error:
 		}
 		// NOTE: the called should manage the memory of @neuron
 	}
-	return status;
+	return FAIL;
 }
 
 
@@ -188,7 +187,7 @@ error:
 
 Neuron* neuron_create(NeuronClass* neuron_class) {
 	Neuron* neuron = NULL;
-	neuron = (Neuron*)malloc(sizeof(Neuron));
+	neuron = (Neuron*)calloc(1, sizeof(Neuron));
 	check_memory(neuron);
 
 	check(neuron_init(neuron, neuron_class) == SUCCESS, init_argument("neuron"));
@@ -205,6 +204,9 @@ error:
 
 
 void neuron_destroy(Neuron* neuron) {
+	// TODO: vezi ca fara acest check daca pusca in reset tu dai free si nu stiu daca asta se doreste
+	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
+
 	neuron_reset(neuron);
 	free(neuron);
 
@@ -220,7 +222,7 @@ Status neuron_add_in_synapse(Neuron* neuron, Synapse* synapse) {
 	
 	// NOTE: @neuron keeps internally its INPUT synapses, so copy its content and free it
 	check(vector_append(neuron->in_synapses, synapse) == SUCCESS, "Could not add new INPUT synapse");
-	free(synapse);
+	free(synapse); // do not delete the queue which was just copied in @neuron->in_synapses
 
 	status = SUCCESS;
 

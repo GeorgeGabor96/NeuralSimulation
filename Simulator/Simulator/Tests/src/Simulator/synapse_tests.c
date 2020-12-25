@@ -106,9 +106,10 @@ TestStatus synapse_destroy_test() {
 	TestStatus status = TEST_FAILED;
 	SynapseClass s_class;
 	float w = 1.0f;
+	s_class.type = CONDUCTANCE_SYNAPCE;
 	Synapse* synapse = synapse_create(&s_class, w);
 	Queue* spike_times = NULL;
-
+	
 	// call with @synapse = NULL
 	synapse_destroy(NULL);
 	
@@ -137,6 +138,7 @@ TestStatus synapse_add_spike_time_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
 	SynapseClass s_class;
+	s_class.type = CONDUCTANCE_SYNAPCE;
 	s_class.delay = 0u;
 	float w = 1.0f;
 	Synapse* synapse = synapse_create(&s_class, w);
@@ -189,6 +191,7 @@ TestStatus synapse_compute_PSC_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
 	SynapseClass s_class;
+	s_class.type = CONDUCTANCE_SYNAPCE;
 	s_class.E = 0.0f;
 	float w = 1.5f;
 	float u = 2.3f;
@@ -244,6 +247,7 @@ TestStatus synapse_step_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
 	SynapseClass s_class;
+	s_class.type = CONDUCTANCE_SYNAPCE;
 	s_class.delay = 1u;
 	s_class.tau_exp = 0.5f;
 

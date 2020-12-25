@@ -106,7 +106,7 @@ TestStatus neuron_create_test() {
 	// call normal
 	neuron = neuron_create(&n_class);
 	assert(neuron != NULL, "@neuron should not be NULL");
-	assert(neuron->in_synapses_refs != NULL, "@neuron->in_synapses_refs should not be NULL");
+	assert(neuron->in_synapses != NULL, "@neuron->in_synapses should not be NULL");
 	assert(neuron->out_synapses_refs != NULL, "@neuron->out_synapses_refs should not be NULL");
 	assert(neuron->n_class == &n_class, "@neuron->n_class should be %p not %p", &n_class, neuron->n_class);
 	assert(neuron->u == n_class.u_rest, "@neuron->u should be %f not %f", n_class.u_rest, neuron->u);
@@ -128,16 +128,16 @@ TestStatus neuron_destroy_test() {
 	n_class.type = LIF_NEURON;
 	neuron_class_set_LIF_parameters(&n_class, LIF_U_TH, LIF_U_REST, LIF_R, LIF_C);
 	Neuron* neuron = neuron_create(&n_class);
-	Vector* in_synapses = neuron->in_synapses_refs;
+	Vector* in_synapses = neuron->in_synapses;
 	Vector* out_synapses = neuron->out_synapses_refs;
 
 	// call with @neuron = NULL
 	neuron_destroy(NULL);
 
-	// call with @neuron->in_synapses_refs = NULL
-	neuron->in_synapses_refs = NULL;
+	// call with @neuron->in_synapses = NULL
+	neuron->in_synapses = NULL;
 	neuron_destroy(neuron);
-	neuron->in_synapses_refs = in_synapses;
+	neuron->in_synapses = in_synapses;
 
 	// call with @neuron->out_synapses_refs = NULL
 	neuron->out_synapses_refs = NULL;
@@ -158,7 +158,7 @@ TestStatus neuron_add_in_synapse_test() {
 	n_class.type = LIF_NEURON;
 	neuron_class_set_LIF_parameters(&n_class, LIF_U_TH, LIF_U_REST, LIF_R, LIF_C);
 	Neuron* neuron = neuron_create(&n_class);
-	Vector* in_synapses = neuron->in_synapses_refs;
+	Vector* in_synapses = neuron->in_synapses;
 	Vector* out_synapses = neuron->out_synapses_refs;
 	
 	// create tests synapses
@@ -177,10 +177,10 @@ TestStatus neuron_add_in_synapse_test() {
 	// call with @neuron = NULL
 	assert(neuron_add_in_synapse(NULL, sy1) == FAIL, "Should fail for @neuron = NULL");
 
-	// call with @neuron->in_synapses_refs = NULL
-	neuron->in_synapses_refs = NULL;
-	assert(neuron_add_in_synapse(neuron, sy1) == FAIL, "Should fail for @neuron->in_synapses_refs = NULL");
-	neuron->in_synapses_refs = in_synapses;
+	// call with @neuron->in_synapses = NULL
+	neuron->in_synapses = NULL;
+	assert(neuron_add_in_synapse(neuron, sy1) == FAIL, "Should fail for @neuron->in_synapses = NULL");
+	neuron->in_synapses = in_synapses;
 
 	// call with @neuron->out_synapses_refs = NULL
 	neuron->out_synapses_refs = NULL;
@@ -190,14 +190,12 @@ TestStatus neuron_add_in_synapse_test() {
 	// normal calls
 	assert(neuron_add_in_synapse(neuron, sy1) == SUCCESS, "Should work for sy1");
 	assert(neuron_add_in_synapse(neuron, sy2) == SUCCESS, "Should work for sy2");
-	assert(neuron->in_synapses_refs->length == 2, "@neuron->in_synapses_refs->lenght should be 2 not %u", neuron->in_synapses_refs->length);
+	assert(neuron->in_synapses->length == 2, "@neuron->in_synapses->lenght should be 2 not %u", neuron->in_synapses->length);
 	
 	// check synapses
-	sy = *(Synapse**)vector_get(neuron->in_synapses_refs, 0);
-	assert(sy == sy1, "@sy should be %p not %p", sy1, sy);
+	sy = (Synapse*)vector_get(neuron->in_synapses, 0);
 	assert(memcmp(sy, &sy1_copy, sizeof(Synapse)) == 0, "@sy and @sy1_copy should have the same values");
-	sy = *(Synapse**)vector_get(neuron->in_synapses_refs, 1);
-	assert(sy == sy2, "@sy should be %p not %p", sy2, sy);
+	sy = (Synapse*)vector_get(neuron->in_synapses, 1);
 	assert(memcmp(sy, &sy2_copy, sizeof(Synapse)) == 0, "@sy and @sy2_copy should have the same values");
 
 	status = TEST_SUCCESS;
@@ -205,12 +203,6 @@ TestStatus neuron_add_in_synapse_test() {
 error:
 	if (neuron != NULL) {
 		neuron_destroy(neuron);
-	}
-	if (sy1 != NULL) {
-		synapse_destroy(sy1);
-	}
-	if (sy2 != NULL) {
-		synapse_destroy(sy2);
 	}
 
 	return status;
@@ -224,7 +216,7 @@ TestStatus neuron_add_out_synapse_test() {
 	n_class.type = LIF_NEURON;
 	neuron_class_set_LIF_parameters(&n_class, LIF_U_TH, LIF_U_REST, LIF_R, LIF_C);
 	Neuron* neuron = neuron_create(&n_class);
-	Vector* in_synapses = neuron->in_synapses_refs;
+	Vector* in_synapses = neuron->in_synapses;
 	Vector* out_synapses = neuron->out_synapses_refs;
 
 	// create tests synapses
@@ -243,10 +235,10 @@ TestStatus neuron_add_out_synapse_test() {
 	// call with @neuron = NULL
 	assert(neuron_add_out_synapse(NULL, sy1) == FAIL, "Should fail for @neuron = NULL");
 
-	// call with @neuron->in_synapses_refs = NULL
-	neuron->in_synapses_refs = NULL;
-	assert(neuron_add_out_synapse(neuron, sy1) == FAIL, "Should fail for @neuron->in_synapses_refs = NULL");
-	neuron->in_synapses_refs = in_synapses;
+	// call with @neuron->in_synapses = NULL
+	neuron->in_synapses = NULL;
+	assert(neuron_add_out_synapse(neuron, sy1) == FAIL, "Should fail for @neuron->in_synapses = NULL");
+	neuron->in_synapses = in_synapses;
 
 	// call with @neuron->out_synapses_refs = NULL
 	neuron->out_synapses_refs = NULL;
@@ -256,7 +248,7 @@ TestStatus neuron_add_out_synapse_test() {
 	// normal calls
 	assert(neuron_add_out_synapse(neuron, sy1) == SUCCESS, "Should work for sy1");
 	assert(neuron_add_out_synapse(neuron, sy2) == SUCCESS, "Should work for sy2");
-	assert(neuron->out_synapses_refs->length == 2, "@neuron->in_synapses_refs->lenght should be 2 not %u", neuron->in_synapses_refs->length);
+	assert(neuron->out_synapses_refs->length == 2, "@neuron->in_synapses->lenght should be 2 not %u", neuron->in_synapses->length);
 
 	// check synapses
 	sy = *(Synapse**)vector_get(neuron->out_synapses_refs, 0);

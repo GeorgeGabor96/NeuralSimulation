@@ -23,20 +23,38 @@ typedef enum { LAYER_INPUT = 0, LAYER_FULLY_CONNECTED = 1 } LayerType;
 struct Layer {
 	LayerType type;
 	Array* neurons;				 // managed by the layer
-	Layer_link* link;			 // pointer to link function
+	Layer_link link;			 // pointer to link function
 	NeuronClass* neuron_class;   // managed by the simulator
 	SynapseClass* synapse_class; // managed by the simulator
+	char* name;
+	char** input_names;
 };
+
+/*
+* A @layer is valid if:
+* 1. @layer != NULL
+* 2. @layer->neuron_class != NULL
+* 3. @layer->synapse_class != NULL
+* 4. @layer->neurons != NULL
+*/
+Status layer_is_valid(Layer* layer);
+
 
 // if you have the memory allocated
 Status layer_init(Layer* layer, LayerType type, uint32_t n_neurons, NeuronClass* neuron_class, SynapseClass* synapse_class);
+Status layer_init_fully_connected(Layer* layer, uint32_t n_neurons, NeuronClass* neuron_class, SynapseClass* synapse_class);
+Status layer_init_input(Layer* layer, uint32_t n_neurons, NeuronClass* neuron_class, SynapseClass* synapse_class);
+
+Layer* layer_create(LayerType type, uint32_t n_neurons, NeuronClass* neuron_class, SynapseClass* synapse_class);
+Layer* layer_create_fully_connected(uint32_t n_neurons, NeuronClass* neuron_class, SynapseClass* synapse_class);
+Layer* layer_create_input(uint32_t n_neurons, NeuronClass* neuron_class, SynapseClass* synapse_class);
+
 
 /*
 * Preconditions: @layer is valid
 */
 void layer_reset(Layer* layer);
 
-Layer* layer_create(LayerType type, uint32_t n_neurons, NeuronClass* neuron_class, Synapse* synapse_class);
 void layer_destroy(Layer* layer);
 Status layer_is_valid(Layer* layer);
 

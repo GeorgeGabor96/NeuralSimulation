@@ -52,6 +52,11 @@ error:
 }
 
 
+SynapseClass* synapse_class_create_default() {
+	return synapse_class_create(SYNAPSE_REV_POTENTIAL_DF, SYNAPSE_TAU_MS_DF, SYNAPSE_DELAY_DF, SYNAPSE_TYPE_DF, SYNAPSE_SIMULATION_TIME_MS_DF);
+}
+
+
 void synapse_class_destroy(SynapseClass* synapse_class) {
 	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
 	free(synapse_class);
@@ -114,6 +119,9 @@ error:
 
 
 void synapse_destroy(Synapse* synapse) {
+	// TODO: vezi ca fara acest check daca pusca in reset tu dai free si nu stiu daca asta se doreste
+	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
+
 	synapse_reset(synapse);
 	free(synapse);
 

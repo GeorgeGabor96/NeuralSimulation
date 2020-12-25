@@ -22,6 +22,13 @@ typedef struct SynapseClass {
 	// integration step -> don't know whats with that yet
 } SynapseClass;
 
+
+#define SYNAPSE_REV_POTENTIAL_DF 0.0f
+#define SYNAPSE_TAU_MS_DF -1.0f / (float)log(0.5f)
+#define SYNAPSE_DELAY_DF 1
+#define SYNAPSE_TYPE_DF CONDUCTANCE_SYNAPCE
+#define SYNAPSE_SIMULATION_TIME_MS_DF 1.0f
+
 /*
 * General function to verify that a synapse class is valid
 * A @synapse_class is valid if:
@@ -36,6 +43,7 @@ Preconditions: @tau_ms > 0
 			   @type == CONDUCTANCE_SYNPASE || @type == VOLTAGE_DEPENDENT_SYNAPSE
 */
 SynapseClass* synapse_class_create(float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms);
+SynapseClass* synapse_class_create_default(); // mostly for tests
 
 /*
 Preconditions: @synapse_class != NULL

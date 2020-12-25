@@ -9,6 +9,7 @@
 #include "Simulator/synapse_tests.h"
 #include "Simulator/vector_tests.h"
 #include "Simulator/neuron_tests.h"
+#include "Simulator/network_tests.h"
 
 
 TestInfo tests[] = {
@@ -39,7 +40,7 @@ TestInfo tests[] = {
 	{ vector_destroy_test, "vector_destroy_test" },
 	{ vector_append_test, "vector_append_test" },
 
-	// SYNAPSE
+	// SYNAPSE --> TODO: Need to be rethinked
 	{ synapse_class_create_test, "synapse_class_create_test" },
 	{ synapse_class_destroy_test, "synapse_class_destroy_test" },
 	{ synapse_create_test, "synapse_create_test" },
@@ -48,7 +49,7 @@ TestInfo tests[] = {
 	{ synapse_compute_PSC_test, "synapse_compute_PSC_test" },
 	{ synapse_step_test, "synapse_step_test" },
 
-	// NEURON
+	// NEURON --> TODO: Need to be rethinked
 	{ neuron_class_create_test, "neuron_class_create_test" },
 	{ neuron_class_destroy_test, "neuron_class_destroy_test" },
 	{ neuron_class_set_LIF_parameters_test, "neuron_class_set_LIF_parameters_test" },
@@ -57,6 +58,15 @@ TestInfo tests[] = {
 	{ neuron_add_in_synapse_test, "neuron_add_in_synapse_test" },
 	{ neuron_add_out_synapse_test, "neuron_add_out_synapse_test" },
 	{ neuron_step_test, "neuron_step_test" },
+
+	// NETWORK
+	{ network_create_test, "network_create_test" },
+	{ network_destroy_test, "network_destroy_test" },
+	{ network_is_ready_test, "network_is_ready_test" },
+	{ network_compile_test, "network_compile_test" },
+	{ network_get_layer_by_idx_test, "network_get_layer_by_idx_test" },
+	{ network_add_layer_test, "network_add_layer_test" },
+	{ network_step_test, "network_step_test" }
 };
 
 

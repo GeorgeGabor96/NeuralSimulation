@@ -2,12 +2,29 @@
 
 #include <stdlib.h>
 
+
+/*************************************************************
+* CHECKS FUNCTIONS
+*************************************************************/
+Status layer_is_valid(Layer* layer) {
+	check(layer != NULL, null_argument("layer"));
+	check(layer->link != NULL, "NULL value for @layer->link");
+	check(layer->neuron_class != NULL, null_argument("layer->neuron_class"));
+	check(layer->synapse_class != NULL, null_argument("layer->synapse_class"));
+	check(layer->neurons != NULL, null_argument("layer->neurons"));
+
+	return TRUE;
+
+error:
+	return FALSE;
+}
+
 // DO I NEED A NEURON TO HOLD INFORMATION ABOUT ITS CLASS?, In sensul ca am neuroni pe layer de acelasi tip, nu pot tine asta in layer?? direct
 
 Status layer_init(Layer* layer, LayerType type, uint32_t n_neurons, NeuronClass* neuron_class, SynapseClass* synapse_class) {
-	check(layer != NULL, "NULL value for @layer");
-	check(neuron_class != NULL, "NULL value for @neuron_class");
-	check(synapse_class != NULL, "NULL value for @synapse_class");
+	check(layer != NULL, null_argument("layer"));
+	check(neuron_class != NULL, null_argument("neuron_class"));
+	check(synapse_class != NULL, null_argument("synapse_class"));
 
 	layer->neurons = array_create(n_neurons, sizeof(Neuron));
 	check_memory(layer->neurons);
@@ -18,7 +35,7 @@ Status layer_init(Layer* layer, LayerType type, uint32_t n_neurons, NeuronClass*
 
 	uint32_t i = 0;
 	for (i = 0; i < n_neurons; ++i) {
-		check(SUCCESS == neuron_init(array_get(layer->neurons, i), neuron_class), "Failed to init neuron");
+		check(SUCCESS == neuron_init(array_get(layer->neurons, i), neuron_class), "Failed to init neuron %d", i);
 	}
 
 	switch (type)
@@ -47,11 +64,21 @@ error:
 }
 
 
-Layer* layer_create(LayerType type, uint32_t n_neurons, NeuronClass* neuron_class, Synapse* synapse_class) {
+Status layer_init_fully_connected(Layer* layer, uint32_t n_neurons, NeuronClass* neuron_class, SynapseClass* synapse_class) {
+	return layer_init(layer, LAYER_FULLY_CONNECTED, n_neurons, neuron_class, synapse_class);
+}
+
+
+Status layer_init_input(Layer* layer, uint32_t n_neurons, NeuronClass* neuron_class, SynapseClass* synapse_class) {
+	return layer_init(layer, LAYER_INPUT, n_neurons, neuron_class, synapse_class);
+}
+
+
+Layer* layer_create(LayerType type, uint32_t n_neurons, NeuronClass* neuron_class, SynapseClass* synapse_class) {
 	Layer* layer = (Layer*)malloc(sizeof(Layer));
 	check_memory(layer);
 
-	check(layer_init(layer, type, n_neurons, neuron_class, synapse_class) == TRUE, "Could not initialize @layer");
+	check(layer_init(layer, type, n_neurons, neuron_class, synapse_class) == SUCCESS, "Could not initialize @layer");
 
 	return layer;
 
@@ -64,17 +91,13 @@ error:
 }
 
 
-Status layer_is_valid(Layer* layer) {
-	check(layer != NULL, "NULL value for @layer");
-	check(layer->link != NULL, "NULL value for @layer->link");
-	check(layer->neurons != NULL, "NULL value for @layer->neurons");
-	check(layer->neuron_class != NULL, "NULL value for @layer->neuron_class");
-	check(layer->synapse_class != NULL, "NULL value for @layer->synapse_class");
+Layer* layer_create_fully_connected(uint32_t n_neurons, NeuronClass* neuron_class, SynapseClass* synapse_class) {
+	return layer_create(LAYER_FULLY_CONNECTED, n_neurons, neuron_class, synapse_class);
+}
 
-	return TRUE;
 
-error:
-	return FALSE;
+Layer* layer_create_input(uint32_t n_neurons, NeuronClass* neuron_class, SynapseClass* synapse_class) {
+	return layer_create(LAYER_INPUT, n_neurons, neuron_class, synapse_class);
 }
 
 
@@ -150,23 +173,53 @@ Status layer_link_fc(Layer* layer, Layer* input_layer) {
 	Neuron* neuron_input_layer = NULL;
 	Synapse* synapse = NULL;
 
-	check(layer_is_valid(layer) == TRUE, "@layer is not valid");
-	check(layer_is_valid(input_layer) == TRUE < "@input_layer is not valid");
+	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+	check(layer_is_valid(input_layer) == TRUE, invalid_argument("input_layer"));
 
 	for (i = 0; i < layer->neurons->length; ++i) {
-		neuron_layer = array_get_cast(layer->neurons, i, Neuron*);
+		neuron_layer = (Neuron*)array_get(layer->neurons, i);
 
 		for (j = 0; j < input_layer->neurons->length; ++j) {
-			neuron_input_layer = array_get_cast(input_layer->neurons, j, Neuron*);
+			neuron_input_layer = (Neuron*)array_get(input_layer->neurons, j);
 
-			// POSIBLE OPTIMIZATION:
-
+			// TODO: POSIBLE OPTIMIZATION: can allocate all in one go, but not now
+			// NOTE: the add_in_synapse does copy the synapse into continuous memory
+			// so it does not matter the way in which it is initially alocated
 			synapse = synapse_create(layer->synapse_class, 1.0f);
-			check(synapse != NULL, "Could not allocate")
-			// I can do one big alloc
+			check(synapse != NULL, "Could not allocate");
+
+			// copy the synapse into the @neuron_layer and get it back to have the reference fot he @neuron_input_layer
+			neuron_add_in_synapse(neuron_layer, synapse);
+			synapse = (Synapse*)vector_get(neuron_layer->in_synapses, neuron_layer->in_synapses->length - 1);
+			check(synapse != NULL, null_argument("synapse"));
+			neuron_add_out_synapse(neuron_input_layer, synapse);
 		}
 	}
 
 error:
+	// TODO: currently if a synapse is not well allocated the system goes on
+	// need to dealocate the memory
+
 	return FALSE;
+}
+
+
+Status layer_step(Layer* layer, uint32_t time) {
+	// NOTE: every neuron is updating the state of its input synapse
+	// => only need to care about neurons state here
+	// TODO: maybe if this layer is the input???
+
+	uint32_t i = 0;
+	Neuron* neuron = NULL;
+
+	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+
+	for (i = 0; i < layer->neurons->length; ++i) {
+		neuron = (Neuron*)array_get(layer->neurons, i);
+		check(neuron != NULL, null_argument("neuron"));
+		neuron_step(neuron, time);
+	}
+
+error:
+	return FAIL;
 }

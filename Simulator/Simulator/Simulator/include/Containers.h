@@ -8,7 +8,7 @@
 
 /*-----------TO DO-----------------*/
 // La unele teste vezi ca ai dat destroy direct daca setai ceva intern pe NULL sa verifici o preconditie, daca chiar nu era ok ar pusca
-
+// document when to use each of them
 
 /*************************************************************
 * Array Functionality
