@@ -41,17 +41,24 @@ TestStatus network_step_test() {
 	Network* network = network_create();
 	NeuronClass* neuron_class = neuron_class_create(LIF_NEURON);
 	SynapseClass* synapse_class = synapse_class_create_default();
+	Layer dummy_layer;
 
-	network_add_layer(network, layer_create(LAYER_FULLY_CONNECTED, 100, neuron_class, synapse_class));
-	network_add_layer(network, layer_create(LAYER_FULLY_CONNECTED, 10, neuron_class, synapse_class));
-
-	// verify that all the layers are ok
-	check(network_is_ready(network) == TRUE, "Should be ready");
+	// build network
+	layer_init(&dummy_layer, LAYER_FULLY_CONNECTED, 1, neuron_class, synapse_class);
+	network_add_layer(network, &dummy_layer, TRUE, FALSE);
+	
+	layer_init(&dummy_layer, LAYER_FULLY_CONNECTED, 1, neuron_class, synapse_class);
+	network_add_layer(network, &dummy_layer, FALSE, TRUE);
 
 	// build connections
 	network_compile(network);
 
+	// build input for network
+
+
 	network_step(network, 0);
+
+
 
 	status = TEST_SUCCESS;
 error:

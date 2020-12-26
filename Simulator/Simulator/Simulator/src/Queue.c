@@ -4,6 +4,25 @@
 #include "debug.h"
 
 
+/*************************************************************
+* CHECKS FUNCTIONS
+*************************************************************/
+Status queue_is_valid(Queue* queue) {
+	check(queue != NULL, null_argument("queue"));
+	check(array_is_valid(&(queue->array)) == TRUE, invalid_argument("queue->array"));
+	check(queue->length <= queue->array.length, "@queue->length is bigger than @queue->array.length");
+	check(queue->head < queue->array.length, "@queue->haed >= @queue->array.length");
+	check(queue->tail < queue->array.length, "@queue->tail >= @queue->array.length");
+
+	return TRUE;
+error:
+	return FALSE;
+}
+
+
+/*************************************************************
+* Queue Functionality
+*************************************************************/
 Queue* queue_create(uint32_t length, size_t element_size) {
 	Queue* queue = (Queue*)malloc(sizeof(Queue));
 	check_memory(queue);
@@ -27,9 +46,10 @@ error:
 }
 
 
-void queue_destroy(Queue* queue) {
-	check(queue != NULL, "NULL value for @queue");
-	check(queue->array.data != NULL, "NULL value for @queue->array.data");
+void queue_destroy(Queue* queue, ElemReset reset) {
+	check(queue_is_valid(queue) == TRUE, invalid_argument("queue"));
+	array_reset(&(queue->array), reset);
+	free(queue->array.data);
 	free(queue);
 
 error:
@@ -39,8 +59,7 @@ error:
 
 Status queue_enqueue(Queue* queue, void* data) {
 	Status status = FAIL;
-	check(queue != NULL, "NULL value for @queue");
-	check(queue->array.data != NULL, "NULL value for @queue");
+	check(queue_is_valid(queue) == TRUE, invalid_argument("queue"));
 	check(data != NULL, "NULL value for @data");
 
 	if (queue_is_full(queue)) {
@@ -71,8 +90,7 @@ error:
 
 void* queue_dequeue(Queue* queue) {
 	void* element = NULL;
-	check(queue != NULL, "NULL value for queue");
-	check(queue->array.data != NULL, "NULL value for @queue");
+	check(queue_is_valid(queue) == TRUE, invalid_argument("queue"));
 
 	if (!queue_is_empty(queue)) {
 		element = array_get_fast(&(queue->array), (queue->head)++);
@@ -89,8 +107,7 @@ error:
 
 void* queue_head(Queue* queue) {
 	void* element = NULL;
-	check(queue != NULL, "NULL value for @queue");
-	check(queue->array.data != NULL, "NULL value for @queue");
+	check(queue_is_valid(queue) == TRUE, invalid_argument("queue"));
 
 	if (!queue_is_empty(queue)) {
 		element = array_get_fast(&(queue->array), queue->head);

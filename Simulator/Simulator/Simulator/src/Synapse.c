@@ -90,7 +90,7 @@ error:
 void synapse_reset(Synapse* synapse) {
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 
-	queue_destroy(synapse->spike_times);
+	queue_destroy(synapse->spike_times, NULL);
 	synapse->s_class = NULL;
 	// NOTE: synapse->s_class should be managed by caller
 

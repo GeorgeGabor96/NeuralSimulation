@@ -23,7 +23,7 @@ TestStatus queue_create_test() {
 	status = TEST_SUCCESS;
 
 error:
-	queue_destroy(queue);
+	queue_destroy(queue, NULL);
 	return status;
 }
 
@@ -35,16 +35,16 @@ TestStatus queue_destroy_test() {
 	void* data = NULL;
 
 	// call with queue = NULL
-	queue_destroy(NULL);
+	queue_destroy(NULL, NULL);
 
 	// call with queue->array.data = NULL
 	data = queue->array.data;
 	queue->array.data = NULL;
-	queue_destroy(queue);
+	queue_destroy(queue, NULL);
 	queue->array.data = data;
 
 	// normal call
-	queue_destroy(queue);
+	queue_destroy(queue, NULL);
 
 	status = TEST_SUCCESS;
 
@@ -121,7 +121,7 @@ TestStatus queue_dequeue_test() {
 	status = TEST_SUCCESS;
 
 error:
-	queue_destroy(queue);
+	queue_destroy(queue, NULL);
 	return status;
 }
 
@@ -212,7 +212,7 @@ TestStatus queue_enqueue_test() {
 	status = TEST_SUCCESS;
 
 error:
-	queue_destroy(queue);
+	queue_destroy(queue, NULL);
 	return status;
 }
 
@@ -280,6 +280,6 @@ TestStatus queue_head_test() {
 
 	// cleanup
 error:
-	queue_destroy(queue);
+	queue_destroy(queue, NULL);
 	return status;
 }

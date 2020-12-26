@@ -4,6 +4,23 @@
 #include <stdlib.h>
 
 
+/*************************************************************
+* CHECKS FUNCTIONS
+*************************************************************/
+Status vector_is_valid(Vector* vector) {
+	check(vector != NULL, null_argument("vector"));
+	check(array_is_valid(&(vector->array)) == TRUE, invalid_argument("vector->array"));
+	check(vector->length <= vector->array.length, "@vector->length is bigger than @vector->array.length");
+
+	return TRUE;
+error:
+	return FALSE;
+}
+
+
+/*************************************************************
+* Vector Functionality
+*************************************************************/
 Vector* vector_create(uint32_t length, size_t element_size) {
 	Vector* vector = (Vector*)malloc(sizeof(Vector));
 	check_memory(vector);
@@ -25,9 +42,9 @@ error:
 }
 
 
-void vector_destroy(Vector* vector) {
-	check(vector != NULL, "NULL value for @vector");
-	check(vector->array.data != NULL, "NULL value for @vector->array.data");
+void vector_destroy(Vector* vector, ElemReset reset) {
+	check(vector_is_valid(vector) == TRUE, invalid_argument("vector"));
+	array_reset(&(vector->array), reset);
 	free(vector->array.data);
 	free(vector);
 
@@ -38,13 +55,12 @@ error:
 
 Status vector_set(Vector* vector, uint32_t index, void* data) {
 	return array_set(&(vector->array), index, data);
-
 }
+
 
 Status vector_append(Vector* vector, void* data) {
 	Status status = FAIL;
-	check(vector != NULL, "NULL value for @vector");
-	check(vector->array.data != NULL, "NULL value for @vector->array.data");
+	check(vector_is_valid(vector) == TRUE, invalid_argument("vector"));
 	check(data != NULL, "NULL value for @data");
 
 	if (vector_is_full(vector)) {

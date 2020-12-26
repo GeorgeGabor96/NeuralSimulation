@@ -20,37 +20,42 @@ typedef struct Array {
 	uint8_t* data;
 } Array;
 
-#define ARRAY_EXPAND_RATE 100
+#define ARRAY_EXPAND_RATE 100 // TODO: if this is too much consider using a doubleling or some value per array that you give in the create
 #define array_get_fast(a, i) ((a)->data + (a)->element_size * (i))
 #define array_set_fast(a, i, d) memcpy((a)->data + (a)->element_size * (i), (void*) (d), (a)->element_size)
 #define array_get_cast(a, i, t) ((t) array_get(a, i))
 
+
+/*
+Verify that an @array is valid, meaning:
+1. array != NULL
+2. arra->data != NULL
+*/
+Status array_is_valid(Array* array);
+
+/*
+length - number of elements in the array
+element_size - the size of an element
+*/
 Array* array_create(uint32_t length, size_t element_size);
 
 /*
-Preconditions:	@array != NULL
-				@array->data != NULL
+reset - function that knows how to free the memory inside an element (not the memory of the element itself)
+NOTE: if elements are simple (ex: int) and no special deallocation is required, pass NULL to @destroy
 */
-void array_destroy(Array* array);
+typedef void (*ElemReset) (void* elem);
+// resets the content of the @array->data, @array remains valid
+void array_reset(Array* array, ElemReset reset);
+// completely destroys the @array
+void array_destroy(Array* array, ElemReset reset);
 
-/*
-Preconditions: @array != NULL
-               @index < @array->max_length
-			   @array->data != NULL
-*/
 void* array_get(Array* array, uint32_t index);
 
-/*
-Preconditions: @array != NULL
-			   @array->data != NULL
-			   @index < @array->max_length
-			   @data != NULL
-*/
 Status array_set(Array* array, uint32_t index, void* data);
 
 /*
-Preconditions: @array != NULL
-			   @array->data != NULL
+Increases the number of elements in @array by ARRAY_EXPAND_RATE
+TODO: maybe it is better to use a more personalised value here, don't know, this may be sufficient
 */
 Status array_expand(Array* array);
 
@@ -69,36 +74,27 @@ typedef struct Stack {
 #define stack_pop_cast(s, t) ((t) stack_pop(s))
 #define stack_top_cast(s, t) ((t) stack_top(s))
 
+/*
+Verify that the @stack is valid, meaning:
+1. stack != NULL
+2. stack->array is valid
+3. stack->top <= stack->array.length
+*/
+Status stack_is_valid(Stack* stack);
+
 Stack* stack_create(uint32_t length, size_t element_size);
 
-/*
-Preconditions:	@stack != NULL
-				@stack->array.data != NULL
-*/
-void stack_destroy(Stack* stack);
+void stack_destroy(Stack* stack, ElemReset reset);
 
-/*
-Preconditions:	@stack != NULL
-				@stack->array.data != NULL
-				@data != NULL
-*/
 Status stack_push(Stack* stack, void* data);
 
-/*
-Preconditions:	@stack != NULL
-				@stack->array.data != NULL
-*/
 void* stack_pop(Stack* stack);
 
-/*
-Preconditions:	@stack != NULL
-				@stack->array.data != NULL
-*/
 void* stack_top(Stack* stack);
 
 
 /*************************************************************
-* Stack Functionality
+* Queue Functionality
 *************************************************************/
 typedef struct Queue {
 	uint32_t length;
@@ -112,31 +108,24 @@ typedef struct Queue {
 #define queue_dequeue_cast(q, t) ((t) queue_dequeue(q))
 #define queue_head_cast(q, t) ((t) queue_head(q))
 
+/*
+Verify that a queue is in a valid state, meaning:
+1. queue != NULL
+2. queue->array is valid
+3. queue->length <= queue->array.length
+4. queue->head < queue->array.length
+5. queue->tail < queue->array.length
+*/
+Status queue_is_valid(Queue* queue);
+
 Queue* queue_create(uint32_t length, size_t element_size);
 
-/*
-Preconditions:	@queue != NULL
-				@queue->array.data != NULL
-*/
-void queue_destroy(Queue* queue);
+void queue_destroy(Queue* queue, ElemReset reset);
 
-/*
-Preconditions:	@queue != NULL
-				@queue->array.data != NULL
-				@data != NULL
-*/
 Status queue_enqueue(Queue* queue, void* data);
 
-/*
-Preconditions:	@queue != NULL
-				@queue->array.data != NULL
-*/
 void* queue_dequeue(Queue* queue);
 
-/*
-Preconditions:	@queue != NULL
-				@queue->array.data != NULL
-*/
 void* queue_head(Queue* queue);
 
 
@@ -152,32 +141,22 @@ typedef struct Vector {
 
 #define vector_is_full(v) ((v)->length == (v)->array.length)
 
+/*
+Verify that @vector is valid, meaning:
+1. vector != NULL
+2. vector->array is valid
+3. vector->length <= vector->array.length
+*/
+Status vector_is_valid(Vector* vector);
+
 Vector* vector_create(uint32_t length, size_t element_size);
 
-/*
-Preconditions:	@vector != NULL
-				@vector->array.data != NULL
-*/
-void vector_destroy(Vector* vector);
+void vector_destroy(Vector* vector, ElemReset reset);
 
-/*
-Preconditions:	@vector != NULL
-				@vector->array.data != NULL
-				@data != NULL
-*/
 Status vector_set(Vector* vector, uint32_t index, void* data);
 
-/*
-Preconditions:	@vector != NULL
-				@vector->array.data != NULL
-				@data != NULL
-*/
 Status vector_append(Vector* vector, void* data);
 
-/*
-Preconditions:	@vector != NULL
-				@vector->array.data != NULL;
-*/
 void* vector_get(Vector* vector, uint32_t index);
 
 

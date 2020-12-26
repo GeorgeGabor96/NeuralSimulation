@@ -25,7 +25,7 @@ TestStatus vector_create_test() {
 error:
 	// @vector->array.data failed
 	if (vector != NULL) {
-		free(vector);
+		vector_destroy(vector, NULL);
 	}
 	return status;
 }
@@ -37,15 +37,15 @@ TestStatus vector_destroy_test() {
 	void* data = vector->array.data;
 
 	// call with @vector = NULL
-	vector_destroy(NULL);
+	vector_destroy(NULL, NULL);
 
 	// call with @vector->array.data = NULL
 	vector->array.data = NULL;
-	vector_destroy(vector);
+	vector_destroy(vector, NULL);
 	vector->array.data = data;
 
 	// call normal
-	vector_destroy(vector);
+	vector_destroy(vector, NULL);
 
 	return TEST_SUCCESS;
 }
@@ -100,7 +100,7 @@ error:
 		if (vector->array.data == NULL) {
 			vector->array.data = data;
 		}
-		vector_destroy(vector);
+		vector_destroy(vector, NULL);
 	}
 
 	return status;

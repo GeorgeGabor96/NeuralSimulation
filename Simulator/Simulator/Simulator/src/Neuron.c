@@ -164,7 +164,7 @@ error:
 	if (neuron != NULL) {
 		// @neuron->out_synapses FAIL
 		if (neuron->in_synapses != NULL) {
-			vector_destroy(neuron->in_synapses);
+			vector_destroy(neuron->in_synapses, synapse_reset);
 		}
 		// NOTE: the called should manage the memory of @neuron
 	}
@@ -175,8 +175,8 @@ error:
 void neuron_reset(Neuron* neuron) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
-	vector_destroy(neuron->in_synapses);
-	vector_destroy(neuron->out_synapses_refs);
+	vector_destroy(neuron->in_synapses, synapse_reset);
+	vector_destroy(neuron->out_synapses_refs, NULL);
 	neuron->n_class = NULL;
 	// NOTE: neuron_class should be managed by the called, may be common to multiple neurons
 

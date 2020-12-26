@@ -22,7 +22,7 @@ TestStatus array_create_test() {
 	// cleanup
 error:
 	if (array != NULL) {
-		array_destroy(array);
+		array_destroy(array, NULL);
 	}
 	return status;
 }
@@ -34,16 +34,16 @@ TestStatus array_destroy_test() {
 	void* data = NULL;
 
 	// call with array = NULL
-	array_destroy(NULL);
+	array_destroy(NULL, NULL);
 
 	// call with array->data = NULL
 	data = array->data;
 	array->data = NULL;
-	array_destroy(array);
+	array_destroy(array, NULL);
 	array->data = data;
 
 	// normal call
-	array_destroy(array);
+	array_destroy(array, NULL);
 
 	return TEST_SUCCESS;
 }
@@ -102,7 +102,7 @@ TestStatus array_get_test() {
 	// cleanup
 error:
 	if (array != NULL) {
-		array_destroy(array);
+		array_destroy(array, NULL);
 	}
 	return status;
 }
@@ -153,7 +153,7 @@ TestStatus array_set_test() {
 	// cleanup
 error:
 	if (array != NULL) {
-		array_destroy(array);
+		array_destroy(array, NULL);
 	}
 	return status;
 }
@@ -206,7 +206,7 @@ TestStatus array_expand_test() {
 	// cleanup
 error:
 	if (array != NULL) {
-		array_destroy(array);
+		array_destroy(array, NULL);
 	}
 	return status;
 }

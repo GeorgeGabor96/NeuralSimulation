@@ -4,6 +4,23 @@
 #include "debug.h"
 
 
+/*************************************************************
+* CHECKS FUNCTIONS
+*************************************************************/
+Status stack_is_valid(Stack* stack) {
+	check(stack != NULL, null_argument("stack"));
+	check(array_is_valid(&(stack->array)) == TRUE, invalid_argument("stack->array"));
+	check(stack->top <= stack->array.length, "@stack->top is bigger than @stack->array.length");
+
+	return TRUE;
+error:
+	return FALSE;
+}
+
+
+/*************************************************************
+* Stack Functionality
+*************************************************************/
 Stack* stack_create(uint32_t length, size_t element_size) {
 	Stack* stack = (Stack*)malloc(sizeof(Stack));
 	check_memory(stack);
@@ -25,9 +42,9 @@ error:
 }
 
 
-void stack_destroy(Stack* stack) {
-	check(stack != NULL, "NULL value for @stack");
-	check(stack->array.data != NULL, "NULL value for @stack->array.data");
+void stack_destroy(Stack* stack, ElemReset reset) {
+	check(stack_is_valid(stack), invalid_argument("stack"));
+	array_reset(&(stack->array), reset);
 	free(stack->array.data);
 	free(stack);
 
@@ -38,8 +55,7 @@ error:
 
 Status stack_push(Stack* stack, void* data) {
 	Status status = FAIL;
-	check(stack != NULL, "NULL value for @stack");
-	check(stack->array.data != NULL, "NULL value for @stack->array.data");
+	check(stack_is_valid(stack), invalid_argument("stack"));
 	check(data != NULL, "NULL value for @data");
 
 	if (stack_is_full(stack)) {
@@ -57,8 +73,7 @@ error:
 
 void* stack_pop(Stack* stack) {
 	void* element = NULL;
-	check(stack != NULL, "NULL value for @stack");
-	check(stack->array.data != NULL, "NULL value for @stack->array.data");
+	check(stack_is_valid(stack), invalid_argument("stack"));
 
 	if (!stack_is_empty(stack)) {
 		element = array_get_fast(&(stack->array), --(stack->top));
@@ -71,8 +86,7 @@ error:
 
 void* stack_top(Stack* stack) {
 	void* element = NULL;
-	check(stack != NULL, "NULL value for @stack");
-	check(stack->array.data != NULL, "NULL value for @stack->array.data");
+	check(stack_is_valid(stack), invalid_argument("stack"));
 
 	if (!stack_is_empty(stack)) {
 		element = array_get_fast(&(stack->array), stack->top - 1);

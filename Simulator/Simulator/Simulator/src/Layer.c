@@ -105,13 +105,7 @@ void layer_reset(Layer* layer) {
 	uint32_t i = 0;
 
 	check(layer_is_valid(layer) == TRUE, "@layer is not valid");
-
-	// need to reset every neuron
-	for (i = 0; i < layer->neurons->length; ++i) {
-		neuron_reset(array_get(layer->neurons, i));
-	}
-
-	array_destroy(layer->neurons);
+	array_destroy(layer->neurons, neuron_reset);
 
 error:
 	return;
@@ -129,19 +123,21 @@ error:
 }
 
 
-
-
 // this can be tested
 Array* layer_get_spikes(Layer* layer) {
 	Array* spikes = NULL;
+	Neuron* neuron = NULL;
 	uint32_t i = 0;
-	check(layer_is_valid(layer) == TRUE, "@layer is not valid");
-
-	spikes = array_create(layer->neurons->length, sizeof(uint8_t));
-	check(spikes != NULL, "@spikes is NULL");
+	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+	
+	spikes = array_create(layer->neurons->length, sizeof(Status));
+	check(spikes != NULL, null_argument("spikes"));
 
 	for (i = 0; i < layer->neurons->length; ++i) {
-		array_set(spikes, i, &(array_get_cast(layer->neurons, i, Neuron*)->spike));
+		neuron = (Neuron*)array_get(layer->neurons, i);
+		check(neuron != NULL, null_argument("neuron"));
+
+		array_set(spikes, i, &(neuron->spike));
 	}
 
 error:
@@ -152,13 +148,17 @@ error:
 // this can be tested
 Array* layer_get_voltages(Layer* layer) {
 	Array* voltages = NULL;
+	Neuron* neuron = NULL;
 	uint32_t i = 0;
 	check(layer_is_valid(layer) == TRUE, "@layer is not valid");
 
 	voltages = array_create(layer->neurons->length, sizeof(float));
 
 	for (i = 0; i < layer->neurons->length; ++i) {
-		array_set(voltages, i, &(array_get_cast(layer->neurons, i, Neuron*)->u));
+		neuron = (Neuron*)array_get(layer->neurons, i);
+		check(neuron != NULL, null_argument("neuron"));
+
+		array_set(voltages, i, &(neuron->u));
 	}
 
 error:
@@ -196,11 +196,13 @@ Status layer_link_fc(Layer* layer, Layer* input_layer) {
 		}
 	}
 
+	return SUCCESS;
+
 error:
 	// TODO: currently if a synapse is not well allocated the system goes on
 	// need to dealocate the memory
 
-	return FALSE;
+	return FAIL;
 }
 
 
@@ -220,6 +222,54 @@ Status layer_step(Layer* layer, uint32_t time) {
 		neuron_step(neuron, time);
 	}
 
+error:
+	return FAIL;
+}
+
+
+Status layer_set_spikes(Layer* layer, Array* spikes, uint32_t time) {
+	check(layer_is_valid(layer), invalid_argument("layer"));
+	check(array_is_valid(spikes), invalid_argument("spikes"));
+	check(layer->neurons->length == spikes->length, "Lenght of @layer %d different from length of @spikes %d at time %d", layer->neurons->length, spikes->length, time);
+
+	uint32_t i = 0;
+	Status* spike = NULL;
+	Neuron* neuron = NULL;
+
+	for (i = 0; i < spikes->length; ++i) {
+		spike = (Status*)array_get(spikes, i);
+		check(spike != NULL, null_argument("spike"));
+		if (*spike == TRUE) {
+			neuron = (Neuron*)array_get(layer->neurons, i);
+			check(neuron != NULL, null_argument("neuron"));
+			neuron_force_spike(neuron, time);
+		}
+	}
+
+	return SUCCESS;
+error:
+	return FAIL;
+}
+
+
+Status layer_set_currents(Layer* layer, Array* currents, uint32_t time) {
+	check(layer_is_valid(layer), invalid_argument("layer"));
+	check(array_is_valid(currents), invalid_argument("currents"));
+	check(layer->neurons->length == currents->length, "Lenght of @layer %d different from length of @currents %d at time %d", layer->neurons->length, currents->length, time);
+
+	uint32_t i = 0;
+	float* current = NULL;
+	Neuron* neuron = NULL;
+
+	for (i = 0; i < currents->length; ++i) {
+		current = (float*)array_get(currents, i);
+		check(current != NULL, null_argument("current"));
+
+		neuron = (Neuron*)array_get(layer->neurons, i);
+		neuron_inject_current(neuron, *current, time);
+	}
+
+	return SUCCESS;
 error:
 	return FAIL;
 }

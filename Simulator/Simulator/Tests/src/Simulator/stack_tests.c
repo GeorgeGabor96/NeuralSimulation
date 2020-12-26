@@ -21,7 +21,7 @@ TestStatus stack_create_test() {
 	// cleanup
 error:
 	if (stack != NULL) {
-		stack_destroy(stack);
+		stack_destroy(stack, NULL);
 	}
 	return status;
 }
@@ -34,16 +34,16 @@ TestStatus stack_destroy_test() {
 	void* data = NULL;
 
 	// call with queue = NULL
-	stack_destroy(NULL);
+	stack_destroy(NULL, NULL);
 
 	// call with queue->array.data = NULL
 	data = stack->array.data;
 	stack->array.data = NULL;
-	stack_destroy(stack);
+	stack_destroy(stack, NULL);
 	stack->array.data = data;
 
 	// normal call
-	stack_destroy(stack);
+	stack_destroy(stack, NULL);
 
 	status = SUCCESS;
 
@@ -98,7 +98,7 @@ TestStatus stack_push_test() {
 
 	// cleanup
 error:
-	stack_destroy(stack);
+	stack_destroy(stack, NULL);
 	return TEST_SUCCESS;
 }
 
@@ -154,7 +154,7 @@ TestStatus stack_pop_test() {
 
 	// cleanup
 error:
-	stack_destroy(stack);
+	stack_destroy(stack, NULL);
 	return status;
 }
 
@@ -209,6 +209,6 @@ TestStatus stack_top_test() {
 
 	// cleanup
 error:
-	stack_destroy(stack);
+	stack_destroy(stack, NULL);
 	return TEST_SUCCESS;
 }

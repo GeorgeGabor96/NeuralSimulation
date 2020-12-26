@@ -75,4 +75,7 @@ Status layer_link_fc(Layer* layer, Layer* input_layer);
 Array* layer_get_spikes(Layer* layer);
 Array* layer_get_voltages(Layer* layer);
 
+Status layer_set_spikes(Layer* layer, Array* spikes, uint32_t time);
+Status layer_set_currents(Layer* layer, Array* currents, uint32_t time);
+
 #endif // __LAYER_H__
