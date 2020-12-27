@@ -39,6 +39,7 @@ TestInfo tests[] = {
 	{ vector_create_test, "vector_create_test" },
 	{ vector_destroy_test, "vector_destroy_test" },
 	{ vector_append_get_set_test, "vector_append_get_set_test" },
+	{ vector_show_test, "vector_show_test" },
 
 	// SYNAPSE --> TODO: Need to be rethinked
 	{ synapse_class_create_test, "synapse_class_create_test" },

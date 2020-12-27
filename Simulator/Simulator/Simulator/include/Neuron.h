@@ -4,8 +4,6 @@
 #include "Containers.h"
 #include "Synapse.h"
 
-// TODO: update comments
-
 
 /*************************************************************
 * NeuronClass Functionality
@@ -35,10 +33,16 @@ typedef struct NeuronClass {
 #define LIF_R		10.0f
 #define LIF_C		1.0f
 
-
+/*
+1. neuron_class != NULL
+2. neuron_class->type is a valid one
+*/
 Status neuron_class_is_valid(NeuronClass* neuron_class);
+
 NeuronClass* neuron_class_create(NeuronType type);
+
 void neuron_class_destroy(NeuronClass* neuron_class);
+
 Status neuron_class_set_LIF_parameters(NeuronClass* neuron_class, float u_th, float u_rest, float r, float c);
 
 
@@ -55,9 +59,9 @@ typedef struct Neuron {
 } Neuron;
 
 
-#define NEURON_INITIAL_SYNAPSE_LENGHT 10u
+#define NEURON_INITIAL_SYNAPSE_LENGTH 10u
 
-/* TODO: De ce nu verific si n_class??????
+/*
 General function to verify that a neuron is valid
 A @neuron is valid if:
 1. @neuron != NULL
@@ -75,10 +79,10 @@ Neuron* neuron_create(NeuronClass* neuron_class);
 void neuron_destroy(Neuron* neuron);
 
 /*
-* THIS will copy the content of @synapse and free it
+* THIS will copy the content of @synapse and free it if should_free is TRUE
 * Synapses are kept by the neuron for which they are input
 */
-Status neuron_add_in_synapse(Neuron* neuron, Synapse* synapse);
+Status neuron_add_in_synapse(Neuron* neuron, Synapse* synapse, Status should_free);
 
 // The ouput synapses are only kept as references
 Status neuron_add_out_synapse(Neuron* neuron, Synapse* out_synapse);

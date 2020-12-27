@@ -8,5 +8,6 @@
 TestStatus vector_create_test();
 TestStatus vector_destroy_test();
 TestStatus vector_append_get_set_test();
+TestStatus vector_show_test();
 
 #endif // __VECTOR_TESTS_H__

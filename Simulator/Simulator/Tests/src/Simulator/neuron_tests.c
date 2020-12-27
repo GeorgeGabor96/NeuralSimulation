@@ -154,20 +154,16 @@ TestStatus neuron_destroy_test() {
 TestStatus neuron_add_in_synapse_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
-	NeuronClass n_class;
-	n_class.type = LIF_NEURON;
-	neuron_class_set_LIF_parameters(&n_class, LIF_U_TH, LIF_U_REST, LIF_R, LIF_C);
-	Neuron* neuron = neuron_create(&n_class);
+	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
+	Neuron* neuron = neuron_create(n_class);
 	Vector* in_synapses = neuron->in_synapses;
 	Vector* out_synapses = neuron->out_synapses_refs;
 	
 	// create tests synapses
-	float w1 = 1.1f;
-	float w2 = 3.4f;
-	SynapseClass s_class;
-	s_class.type = CONDUCTANCE_SYNAPCE;
-	Synapse* sy1 = synapse_create(&s_class, w1);
-	Synapse* sy2 = synapse_create(&s_class, w2);
+	SynapseClass* s_class = synapse_class_create_default();
+	Synapse* sy1 = synapse_create(s_class, 1.1f);
+	Synapse* sy2 = synapse_create(s_class, 3.4f);
+
 	Synapse* sy = NULL;
 	Synapse sy1_copy;
 	Synapse sy2_copy;
@@ -175,21 +171,21 @@ TestStatus neuron_add_in_synapse_test() {
 	memcpy(&sy2_copy, sy2, sizeof(Synapse));
 
 	// call with @neuron = NULL
-	assert(neuron_add_in_synapse(NULL, sy1) == FAIL, "Should fail for @neuron = NULL");
+	assert(neuron_add_in_synapse(NULL, sy1, FALSE) == FAIL, "Should fail for @neuron = NULL");
 
 	// call with @neuron->in_synapses = NULL
 	neuron->in_synapses = NULL;
-	assert(neuron_add_in_synapse(neuron, sy1) == FAIL, "Should fail for @neuron->in_synapses = NULL");
+	assert(neuron_add_in_synapse(neuron, sy1, FALSE) == FAIL, "Should fail for @neuron->in_synapses = NULL");
 	neuron->in_synapses = in_synapses;
 
 	// call with @neuron->out_synapses_refs = NULL
 	neuron->out_synapses_refs = NULL;
-	assert(neuron_add_in_synapse(neuron, sy1) == FAIL, "Should fail for @neuron->out_synapses_refs = NULL");
+	assert(neuron_add_in_synapse(neuron, sy1, FALSE) == FAIL, "Should fail for @neuron->out_synapses_refs = NULL");
 	neuron->out_synapses_refs = out_synapses;
 
 	// normal calls
-	assert(neuron_add_in_synapse(neuron, sy1) == SUCCESS, "Should work for sy1");
-	assert(neuron_add_in_synapse(neuron, sy2) == SUCCESS, "Should work for sy2");
+	assert(neuron_add_in_synapse(neuron, sy1, TRUE) == SUCCESS, "Should work for sy1");
+	assert(neuron_add_in_synapse(neuron, sy2, TRUE) == SUCCESS, "Should work for sy2");
 	assert(neuron->in_synapses->length == 2, "@neuron->in_synapses->lenght should be 2 not %u", neuron->in_synapses->length);
 	
 	// check synapses
@@ -201,9 +197,9 @@ TestStatus neuron_add_in_synapse_test() {
 	status = TEST_SUCCESS;
 
 error:
-	if (neuron != NULL) {
-		neuron_destroy(neuron);
-	}
+	if (neuron != NULL) neuron_destroy(neuron);
+	if (s_class != NULL) synapse_class_destroy(s_class);
+	if (n_class != NULL) neuron_class_destroy(n_class);
 
 	return status;
 }
@@ -212,20 +208,17 @@ error:
 TestStatus neuron_add_out_synapse_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
-	NeuronClass n_class;
-	n_class.type = LIF_NEURON;
-	neuron_class_set_LIF_parameters(&n_class, LIF_U_TH, LIF_U_REST, LIF_R, LIF_C);
-	Neuron* neuron = neuron_create(&n_class);
+	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
+	Neuron* neuron = neuron_create(n_class);
 	Vector* in_synapses = neuron->in_synapses;
 	Vector* out_synapses = neuron->out_synapses_refs;
 
 	// create tests synapses
 	float w1 = 1.1f;
 	float w2 = 3.4f;
-	SynapseClass s_class;
-	s_class.type = CONDUCTANCE_SYNAPCE;
-	Synapse* sy1 = synapse_create(&s_class, w1);
-	Synapse* sy2 = synapse_create(&s_class, w2);
+	SynapseClass* s_class = synapse_class_create_default();
+	Synapse* sy1 = synapse_create(s_class, 1.1f);
+	Synapse* sy2 = synapse_create(s_class, 3.4f);
 	Synapse* sy = NULL;
 	Synapse sy1_copy;
 	Synapse sy2_copy;
@@ -261,22 +254,92 @@ TestStatus neuron_add_out_synapse_test() {
 	status = TEST_SUCCESS;
 
 error:
-	if (neuron != NULL) {
-		neuron_destroy(neuron);
-	}
-	if (sy1 != NULL) {
-		synapse_destroy(sy1);
-	}
-	if (sy2 != NULL) {
-		synapse_destroy(sy2);
-	}
+	if (neuron != NULL) neuron_destroy(neuron);
+	if (sy1 != NULL) synapse_destroy(sy1);
+	if (sy2 != NULL) synapse_destroy(sy2);
+	if (s_class != NULL) synapse_class_destroy(s_class);
+	if (n_class != NULL) neuron_class_destroy(n_class);
 
 	return status;
 }
 
 
 TestStatus neuron_step_test() {
-	// TODO can you mock the inside?
-	return TEST_UNIMPLEMENTED;
+	Status status = TEST_FAILED;
+
+	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
+	SynapseClass* s_class = synapse_class_create_default();
+	Neuron* neuron = neuron_create(n_class);
+
+	// add synapses
+	Synapse* sy_in_1 = NULL;
+	Synapse* sy_in_2 = NULL;
+	Synapse* sy_out = synapse_create(s_class, 1.0f);
+	uint32_t data = 0;
+
+	neuron_add_in_synapse(neuron, synapse_create(s_class, 1.0f), FALSE);
+	neuron_add_in_synapse(neuron, synapse_create(s_class, 2.0f), FALSE);
+	neuron_add_out_synapse(neuron, sy_out);
+
+	sy_in_1 = (Synapse*)vector_get(neuron->in_synapses, 0);
+	sy_in_2 = (Synapse*)vector_get(neuron->in_synapses, 1);
+
+	// case 1: no spyke due to low conductances
+	sy_in_1->g = 1.0f;
+	sy_in_2->g = 1.0f;
+	neuron_step(neuron, 0u);
+	check(neuron->spike == FALSE, "Should not spyke");
+	check(neuron->u > neuron->n_class->u_rest, "Should have increased the voltage");
+	check(sy_in_1->g < 1.0f, "Should have lowered the input synapse 1 conductance");
+	check(sy_in_2->g < 1.0f, "Should have lowered the input synapse 2 conductance");
+	check(sy_out->spike_times->length == 0, "Should not have added spyke on the output synapse");
+
+	// case 2: spyke because of the high conductances
+	sy_in_1->g = 10.0f;
+	sy_in_2->g = 10.0f;
+	neuron_step(neuron, 1u);
+	check(neuron->spike == TRUE, "Should spyke");
+	check(neuron->u == neuron->n_class->u_rest, "Should have reseted the voltage");
+	check(sy_in_1->g < 10.0f, "Should have lowered the input synapse 1 conductance");
+	check(sy_in_2->g < 10.0f, "Should have lowered the input synapse 2 conductance");
+	check(sy_out->spike_times->length == 1, "Should have added spyke on the output synapse");
+	// remove the spike from the output synapse
+	data = *((uint32_t*)queue_dequeue(sy_out->spike_times)) - s_class->delay; // remove the delay, synapse keep the time they need to process the spyke
+	check(data == 1u, "The spyke time should be 1 not %u", data);
+
+	// case 3: force a spike
+	sy_in_1->g = 0.0f;
+	sy_in_2->g = 0.0f;
+	neuron_force_spike(neuron, 2u);
+	check(neuron->spike == TRUE, "Should spyke");
+	check(neuron->u == neuron->n_class->u_rest, "Should have reseted the voltage");
+	check(sy_out->spike_times->length == 1, "Should have added spyke on the output synapse");
+	// remove the spike from the output synapse
+	data = *((uint32_t*)queue_dequeue(sy_out->spike_times)) - s_class->delay; // remove the delay, synapse keep the time they need to process the spyke
+	check(data == 2u, "The spyke time should be 2 not %u", data);
+
+	// case 4: inject current -> no spyke
+	neuron_inject_current(neuron, 3.0f, 3u);
+	check(neuron->spike == FALSE, "Should not spyke");
+	check(sy_out->spike_times->length == 0, "Should have added spyke on the output synapse");
+
+	// case 5: inject current -> spyke
+	neuron_inject_current(neuron, 100.0f, 4u);
+	check(neuron->spike == TRUE, "Should spyke");
+	check(neuron->u == neuron->n_class->u_rest, "Should have reseted the voltage");
+	check(sy_out->spike_times->length == 1, "Should have added spyke on the output synapse");
+	// remove the spike from the output synapse
+	data = *((uint32_t*)queue_dequeue(sy_out->spike_times)) - s_class->delay; // remove the delay, synapse keep the time they need to process the spyke
+	check(data == 4u, "The spyke time should be 2 not %u", data);
+
+	status = SUCCESS;
+
+error:
+	if (n_class != NULL) neuron_class_destroy(n_class);
+	if (s_class != NULL) synapse_class_destroy(s_class);
+	if (neuron != NULL) neuron_destroy(neuron);
+	if (sy_out != NULL) synapse_destroy(sy_out);
+
+	return status;
 }
 

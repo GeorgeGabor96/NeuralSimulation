@@ -105,3 +105,25 @@ error:
 
 	return status;
 }
+
+
+TestStatus vector_show_test() {
+	TestStatus status = FAIL;
+	Vector* vector = vector_create(10, sizeof(uint32_t));
+	uint32_t i = 0;
+
+	for (i = 0; i < 7; i++) {
+		vector_append(vector, &i);
+	}
+
+	vector_show(vector, show_uint32_t);
+
+	// corner cases
+	vector_show(NULL, NULL);
+
+	status = TEST_SUCCESS;
+
+	vector_destroy(vector, NULL);
+
+	return status;
+}

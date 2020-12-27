@@ -104,3 +104,18 @@ void* vector_get(Vector* vector, uint32_t index) {
 error:
 	return NULL;
 }
+
+
+void vector_show(Vector* vector, ShowElem show) {
+	check(vector_is_valid(vector) == TRUE, invalid_argument("vector"));
+	uint32_t i = 0;
+
+	for (i = 0; i < vector->length; ++i) {
+		show(vector_get(vector, i));
+	}
+	printf("\n");
+
+error:
+	return;
+}
+

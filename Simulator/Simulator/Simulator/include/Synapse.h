@@ -43,11 +43,9 @@ Preconditions: @tau_ms > 0
 			   @type == CONDUCTANCE_SYNPASE || @type == VOLTAGE_DEPENDENT_SYNAPSE
 */
 SynapseClass* synapse_class_create(float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms);
-SynapseClass* synapse_class_create_default(); // mostly for tests
 
-/*
-Preconditions: @synapse_class != NULL
-*/
+SynapseClass* synapse_class_create_default(); 
+
 void synapse_class_destroy(SynapseClass* synapse_class);
 
 
@@ -73,17 +71,19 @@ typedef struct Synapse {
 */
 Status synapse_is_valid(Synapse* synapse);
 
-// USed to fill a neuron structure already allocated
-// NOt responsible for @synapse and @s_class
 Status synapse_init(Synapse* synapse, SynapseClass* s_class, float w);
+
 void synapse_reset(Synapse* synapse);
+
 Synapse* synapse_create(SynapseClass* s_class, float w);
+
 void synapse_destroy(Synapse* synapse);
 
 /*
 Preconditions: @spike_time > queue_head(synapse->spike_times) - should never receive a spike older that I already have
 */
 Status synapse_add_spike_time(Synapse* synapse, uint32_t spike_time);
+
 float synapse_compute_PSC(Synapse* synapse, float u);
 
 Status synapse_step(Synapse* synapse, uint32_t simulation_time);

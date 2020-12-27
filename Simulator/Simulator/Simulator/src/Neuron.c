@@ -148,10 +148,10 @@ Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
 	check(neuron != NULL, null_argument("neuron"));
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
 
-	neuron->in_synapses = vector_create(NEURON_INITIAL_SYNAPSE_LENGHT, sizeof(Synapse));
+	neuron->in_synapses = vector_create(NEURON_INITIAL_SYNAPSE_LENGTH, sizeof(Synapse));
 	check_memory(neuron->in_synapses);
 
-	neuron->out_synapses_refs = vector_create(NEURON_INITIAL_SYNAPSE_LENGHT, sizeof(Synapse*));
+	neuron->out_synapses_refs = vector_create(NEURON_INITIAL_SYNAPSE_LENGTH, sizeof(Synapse*));
 	check_memory(neuron->out_synapses_refs);
 
 	neuron->n_class = neuron_class;
@@ -215,14 +215,14 @@ error:
 }
 
 
-Status neuron_add_in_synapse(Neuron* neuron, Synapse* synapse) {
+Status neuron_add_in_synapse(Neuron* neuron, Synapse* synapse, Status should_free) {
 	Status status = FAIL;
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 	
 	// NOTE: @neuron keeps internally its INPUT synapses, so copy its content and free it
 	check(vector_append(neuron->in_synapses, synapse) == SUCCESS, "Could not add new INPUT synapse");
-	free(synapse); // do not delete the queue which was just copied in @neuron->in_synapses
+	if (should_free == TRUE) free(synapse);
 
 	status = SUCCESS;
 

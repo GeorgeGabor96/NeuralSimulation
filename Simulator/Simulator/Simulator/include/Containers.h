@@ -24,6 +24,7 @@ void show_bool(void* data);
 void show_uint8_t(void* data);
 void show_uint16_t(void* data);
 void show_uint32_t(void* data);
+void show_status(void* data);
 
 
 /*************************************************************
@@ -170,5 +171,8 @@ Status vector_append(Vector* vector, void* data);
 
 // index < vector->length
 void* vector_get(Vector* vector, uint32_t index);
+
+void vector_show(Vector* vector, ShowElem show);
+
 
 #endif // __GENERIC_ARRAY_H__

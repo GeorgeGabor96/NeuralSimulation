@@ -11,7 +11,7 @@ Status queue_is_valid(Queue* queue) {
 	check(queue != NULL, null_argument("queue"));
 	check(array_is_valid(&(queue->array)) == TRUE, invalid_argument("queue->array"));
 	check(queue->length <= queue->array.length, "@queue->length is bigger than @queue->array.length");
-	check(queue->head < queue->array.length, "@queue->haed >= @queue->array.length");
+	check(queue->head < queue->array.length, "@queue->head >= @queue->array.length");
 	check(queue->tail < queue->array.length, "@queue->tail >= @queue->array.length");
 
 	return TRUE;
