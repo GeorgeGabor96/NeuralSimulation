@@ -25,6 +25,8 @@ typedef enum { SUCCESS = 0, FAIL = 1, FALSE = 0, TRUE = 1 } Status;
 // An info is something of interest that happends in the execution (ex: the execution starts a new processing step and it prints that to inform the user)
 #define log_info(M, ...) fprintf(stderr, "[INFO] (%s:%d) " M "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 
+#define print(M, ...) fprintf(stdout, M, ##__VA_ARGS__)
+
 #ifdef NDEBUG
 
 #define debug(M, ...)

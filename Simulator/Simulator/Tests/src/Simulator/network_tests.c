@@ -53,15 +53,35 @@ TestStatus network_step_test() {
 	// build connections
 	network_compile(network);
 
+	Layer* layer = *(Layer**)vector_get(network->input_layers, 0);
+	printf("%d\n", layer->neurons->length);
+
 	// build input for network
+	Vector* inputs = vector_create(1, sizeof(NetworkValues));
+	Array* values = array_create(1, sizeof(float));
+	float PSC = 1.0f;
+	array_set(values, 0, &PSC);
+	NetworkValues net_input;
+	net_input.type = CURRENT;
+	net_input.values = values;
+	vector_append(inputs, &net_input);
 
+	layer = *(Layer**)vector_get(network->input_layers, 0);
+	printf("%d\n", layer->neurons->length);
 
-	network_step(network, 0);
+	for (int i = 0; i < 100; ++i) {
+		log_info("Loop %d", i);
+		network_step(network, inputs, i);
 
-
-
+		//Array* outputs = network_get_outputs(network, VOLTAGE);
+		//network_values_show(outputs);
+	}
 	status = TEST_SUCCESS;
-error:
+
+
+	array_destroy(values, NULL);
+	vector_destroy(inputs, NULL);
+
 	network_destroy(network);
 	neuron_class_destroy(neuron_class);
 	synapse_class_destroy(synapse_class);

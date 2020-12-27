@@ -8,6 +8,8 @@
 *************************************************************/
 Status array_is_valid(Array* array) {
 	check(array != NULL, null_argument("array"));
+	check(array->length > 0, "@array->length == 0");
+	check(array->element_size > 0, "@array->element_size == 0");
 	check(array->data != NULL, null_argument("array->data"));
 
 	return TRUE;
@@ -20,7 +22,7 @@ error:
 * Array Functionality
 *************************************************************/
 Array* array_create(uint32_t length, size_t element_size) {
-	Array* array = (Array*)malloc(sizeof(Array));
+	Array* array = (Array*)calloc(1, sizeof(Array));
 	check_memory(array);
 
 	array->element_size = element_size;
@@ -32,6 +34,7 @@ Array* array_create(uint32_t length, size_t element_size) {
 
 error:
 	if (array != NULL) {
+		if (array->data != NULL) free(array->data);
 		free(array);
 	}
 	return NULL;
@@ -77,22 +80,19 @@ error:
 
 
 Status array_set(Array* array, uint32_t index, void* data) {
-	Status status = FAIL;
 	check(array_is_valid(array) == TRUE, invalid_argument("array"));
-	check(data != NULL, "NULL value for @src_data");
+	check(data != NULL, null_argument("src_data"));
 	check(index < array->length, "Out of bound value for @index: %u; @array->max_lenght: %u", index, array->length);
 	
 	array_set_fast(array, index, data);
-	status = SUCCESS;
+	return SUCCESS;
 
 error:
-	return status;
+	return FAIL;
 }
 
 
-// POSSIBLE OPTIMIZATION, add parameter for expand rate, not every container needs the same amount
 Status array_expand(Array* array) {
-	Status status = FAIL;
 	check(array_is_valid(array) == TRUE, invalid_argument("array"));
 
 	uint32_t new_length = array->length + ARRAY_EXPAND_RATE;
@@ -101,8 +101,22 @@ Status array_expand(Array* array) {
 
 	array->length = new_length;
 	array->data = new_data;
-	status = SUCCESS;
+	return SUCCESS;
 
 error:
-	return status;
+	return FAIL;
+}
+
+
+void array_show(Array* array, ShowElem show) {
+	check(array_is_valid(array) == TRUE, invalid_argument("array"));
+	uint32_t i = 0;
+
+	for (i = 0; i < array->length; ++i) {
+		show(array_get(array, i));
+	}
+	printf("\n");
+
+error:
+	return;
 }

@@ -4,6 +4,25 @@
 #include <stdbool.h>
 
 
+void network_values_show(Array* values) {
+	uint32_t i = 0;
+	NetworkValues* net_values = NULL;
+
+	log_info("Showing values");
+
+	for (i = 0; i < values->length; ++i) {
+		net_values = (NetworkValues*)array_get(values, i);
+		printf("\n[%d]-Type: %d\n", i, net_values->type);
+		if (net_values->type == SPIKES) {
+			array_show(net_values->values, NULL);
+		}
+		else if (net_values->type == VOLTAGE) {
+			array_show(net_values->values, show_float);
+		}
+	}
+}
+
+
 Network* network_create() {
 	Network* network = (Network*)calloc(1, sizeof(Network));
 	check_memory(network);
@@ -34,11 +53,6 @@ void network_destroy(Network* network) {
 	
 	uint32_t i = 0;
 	Layer* layer = NULL;
-	for (i = 0; i < network->layers->length; ++i) {
-		layer = (Layer*)vector_get(network->layers, i);
-		check(layer != NULL, null_argument("layer"));
-		layer_reset(layer);
-	}
 
 	vector_destroy(network->layers, layer_reset);
 	vector_destroy(network->input_layers, NULL);
@@ -154,29 +168,68 @@ void network_step(Network* network, Vector* inputs, uint32_t time) {
 	check(inputs->length == network->input_layers->length, "@inputs->length %d should equal @network->input_layers->lenght %d", inputs->length, network->input_layers->length);
 
 	uint32_t i = 0;
-	Array* input = NULL;
 	Layer* layer = NULL;
+	NetworkValues* input = NULL;
 
-	// set inputs
 	for (i = 0; i < inputs->length; ++i) {
-		input = (Array*)vector_get(inputs, i);
-		check(input != NULL, null_argument("input"));
-
+		input = (NetworkValues*)vector_get(inputs, i);
 		layer = *(Layer**)vector_get(network->input_layers, i);
-		check(layer != NULL, null_argument("layer"));
+		printf("%d\n", input->values->length);
+		printf("%d\n", layer->neurons->length);
+		check(input->values->length == layer->neurons->length, "for input %i - input lenght %d while layer length %d", i, input->values->length, layer->neurons->length);
 
-		check(input->length == layer->neurons->length, "for input %i - input lenght %d while layer length %d", i, input->length, layer->neurons->length);
-		// how to set the input if it can be spikes or current?????
-		/// probably some structure
+		if (input->type == SPIKES) {
+			layer_set_spikes(layer, input->values, time);
+		}
+		else if (input->type == CURRENT) {
+			layer_set_currents(layer, input->values, time);
+		}
+		else {
+			log_error("Undefined NETWORK input type %d", input->type);
+		}
 	}
-
+	return;
 	for (i = 0; i < network->layers->length; ++i) {
+		printf("Before\n");
+
 		layer = (Layer*)vector_get(network->layers, i);
 		check(layer != NULL, null_argument("layer"));
 		
 		layer_step(layer, time);
+		printf("After\n");
 	}
 
 error:
 	return;
+}
+
+
+Array* network_get_outputs(Network* network, NetworkValueType type) {
+	Array* outputs = array_create(network->output_layers->length, sizeof(NetworkValues));
+	check_memory(outputs);
+	uint32_t i = 0;
+	Layer* output_layer = NULL;
+	Array* values = NULL;
+	NetworkValues net_values;
+
+	for (i = 0; i < network->output_layers->length; ++i) {
+		output_layer = *((Layer**)vector_get(network->output_layers, i));
+		if (type == SPIKES) {
+			values = layer_get_spikes(output_layer);
+		}
+		else if (type == VOLTAGE) {
+			values = layer_get_voltages(output_layer);
+		}
+		else {
+			log_error(invalid_argument("type"));
+		}
+		net_values.type = type;
+		net_values.values = values;
+		array_set(outputs, i, &net_values);
+	}
+
+	return outputs;
+
+error:
+	return NULL;
 }

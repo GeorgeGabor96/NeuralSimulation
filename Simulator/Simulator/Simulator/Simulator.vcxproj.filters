@@ -62,5 +62,8 @@
     <ClCompile Include="src\Layer.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Printing.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

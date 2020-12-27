@@ -9,8 +9,8 @@
 *************************************************************/
 Status vector_is_valid(Vector* vector) {
 	check(vector != NULL, null_argument("vector"));
-	check(array_is_valid(&(vector->array)) == TRUE, invalid_argument("vector->array"));
 	check(vector->length <= vector->array.length, "@vector->length is bigger than @vector->array.length");
+	check(array_is_valid(&(vector->array)) == TRUE, invalid_argument("vector->array"));
 
 	return TRUE;
 error:
@@ -22,7 +22,7 @@ error:
 * Vector Functionality
 *************************************************************/
 Vector* vector_create(uint32_t length, size_t element_size) {
-	Vector* vector = (Vector*)malloc(sizeof(Vector));
+	Vector* vector = (Vector*)calloc(1, sizeof(Vector));
 	check_memory(vector);
 
 	vector->array.data = malloc(length * element_size);
@@ -36,15 +36,29 @@ Vector* vector_create(uint32_t length, size_t element_size) {
 
 error:
 	if (vector != NULL) {
+		if (vector->array.data != NULL) free(vector->array.data);
 		free(vector);
 	}
 	return NULL;
 }
 
 
+void vector_reset(Vector* vector, ElemReset destroy) {
+	check(vector_is_valid(vector) == TRUE, invalid_argument("array"));
+	if (destroy != NULL) {
+		for (uint32_t i = 0; i < vector->length; ++i) {
+			destroy(vector_get(vector, i));
+		}
+	}
+
+error:
+	return;
+}
+
+
 void vector_destroy(Vector* vector, ElemReset reset) {
 	check(vector_is_valid(vector) == TRUE, invalid_argument("vector"));
-	array_reset(&(vector->array), reset);
+	vector_reset(vector, reset);
 	free(vector->array.data);
 	free(vector);
 
@@ -54,7 +68,13 @@ error:
 
 
 Status vector_set(Vector* vector, uint32_t index, void* data) {
+	check(vector_is_valid(vector) == TRUE, invalid_argument("vector"));
+	check(index < vector->length, "@index >= @vector->length");
+
 	return array_set(&(vector->array), index, data);
+
+error:
+	return FAIL;
 }
 
 
@@ -77,5 +97,10 @@ error:
 
 
 void* vector_get(Vector* vector, uint32_t index) {
+	check(vector_is_valid(vector) == TRUE, invalid_argument("vector"));
+	check(index < vector->length, "@index >= @vector->length");
 	return array_get(&(vector->array), index);
+
+error:
+	return NULL;
 }

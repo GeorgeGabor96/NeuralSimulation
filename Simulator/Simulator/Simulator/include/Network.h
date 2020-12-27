@@ -16,6 +16,19 @@ typedef float Spike;
 
 // TO DO: so if we want non linear networks, need a way to reference a layer by name/index
 
+typedef enum { SPIKES = 0, CURRENT = 1, VOLTAGE = 2 } NetworkValueType;
+
+// Chestia este ca input-ul si output-ul unei retele practic este acelasi structura
+// caci ca input trebuie un vector de arrays cu valori si un tip (spike sau current)
+// iar la output ai un vector de arrays cu valori si un tip (spike sau voltaj)
+typedef struct NetworkValues {
+	NetworkValueType type;
+	Array* values;
+} NetworkValues;
+
+
+void network_values_show(Array* values);
+
 typedef struct Network {
 	/*
 	A layer in @layers can simultaneously be an input oand an output layer (usefull for debuging)
@@ -50,6 +63,8 @@ Status network_add_layer(Network* netowrk, Layer* layer, Status is_input, Status
 // forward of the network for an input
 // NOTE the inputs vector should have the same length as the number of input layers and the same number of values
 void network_step(Network* network, Vector* inputs, uint32_t time);
+
+Array* network_get_outputs(Network* network, NetworkValueType type);
 
 
 // Need to get the output of the network and of individual layers somehow, AGAIN not sure if that is the spikes?, the voltages?

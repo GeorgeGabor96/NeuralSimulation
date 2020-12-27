@@ -51,45 +51,45 @@ TestStatus vector_destroy_test() {
 }
 
 
-TestStatus vector_append_test() {
+TestStatus vector_append_get_set_test() {
 	// setup
-	TestStatus status = SUCCESS;
+	TestStatus status = TEST_FAILED;
+	uint32_t a[4] = { 2u, 5u, 10u, 15u };
+	uint32_t value = 0;
 	uint32_t length = 2u;
-	uint32_t value1 = 5u;
-	uint32_t value2 = 10u;
-	uint32_t value3 = 15u;
-	uint32_t value = 0u;
+	uint32_t i = 0;
 	size_t element_size = sizeof(uint32_t);
 	Vector* vector = vector_create(length, element_size);
 	void* data = vector->array.data;
 
 	// call with @vector = NULL
-	assert(vector_append(NULL, &value1) == FAIL, "Should fail for @vector = NULL");
+	assert(vector_append(NULL, &(a[0])) == FAIL, "Should fail for @vector = NULL");
 	
 	// call with @vector->array.data = NULL
 	vector->array.data = NULL;
-	assert(vector_append(vector, &value1) == FAIL, "Should fail for @vector->array.data = NULL");
+	assert(vector_append(vector, &(a[0])) == FAIL, "Should fail for @vector->array.data = NULL");
 	vector->array.data = data;
 
 	// call with @data = NULL
 	assert(vector_append(vector, NULL) == FAIL, "Should fail for @data = NULL");
 
-	// add 3 elements, should extend the vector
-	assert(vector_append(vector, &value1) == SUCCESS, "Should be able to append value %u", value1);
-	assert(vector_append(vector, &value2) == SUCCESS, "Should be able to append value %u", value2);
-	assert(vector_append(vector, &value3) == SUCCESS, "Should be able to append value %u", value3);
-	assert(vector->length == 3, "Should have %u elements not %u", 3, vector->length);
+	// add elements, should extend the vector
+	for (i = 0; i < 4; ++i) {
+		assert(vector_append(vector, &(a[i])) == SUCCESS, "Value %u at index %u could not be inserted", a[i], i);
+	}
+	assert(vector->length == 4, "Should have %u elements not %u", 3, vector->length);
 
 	// check that array was extended
 	assert(vector->array.length == length + ARRAY_EXPAND_RATE, "@vector->array.lenght should be %u not %u", length + ARRAY_EXPAND_RATE, vector->array.length);
 
-	// check the contained elements
+	for (i = 0; i < 4; ++i) {
+		value = *(uint32_t*)vector_get(vector, i);
+		assert(value == a[i], "Value at index %u should be %u not %u", i, a[i], value);
+	}
+
+	assert(vector_set(vector, 0, &a[3]) == SUCCESS, "Should be able to set value");
 	value = *(uint32_t*)vector_get(vector, 0);
-	assert(value == value1, "First element should be %u not %u", value1, value);
-	value = *(uint32_t*)vector_get(vector, 1);
-	assert(value == value2, "Second element should be %u not %u", value2, value);
-	value = *(uint32_t*)vector_get(vector, 2);
-	assert(value == value3, "Third element should be %u not %u", value3, value);
+	assert(value == a[3], "Value at index 0 shoule now be %u not %u", a[3], value);
 
 	status = TEST_SUCCESS;
 

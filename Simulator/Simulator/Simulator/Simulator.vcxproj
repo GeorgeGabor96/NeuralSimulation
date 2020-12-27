@@ -154,6 +154,7 @@
     <ClCompile Include="src\Layer.c" />
     <ClCompile Include="src\Network.c" />
     <ClCompile Include="src\Neuron.c" />
+    <ClCompile Include="src\Printing.c" />
     <ClCompile Include="src\Queue.c" />
     <ClCompile Include="src\Stack.c" />
     <ClCompile Include="src\Synapse.c" />

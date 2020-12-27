@@ -6,14 +6,31 @@
 
 #include "debug.h"
 
-/*-----------TO DO-----------------*/
-// La unele teste vezi ca ai dat destroy direct daca setai ceva intern pe NULL sa verifici o preconditie, daca chiar nu era ok ar pusca
-// document when to use each of them
+
+typedef uint8_t bool;
+
+/*
+reset - function that knows how to free the memory inside an element (not the memory of the element itself)
+NOTE: if elements are simple (ex: int) and no special deallocation is required, pass NULL to @destroy
+*/
+typedef void (*ElemReset) (void* elem);
+
+/*************************************************************
+* General Printing Functionality
+*************************************************************/
+typedef void(*ShowElem)(void*);
+void show_float(void* data);
+void show_bool(void* data);
+void show_uint8_t(void* data);
+void show_uint16_t(void* data);
+void show_uint32_t(void* data);
+
 
 /*************************************************************
 * Array Functionality
 *************************************************************/
 
+// Use this when you already know how many elements you will save
 typedef struct Array {
 	uint32_t length;
 	size_t element_size; // in bytes
@@ -25,40 +42,30 @@ typedef struct Array {
 #define array_set_fast(a, i, d) memcpy((a)->data + (a)->element_size * (i), (void*) (d), (a)->element_size)
 #define array_get_cast(a, i, t) ((t) array_get(a, i))
 
-
 /*
 Verify that an @array is valid, meaning:
 1. array != NULL
-2. arra->data != NULL
+2. array->length > 0
+3. array->element_size > 0
+2. array->data != NULL
 */
 Status array_is_valid(Array* array);
 
-/*
-length - number of elements in the array
-element_size - the size of an element
-*/
 Array* array_create(uint32_t length, size_t element_size);
 
-/*
-reset - function that knows how to free the memory inside an element (not the memory of the element itself)
-NOTE: if elements are simple (ex: int) and no special deallocation is required, pass NULL to @destroy
-*/
-typedef void (*ElemReset) (void* elem);
 // resets the content of the @array->data, @array remains valid
 void array_reset(Array* array, ElemReset reset);
-// completely destroys the @array
+
 void array_destroy(Array* array, ElemReset reset);
 
 void* array_get(Array* array, uint32_t index);
 
 Status array_set(Array* array, uint32_t index, void* data);
 
-/*
-Increases the number of elements in @array by ARRAY_EXPAND_RATE
-TODO: maybe it is better to use a more personalised value here, don't know, this may be sufficient
-*/
+// TODO: maybe it is better to use a more personalised value here, don't know, this may be sufficient
 Status array_expand(Array* array);
 
+void array_show(Array* array, ShowElem show);
 
 
 /*************************************************************
@@ -132,6 +139,8 @@ void* queue_head(Queue* queue);
 /*************************************************************
 * Vector Functionality
 *************************************************************/
+
+// use this when you are not sure about how many elements it will contain (list like functionality)
 typedef struct Vector {
 	uint32_t length;
 	Array array;
@@ -144,20 +153,22 @@ typedef struct Vector {
 /*
 Verify that @vector is valid, meaning:
 1. vector != NULL
-2. vector->array is valid
-3. vector->length <= vector->array.length
+2. vector->length <= vector->array.length
+3. vector->array is valid
 */
 Status vector_is_valid(Vector* vector);
 
 Vector* vector_create(uint32_t length, size_t element_size);
 
+void vector_reset(Vector* vector, ElemReset destroy);
 void vector_destroy(Vector* vector, ElemReset reset);
 
+// index < vector->length
 Status vector_set(Vector* vector, uint32_t index, void* data);
 
 Status vector_append(Vector* vector, void* data);
 
+// index < vector->length
 void* vector_get(Vector* vector, uint32_t index);
-
 
 #endif // __GENERIC_ARRAY_H__

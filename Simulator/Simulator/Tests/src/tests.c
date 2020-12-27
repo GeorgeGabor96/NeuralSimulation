@@ -13,13 +13,13 @@
 
 
 TestInfo tests[] = {
-	
+
 	// ARRAY
 	{ array_create_test, "array_create_test" },
 	{ array_destroy_test, "array_destroy_test" },
-	{ array_get_test, "array_get_test" },
-	{ array_set_test, "array_set_test" },
+	{ array_set_get_test, "array_set_get_test" },
 	{ array_expand_test, "array_expand_test" },
+	{ array_show_test, "array_show_test" },
 
 	// STACK
 	{ stack_create_test, "stack_create_test" },
@@ -38,7 +38,7 @@ TestInfo tests[] = {
 	// VECTOR
 	{ vector_create_test, "vector_create_test" },
 	{ vector_destroy_test, "vector_destroy_test" },
-	{ vector_append_test, "vector_append_test" },
+	{ vector_append_get_set_test, "vector_append_get_set_test" },
 
 	// SYNAPSE --> TODO: Need to be rethinked
 	{ synapse_class_create_test, "synapse_class_create_test" },
