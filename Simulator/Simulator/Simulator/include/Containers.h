@@ -68,6 +68,11 @@ Status array_expand(Array* array);
 
 void array_show(Array* array, ShowElem show);
 
+// UNTESTED
+void array_copy_data(Array* array, void* data, uint32_t start_idx, uint32_t elem_cnt);
+
+
+
 
 /*************************************************************
 * Stack Functionality
@@ -174,5 +179,14 @@ void* vector_get(Vector* vector, uint32_t index);
 
 void vector_show(Vector* vector, ShowElem show);
 
+
+/*************************************************************
+* String Functionality
+*************************************************************/
+// string have at most 256 chars currently
+Array* string_create(char* string);
+Vector* string_vector_create(char** strings, uint32_t cnt);
+void string_destroy(Array* array);
+void string_vector_destroy(Vector* strings);
 
 #endif // __GENERIC_ARRAY_H__

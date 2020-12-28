@@ -4,11 +4,13 @@
 #include "debug.h"
 
 #include "Simulator/array_tests.h"
+#include "Simulator/string_tests.h"
 #include "Simulator/stack_tests.h"
 #include "Simulator/queue_tests.h"
 #include "Simulator/synapse_tests.h"
 #include "Simulator/vector_tests.h"
 #include "Simulator/neuron_tests.h"
+#include "Simulator/layer_tests.h"
 #include "Simulator/network_tests.h"
 
 
@@ -20,6 +22,10 @@ TestInfo tests[] = {
 	{ array_set_get_test, "array_set_get_test" },
 	{ array_expand_test, "array_expand_test" },
 	{ array_show_test, "array_show_test" },
+
+	// STRING
+	{ string_create_destroy_test, "string_create_destroy_test" },
+	{ string_vector_create_destroy_test, "string_vector_create_destroy_test" },
 
 	// STACK
 	{ stack_create_test, "stack_create_test" },
@@ -60,14 +66,12 @@ TestInfo tests[] = {
 	{ neuron_add_out_synapse_test, "neuron_add_out_synapse_test" },
 	{ neuron_step_test, "neuron_step_test" },
 
+	// LAYER
+	{ layer_create_destroy_test, "layer_create_destroy_test" },
+	{ layer_step_test, "layer_step_test" },
+
 	// NETWORK
-	{ network_create_test, "network_create_test" },
-	{ network_destroy_test, "network_destroy_test" },
-	{ network_is_ready_test, "network_is_ready_test" },
-	{ network_compile_test, "network_compile_test" },
-	{ network_get_layer_by_idx_test, "network_get_layer_by_idx_test" },
-	{ network_add_layer_test, "network_add_layer_test" },
-	{ network_step_test, "network_step_test" }
+	//{ network_step_test, "network_step_test" }
 };
 
 

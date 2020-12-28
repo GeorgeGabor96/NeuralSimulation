@@ -157,6 +157,7 @@
     <ClCompile Include="src\Printing.c" />
     <ClCompile Include="src\Queue.c" />
     <ClCompile Include="src\Stack.c" />
+    <ClCompile Include="src\String.c" />
     <ClCompile Include="src\Synapse.c" />
     <ClCompile Include="src\Vector.c" />
   </ItemGroup>

@@ -12,12 +12,12 @@ TestStatus vector_create_test() {
 	
 	// call
 	Vector* vector = vector_create(length, element_size);
-	check_memory(vector);
+	assert(vector != NULL, null_argument("vector"));
 
 	assert(vector->length == 0, "@vector->length should be 0");
 	assert(vector->array.length == length, "@vector->array.length should be %u not %u", length, vector->array.length);
 	assert(vector->array.element_size == element_size, "@vector->array.element_length should be %llu not %llu", element_size, vector->array.element_size);
-	check_memory(vector->array.data);
+	assert(vector->array.data != NULL, null_argument("vector->array.data"));
 
 	status = TEST_SUCCESS;
 

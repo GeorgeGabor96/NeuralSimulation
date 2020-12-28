@@ -65,5 +65,8 @@
     <ClCompile Include="src\Printing.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\String.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

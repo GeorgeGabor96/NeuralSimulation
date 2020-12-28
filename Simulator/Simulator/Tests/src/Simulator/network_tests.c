@@ -44,10 +44,10 @@ TestStatus network_step_test() {
 	Layer dummy_layer;
 
 	// build network
-	layer_init(&dummy_layer, LAYER_FULLY_CONNECTED, 1, neuron_class, synapse_class);
+	layer_init(&dummy_layer, LAYER_FULLY_CONNECTED, 1, neuron_class, synapse_class, NULL, NULL);
 	network_add_layer(network, &dummy_layer, TRUE, FALSE);
 	
-	layer_init(&dummy_layer, LAYER_FULLY_CONNECTED, 1, neuron_class, synapse_class);
+	layer_init(&dummy_layer, LAYER_FULLY_CONNECTED, 1, neuron_class, synapse_class, NULL, NULL);
 	network_add_layer(network, &dummy_layer, FALSE, TRUE);
 
 	// build connections

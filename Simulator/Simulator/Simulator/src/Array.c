@@ -120,3 +120,21 @@ void array_show(Array* array, ShowElem show) {
 error:
 	return;
 }
+
+
+void array_copy_data(Array* array, void* data, uint32_t start_idx, uint32_t elem_cnt) {
+	check(array_is_valid(array) == TRUE, invalid_argument("array"));
+	check(data != NULL, null_argument("data"));
+	check(start_idx < array->length, "@start_idx >= array->length");
+	check(elem_cnt > 0, "@elem_cnt == 0");
+	if (start_idx + elem_cnt > array->length) {
+		log_info("@elem_cnt too big, will trucate it");
+		elem_cnt = array->length - start_idx;
+	}
+
+	memcpy(array_get(array, start_idx), data, elem_cnt * array->element_size);
+
+error:
+	return;
+}
+
