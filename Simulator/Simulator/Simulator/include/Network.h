@@ -8,9 +8,6 @@
 
 #include <stdint.h>
 
-// Config Files:- este mai greu de lucrat cu ele, imi trebuie parsare, definirea unui format, etc
-// Keras Approach - add layers one by one, input/output by name
-
 // TO DO: need a structure for input/output spikes, input Current, output voltages per neuron???
 typedef float Spike;
 
@@ -21,6 +18,8 @@ typedef enum { SPIKES = 0, CURRENT = 1, VOLTAGE = 2 } NetworkValueType;
 // Chestia este ca input-ul si output-ul unei retele practic este acelasi structura
 // caci ca input trebuie un vector de arrays cu valori si un tip (spike sau current)
 // iar la output ai un vector de arrays cu valori si un tip (spike sau voltaj)
+
+// if I add a type to the array and the other structures, i could directly use an array, and i could also verify the type when i receive an array
 typedef struct NetworkValues {
 	NetworkValueType type;
 	Array* values;
@@ -39,26 +38,41 @@ typedef struct Network {
 	Status compiled; // if the network has been compiled TODO: integrate this
 } Network;
 
+
+/* 
+Network is valid if:
+1. @network != NULL
+2. @network->layers is valid
+3. @network->output_layers is valid
+4. @network->input_layers is valid
+*/
+Status network_is_valid(Network* network);
+
 // this will only allocate the layers
 Network* network_create();
 void network_destroy(Network* network);
 
-// this will ensure that the network structure is valid = all layers have a valid type
-Status network_is_valid(Network* network);
-
-// if every layer is valid
-Status network_is_ready(Network* network);
-
-// this will connect the synapses between layers
-Status network_compile(Network* network);
-
 Layer* network_get_layer_by_idx(Network* network, uint32_t layer_idx);
+Layer* network_get_layer_by_name(Network* network, Array* name);
+uint32_t network_get_layer_idx_by_name(Network* network, Array* name);
 
-// this will copy the content of the @layer into the network (shallow copy), and the network will use that copied information
-// user needs to manage the memory that contains the @layer information
-// NOTE: Recomend to alocate the layer on the stack, and pass that here to avoid wierd 'free' calls
-// TODO: free_layer?? parameter?
-Status network_add_layer(Network* netowrk, Layer* layer, Status is_input, Status is_output);
+/*
+This will copy the content of the @layer structure (shallow copy).
+The user need to decide if the memory location that holds the @layer structure is still nedeed
+
+Setting @should_free:
+should_free -> does a free(layer)
+1. If the layer was on the stack then set @should_free = FALSE
+2. If the layer was on the heap and the @layer structure is still needed then set @should_free = FALSE
+3. If the layer was on the heap and the @layer structure is not needed anymore set @should_free = TRUE
+*/
+Status network_add_layer(Network* netowrk, Layer* layer, Status should_free, Status is_input, Status is_output);
+
+/*
+Check that all the layers are valid and if there are missing layers
+Then it will connect every layer with its inputs
+*/
+Status network_compile(Network* network);
 
 // forward of the network for an input
 // NOTE the inputs vector should have the same length as the number of input layers and the same number of values

@@ -188,5 +188,6 @@ Array* string_create(char* string);
 Vector* string_vector_create(char** strings, uint32_t cnt);
 void string_destroy(Array* array);
 void string_vector_destroy(Vector* strings);
+int string_compare(Array* string1, Array* string2);
 
 #endif // __GENERIC_ARRAY_H__

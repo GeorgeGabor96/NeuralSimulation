@@ -79,3 +79,15 @@ void string_vector_destroy(Vector* strings) {
 error:
 	return;
 }
+
+
+int string_compare(Array* string1, Array* string2) {
+	check(array_is_valid(string1), invalid_argument("string1"));
+	check(array_is_valid(string2), invalid_argument("string2"));
+	check(string1->element_size == string2->element_size, "@string1->element_size != @string2->element_size");
+	check(string1->length == string2->length, "@string1->length != @string2->length");
+	
+	return memcmp(string1->data, string2->data, string1->element_size * string1->length);
+error:
+	return -1;
+}

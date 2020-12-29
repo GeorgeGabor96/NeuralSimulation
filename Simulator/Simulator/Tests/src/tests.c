@@ -71,7 +71,7 @@ TestInfo tests[] = {
 	{ layer_step_test, "layer_step_test" },
 
 	// NETWORK
-	//{ network_step_test, "network_step_test" }
+	{ network_create_compile_destroy_test, "network_create_compile_destroy_test" }
 };
 
 
