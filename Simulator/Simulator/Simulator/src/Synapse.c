@@ -132,10 +132,10 @@ error:
 
 Status synapse_add_spike_time(Synapse* synapse, uint32_t spike_time) {
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
-	if_check(!queue_is_empty(synapse->spike_times), *(uint32_t*)queue_head(synapse->spike_times) < spike_time, "Spike should not be older then the head");
-	
 	// add synaptic delay
 	spike_time += synapse->s_class->delay;
+	if_check(!queue_is_empty(synapse->spike_times), *(uint32_t*)queue_head(synapse->spike_times) < spike_time, "Spike should not be older than the head");
+	
 	queue_enqueue(synapse->spike_times, &spike_time);
 
 	return SUCCESS;

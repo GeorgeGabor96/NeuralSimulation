@@ -150,15 +150,20 @@ error:
 Status network_compile(Network* network) {
 	check(network_is_valid(network), invalid_argument("network"));
 
+	// do nothing if already compiled
 	if (network->compiled == TRUE) {
 		return SUCCESS;
 	}
 
+	Status status = FAIL;
 	uint32_t i = 0;
 	uint32_t j = 0;
+	uint32_t k = 0;
 	Layer* layer = NULL;
+	Layer* layer_k = NULL;
 	Layer* input_layer = NULL;
 	Array* layer_name = NULL;
+	Array* input_name = NULL;
 	Vector* inputs_layers_names = NULL;
 
 	// check every layer is valid
@@ -175,7 +180,27 @@ Status network_compile(Network* network) {
 	}
 
 	// sort layers so every layer is after its inputs
-	// TODO
+	// i is incremented only after layer i is in a valid oder in the network->layers
+	// NOTE: multiple solutions for the same network
+	for (i = 0; i < network->layers->length - 1; i++) {
+loop1:
+		layer = (Layer*)vector_get(network->layers, i);
+
+		for (j = 0; j < layer->input_names->length; j++) {
+			input_name = *((Array**)vector_get(layer->input_names, j));
+
+			for (k = i + 1; k < network->layers->length; k++) {
+				layer = (Layer*)vector_get(network->layers, k);
+
+				// check if layer k is input for layer i, where i < k
+				if (string_compare(layer->name, input_name) == 0) {
+					vector_swap(network->layers, i, k);
+					// start over from the same layer
+					goto loop1; // know is bad practice, but is elegant
+				}
+			}
+		}
+	}
 
 	// link the layers
 	for (i = 0; i < network->layers->length; ++i) {
@@ -184,19 +209,16 @@ Status network_compile(Network* network) {
 		for (j = 0; j < layer->input_names->length; ++j) {
 			layer_name = *((Array**)vector_get(layer->input_names, j));
 			input_layer = network_get_layer_by_name(network, layer_name);
-			check(layer->link(layer, input_layer) == SUCCESS, "Could not link layers");
+			status = layer->link(layer, input_layer);
+			check(status == SUCCESS, "Could not link layers");
 		}
 		
 	}
-
 	network->compiled = TRUE;
-
-	return SUCCESS;
+	status = SUCCESS;
 
 error:
-	network->compiled = FALSE;
-
-	return FAIL;
+	return status;
 }
 
 
@@ -208,6 +230,7 @@ void network_step(Network* network, Vector* inputs, uint32_t time) {
 	check(network_is_valid(network) == TRUE, invalid_argument("network"));
 	check(vector_is_valid(inputs) == TRUE, invalid_argument("inputs"));
 	check(inputs->length == network->input_layers->length, "@inputs->length %d should equal @network->input_layers->lenght %d", inputs->length, network->input_layers->length);
+	check(network->compiled == TRUE, invalid_argument("network->compiled"));
 
 	uint32_t i = 0;
 	Layer* layer = NULL;
@@ -215,11 +238,9 @@ void network_step(Network* network, Vector* inputs, uint32_t time) {
 
 	for (i = 0; i < inputs->length; ++i) {
 		input = (NetworkValues*)vector_get(inputs, i);
-		layer = *(Layer**)vector_get(network->input_layers, i);
-		printf("%d\n", input->values->length);
-		printf("%d\n", layer->neurons->length);
-		check(input->values->length == layer->neurons->length, "for input %i - input lenght %d while layer length %d", i, input->values->length, layer->neurons->length);
-
+		layer = *((Layer**)vector_get(network->input_layers, i));
+		check(input->values->length == layer->neurons->length, "for input %u - input lenght %u while layer length %u", i, input->values->length, layer->neurons->length);
+		check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 		if (input->type == SPIKES) {
 			layer_set_spikes(layer, input->values, time);
 		}
@@ -230,15 +251,12 @@ void network_step(Network* network, Vector* inputs, uint32_t time) {
 			log_error("Undefined NETWORK input type %d", input->type);
 		}
 	}
-	return;
+	// TODO: vezi ca la layere de input dai step de 2 ori
 	for (i = 0; i < network->layers->length; ++i) {
-		printf("Before\n");
-
 		layer = (Layer*)vector_get(network->layers, i);
-		check(layer != NULL, null_argument("layer"));
+		check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 		
 		layer_step(layer, time);
-		printf("After\n");
 	}
 
 error:
@@ -248,6 +266,7 @@ error:
 
 Array* network_get_outputs(Network* network, NetworkValueType type) {
 	Array* outputs = array_create(network->output_layers->length, sizeof(NetworkValues));
+	log_info("outputs-%p", outputs->data);
 	check_memory(outputs);
 	uint32_t i = 0;
 	Layer* output_layer = NULL;
@@ -256,6 +275,8 @@ Array* network_get_outputs(Network* network, NetworkValueType type) {
 
 	for (i = 0; i < network->output_layers->length; ++i) {
 		output_layer = *((Layer**)vector_get(network->output_layers, i));
+		check(layer_is_valid(output_layer) == TRUE, invalid_argument("output_layer"));
+
 		if (type == SPIKES) {
 			values = layer_get_spikes(output_layer);
 		}
@@ -269,7 +290,6 @@ Array* network_get_outputs(Network* network, NetworkValueType type) {
 		net_values.values = values;
 		array_set(outputs, i, &net_values);
 	}
-
 	return outputs;
 
 error:
@@ -287,6 +307,7 @@ void network_values_show(Array* values) {
 		net_values = (NetworkValues*)array_get(values, i);
 		printf("\n[%d]-Type: %d\n", i, net_values->type);
 		if (net_values->type == SPIKES) {
+			// to do
 			array_show(net_values->values, NULL);
 		}
 		else if (net_values->type == VOLTAGE) {

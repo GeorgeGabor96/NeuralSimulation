@@ -5,5 +5,6 @@
 
 
 TestStatus network_create_compile_destroy_test();
+TestStatus network_step_test();
 
 #endif // __NETWORK_TESTS_H__

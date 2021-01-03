@@ -119,3 +119,22 @@ error:
 	return;
 }
 
+
+Status vector_swap(Vector* vector, uint32_t i, uint32_t j) {
+	check(vector_is_valid(vector) == TRUE, invalid_argument("vector"));
+
+	void* data1 = vector_get(vector, i);
+	void* data2 = vector_get(vector, j);
+	void* aux = malloc(vector->array.element_size);
+	check_memory(aux);
+
+	memcpy(aux, data1, vector->array.element_size);
+	memcpy(data1, data2, vector->array.element_size);
+	memcpy(data2, aux, vector->array.element_size);
+	free(aux);
+	
+	return SUCCESS;
+error:
+	return FAIL;
+}
+

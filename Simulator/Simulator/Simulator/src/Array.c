@@ -110,8 +110,9 @@ error:
 
 void array_show(Array* array, ShowElem show) {
 	check(array_is_valid(array) == TRUE, invalid_argument("array"));
-	uint32_t i = 0;
+	check(show != NULL, null_argument("show"));
 
+	uint32_t i = 0;
 	for (i = 0; i < array->length; ++i) {
 		show(array_get(array, i));
 	}

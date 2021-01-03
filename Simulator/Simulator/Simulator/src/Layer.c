@@ -8,7 +8,7 @@
 *************************************************************/
 Status layer_is_valid(Layer* layer) {
 	check(layer != NULL, null_argument("layer"));
-	check(layer->type == LAYER_FULLY_CONNECTED, invalid_argument("layer->type"));
+	check(layer->type == LAYER_FULLY_CONNECTED, "@layer->type is %d", layer->type);
 	check(layer->link != NULL, "NULL value for @layer->link");
 	check(neuron_class_is_valid(layer->neuron_class) == TRUE, invalid_argument("layer->neuron_class"));
 	check(synapse_class_is_valid(layer->synapse_class) == TRUE, invalid_argument("layer->synapse_class"));
@@ -178,12 +178,13 @@ Array* layer_get_voltages(Layer* layer) {
 	Neuron* neuron = NULL;
 	uint32_t i = 0;
 	check(layer_is_valid(layer) == TRUE, "@layer is not valid");
-
+	
 	voltages = array_create(layer->neurons->length, sizeof(float));
-
+	check_memory(voltages);
+	log_info("voltages %p", voltages);
 	for (i = 0; i < layer->neurons->length; ++i) {
 		neuron = (Neuron*)array_get(layer->neurons, i);
-		check(neuron != NULL, null_argument("neuron"));
+		check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
 		array_set(voltages, i, &(neuron->u));
 	}

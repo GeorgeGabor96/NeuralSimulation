@@ -34,3 +34,14 @@ void show_uint32_t(void* data) {
 	uint32_t a = *((uint32_t*)data);
 	printf("%u ", a);
 }
+
+
+void show_status(void* data) {
+	Status a = *((Status*)data);
+	if (a == TRUE) {
+		printf("1 ");
+	}
+	else {
+		printf("0 ");
+	}
+}

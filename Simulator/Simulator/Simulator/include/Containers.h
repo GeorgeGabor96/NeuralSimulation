@@ -179,6 +179,8 @@ void* vector_get(Vector* vector, uint32_t index);
 
 void vector_show(Vector* vector, ShowElem show);
 
+Status vector_swap(Vector* vector, uint32_t i, uint32_t j);
+
 
 /*************************************************************
 * String Functionality
