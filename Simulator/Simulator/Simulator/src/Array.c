@@ -139,3 +139,25 @@ error:
 	return;
 }
 
+
+
+Status array_swap(Array* array, uint32_t i, uint32_t j) {
+	check(array_is_valid(array) == TRUE, invalid_argument("array"));
+	check(i < array->length, "Out of bound value for @i: %u; @array->length: %u", i, array->length);
+	check(j < array->length, "Out of bound value for @j: %u; @array->length: %u", j, array->length);
+
+	void* data1 = array_get_fast(array, i);
+	void* data2 = array_get_fast(array, j);
+	void* aux = malloc(array->element_size);
+	check_memory(aux);
+
+	memcpy(aux, data1, array->element_size);
+	memcpy(data1, data2, array->element_size);
+	memcpy(data2, aux, array->element_size);
+	
+	free(aux);
+
+	return SUCCESS;
+error:
+	return FAIL;
+}

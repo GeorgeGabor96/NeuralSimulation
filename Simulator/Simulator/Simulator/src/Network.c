@@ -239,8 +239,8 @@ void network_step(Network* network, Vector* inputs, uint32_t time) {
 	for (i = 0; i < inputs->length; ++i) {
 		input = (NetworkValues*)vector_get(inputs, i);
 		layer = *((Layer**)vector_get(network->input_layers, i));
+		//check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 		check(input->values->length == layer->neurons->length, "for input %u - input lenght %u while layer length %u", i, input->values->length, layer->neurons->length);
-		check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 		if (input->type == SPIKES) {
 			layer_set_spikes(layer, input->values, time);
 		}

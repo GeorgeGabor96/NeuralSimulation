@@ -2,11 +2,16 @@
 #define __DEBUG_H__
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 #include <errno.h>
 #include <string.h>
 
+typedef uint8_t bool;
+#define TRUE 1ui8
+#define FALSE 0ui8
 
-typedef enum { SUCCESS = 0, FAIL = 1, FALSE = 0, TRUE = 1} Status;
+typedef enum { SUCCESS = 0, FAIL = 1} Status;
 
 // Helper error string generators
 #define invalid_argument(a) "INVALID @" a

@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClCompile Include="src\Array.c" />
     <ClCompile Include="src\Layer.c" />
+    <ClCompile Include="src\MemoryManagement.c" />
     <ClCompile Include="src\Network.c" />
     <ClCompile Include="src\Neuron.c" />
     <ClCompile Include="src\Printing.c" />
@@ -165,6 +166,7 @@
     <ClInclude Include="include\debug.h" />
     <ClInclude Include="include\Containers.h" />
     <ClInclude Include="include\Layer.h" />
+    <ClInclude Include="include\MemoryManagement.h" />
     <ClInclude Include="include\Network.h" />
     <ClInclude Include="include\Neuron.h" />
     <ClInclude Include="include\Simulator.h" />
