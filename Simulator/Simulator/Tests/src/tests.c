@@ -20,16 +20,19 @@
 TestInfo tests[] = {
 	{ memory_management_general_test, "memory_management_general_test" },
 	{ memory_manage_report_test, "memory_manage_report_test" },
+
+	// ARRAY
+	{ array_create_set_get_destroy_test, "array_create_set_get_destroy_test" },
+	{ array_expand_test, "array_expand_test" },
+	{ array_show_test, "array_show_test" },
 };
 
 /*
 TestInfo tests[] = {
 
-	// ARRAY
-	{ array_create_test, "array_create_test" },
+	
 	{ array_destroy_test, "array_destroy_test" },
 	{ array_set_get_test, "array_set_get_test" },
-	{ array_expand_test, "array_expand_test" },
 	{ array_show_test, "array_show_test" },
 
 	// STRING

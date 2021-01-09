@@ -1,6 +1,8 @@
 #ifndef __NEURON_H__
 #define __NEURON_H__
 
+
+#include "config.h"
 #include "Containers.h"
 #include "Synapse.h"
 

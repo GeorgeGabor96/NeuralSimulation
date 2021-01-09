@@ -1,8 +1,9 @@
 #ifndef __SYNAPSE_H__
 #define __SYNAPSE_H__
 
+
+#include "config.h"
 #include "Containers.h"
-#include "debug.h"
 
 // TODO: Update documentation
 

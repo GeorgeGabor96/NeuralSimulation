@@ -159,7 +159,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\debug.h" />
     <ClInclude Include="src\Simulator\array_tests.h" />
     <ClInclude Include="src\Simulator\layer_tests.h" />
     <ClInclude Include="src\Simulator\memory_management_tests.h" />

@@ -163,6 +163,7 @@
     <ClCompile Include="src\Vector.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\config.h" />
     <ClInclude Include="include\debug.h" />
     <ClInclude Include="include\Containers.h" />
     <ClInclude Include="include\Layer.h" />

@@ -1,84 +1,60 @@
 #include "array_tests.h"
 #include "Containers.h"
+#include "MemoryManagement.h"
 
 
-TestStatus array_create_test() {
-	// setup
+TestStatus array_create_set_get_destroy_test() {
+	TestStatus status = TEST_FAILED;
+	
 	uint32_t length = 10;
 	size_t element_size = sizeof(uint32_t);
-	TestStatus status = TEST_FAILED;
 
 	// call
 	Array* array = array_create(length, element_size);
-	
-	// checks
 	assert(array != NULL, "@array should not be NULL");
 	assert(array->data != NULL, "@array->data should not be NULL");
 	assert(array->length == length, "@array->length should be %u", length);
 	assert(array->element_size == element_size, "@array->element_size should be %llu", element_size);
 
-	status = TEST_SUCCESS;
-
-	// cleanup
-error:
-	if (array != NULL) {
-		array_destroy(array, NULL);
-	}
-	return status;
-}
-
-
-TestStatus array_destroy_test() {
-	// setup 
-	Array* array = array_create(10, sizeof(int));
-	void* data = NULL;
-
-	// call with array = NULL
-	array_destroy(NULL, NULL);
-
-	// call with array->data = NULL
-	data = array->data;
-	array->data = NULL;
-	array_destroy(array, NULL);
-	array->data = data;
-
-	// normal call
-	array_destroy(array, NULL);
-
-	return TEST_SUCCESS;
-}
-
-
-TestStatus array_set_get_test() {
-	TestStatus status = TEST_FAILED;
-	Array* array = array_create(5, sizeof(float));
-	float a[4] = { 1.2f, 3.103f, -0.124f, 124111.123f };
-	uint32_t i = 0;
-	float* value = NULL;
-
-	for (i = 0; i < 4; ++i) {
-		array_set(array, i, &(a[i]));
-	}
-
-	// get and check them
-	for (i = 0; i < 4; ++i) {
-		value = (float*)array_get(array, i);
-		assert(*value == a[i], "Value at index %u should be %f not %f", i, a[i], *value);
-	}
+	// add elements
+	uint32_t val_1 = 1234;
+	uint32_t val_2 = 7832;
+	uint32_t val_3 = 373737;
+	assert(array_set(array, 9, &val_1) == SUCCESS, "Could not insert at index 9");
+	assert(array_set(array, 7, &val_2) == SUCCESS, "Could not insert at index 7");
+	assert(array_set(array, 0, &val_3) == SUCCESS, "Could not insert at index 0");
+	
+	// get elements
+	uint32_t value = *((uint32_t*)array_get(array, 7));
+	assert(value == val_2, "At index 7 value %u, not %u", value, val_2);
+	value = *((uint32_t*)array_get(array, 0));
+	assert(value == val_3, "At index 0 value %u, not %u", value, val_3);
+	value = *((uint32_t*)array_get(array, 9));
+	assert(value == val_1, "At index 9 value %u, not %u", value, val_1);
 
 	// corner cases
-	assert(array_set(NULL, 0, &(a[0])) == FAIL, "Should fail for invalid array");
-	assert(array_set(array, 10, &(a[0])) == FAIL, "Should fail for invalid index");
-	assert(array_set(array, 0, NULL) == FAIL, "Should fail for invalid data");
+	assert(array_set(NULL, 1, &val_1) == FAIL, "Should fail for invalid array");
+	assert(array_set(array, 11, &val_1) == FAIL, "Should fail for invalid index");
+	assert(array_set(array, 1, NULL) == FAIL, "Should fail for invalid data");
 
-	assert(array_get(NULL, 0) == NULL, "Should fail for invalid array");
-	assert(array_get(array, 10) == NULL, "Should fail for invalid index");
+	assert(array_get(NULL, 1) == NULL, "Should fail for invalid array");
+	assert(array_get(array, 100) == NULL, "Should return NULL for invalid index");
+
+	// destroy & check memory
+	array_destroy(NULL, NULL);
+	array_destroy(array, NULL);
+	assert(memory_leak() == TRUE, "Memory leak");
+
+	// allocate a lot of arrays and check memory
+	Array* arrays[1000] = { NULL };
+	uint32_t i = 0;
+	for (i = 0; i < 1000; ++i) arrays[i] = array_create(length, element_size);
+	for (i = 0; i < 1000; ++i) array_destroy(arrays[i], NULL);
+	assert(memory_leak() == TRUE, "Memory leak");
 
 	status = TEST_SUCCESS;
 
 error:
-	array_destroy(array, NULL);
-
 	return status;
 }
 
@@ -89,19 +65,19 @@ TestStatus array_expand_test() {
 	uint32_t a[4] = { 3, 12, 83, 1231453 };
 	uint32_t i = 0;
 	uint32_t length_orig = 2;
-	uint32_t* value = NULL;
+	uint32_t value = 0;
 	Array* array = array_create(length_orig, sizeof(uint32_t));
 
-
-	// calls
+	// add elements
 	for (i = 0; i < length_orig; ++i) {
 		array_set(array, i, &(a[i]));
 	}
 
-	assert(array_expand(array) == SUCCESS, "Should be able to expand @array");
+	assert(array_expand(&array) == SUCCESS, "Should be able to expand @array");
 	assert(array->length == length_orig + ARRAY_EXPAND_RATE, "New length is incorect");
 	// set the new memory to 0
-	memset((uint8_t*)array->data + array->element_size * length_orig, 0, array->element_size * ARRAY_EXPAND_RATE);
+	memory_leak();
+	memset(array->data + array->element_size * length_orig, 0, array->element_size * (array->length - length_orig));
 
 	for (i = length_orig; i < 4; ++i) {
 		array_set(array, i, &(a[i]));
@@ -109,22 +85,23 @@ TestStatus array_expand_test() {
 
 	// check content
 	for (i = 0; i < 4; ++i) {
-		value = (uint32_t*)array_get(array, i);
-		assert(*value == a[i], "Value at index %u should be %u not %u", i, a[i], *value);
+		value = *((uint32_t*)array_get(array, i));
+		assert(value == a[i], "Value at index %u should be %u not %u", i, a[i], value);
 	}
 	for (i = 4; i < array->length; i++) {
-		value = (uint32_t*)array_get(array, i);
-		assert(*value == 0, "Value at index %u should be 0 not %u", i, *value);
+		value = *((uint32_t*)array_get(array, i));
+		assert(value == 0, "Value at index %u should be 0 not %u", i, value);
 	}
 
 	// corner cases
 	assert(array_expand(NULL) == FAIL, "Should FAIL for invalid array");
 
+	// check memory
+	array_destroy(array, NULL);
+	assert(memory_leak() == TRUE, "Memory leak");
 	status = TEST_SUCCESS;
 
 error:
-	array_destroy(array, NULL);
-	
 	return status;
 }
 
@@ -139,13 +116,16 @@ TestStatus array_show_test() {
 	}
 
 	array_show(array, show_uint32_t);
+	printf("\n");
 
 	// corner cases
 	array_show(NULL, NULL);
 
+	array_destroy(array, NULL);
+	assert(memory_leak() == TRUE, "Memory leak");
+
 	status = TEST_SUCCESS;
 
-	array_destroy(array, NULL);
-
+error:
 	return status;
 }

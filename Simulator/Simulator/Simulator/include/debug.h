@@ -1,23 +1,15 @@
 #ifndef __DEBUG_H__
 #define __DEBUG_H__
 
+
 #include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
 #include <errno.h>
-#include <string.h>
 
-typedef uint8_t bool;
-#define TRUE 1ui8
-#define FALSE 0ui8
-
-typedef enum { SUCCESS = 0, FAIL = 1} Status;
 
 // Helper error string generators
 #define invalid_argument(a) "INVALID @" a
 #define null_argument(a)	"NULL value for @" a
 #define init_argument(a)	"Could not initialize @" a
-
 
 #define errno_text() (errno == 0 ? "None" : strerror(errno))
 
@@ -45,7 +37,5 @@ typedef enum { SUCCESS = 0, FAIL = 1} Status;
 #define if_check(C, A, M, ...) if(C) { check(A, M, ##__VA_ARGS__) }
 
 #endif // __NDEBUG__
-
-
 
 #endif // __DEBUG_H__

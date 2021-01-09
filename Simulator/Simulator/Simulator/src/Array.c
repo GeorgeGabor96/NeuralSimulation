@@ -1,12 +1,13 @@
 #include <stdlib.h>
 
 #include "Containers.h"
+#include "MemoryManagement.h"
 
 
 /*************************************************************
 * CHECKS FUNCTIONS
 *************************************************************/
-Status array_is_valid(Array* array) {
+bool array_is_valid(Array* array) {
 	check(array != NULL, null_argument("array"));
 	check(array->length > 0, "@array->length == 0");
 	check(array->element_size > 0, "@array->element_size == 0");
@@ -22,32 +23,28 @@ error:
 * Array Functionality
 *************************************************************/
 Array* array_create(uint32_t length, size_t element_size) {
-	Array* array = (Array*)calloc(1, sizeof(Array));
+	// allocate also the element memory
+	Array* array = (Array*)malloc(sizeof(Array) + length * element_size, "array_create");
 	check_memory(array);
 
 	array->element_size = element_size;
 	array->length = length;
-	array->data = malloc(length * element_size);
-	check_memory(array->data);
+	array->data = (uint8_t*)array + sizeof(Array);
 
 	return array;
 
 error:
-	if (array != NULL) {
-		if (array->data != NULL) free(array->data);
-		free(array);
-	}
 	return NULL;
 }
 
 
-void array_reset(Array* array, ElemReset destroy) {
+void array_reset(Array* array, ElemReset reset) {
 	check(array_is_valid(array) == TRUE, invalid_argument("array"));
-	if (destroy != NULL) {
+	if (reset != NULL) {
 		void* elem = NULL;
 		for (uint32_t i = 0; i < array->length; ++i) {
 			elem = array_get(array, i);
-			destroy(elem);
+			reset(elem);
 		}
 	}
 
@@ -56,10 +53,9 @@ error:
 }
 
 
-void array_destroy(Array* array, ElemReset destroy) {
+void array_destroy(Array* array, ElemReset reset) {
 	check(array_is_valid(array) == TRUE, invalid_argument("array"));
-	array_reset(array, destroy);
-	free(array->data);
+	array_reset(array, reset);
 	free(array);
 
 error:
@@ -92,15 +88,18 @@ error:
 }
 
 
-Status array_expand(Array* array) {
-	check(array_is_valid(array) == TRUE, invalid_argument("array"));
+Status array_expand(Array** array) {
+	check(array != NULL, null_argument("array"));
+	check(array_is_valid(*array) == TRUE, invalid_argument("array"));
 
-	uint32_t new_length = array->length + ARRAY_EXPAND_RATE;
-	void* new_data = realloc(array->data, new_length * array->element_size);
-	check_memory(new_data);
+	uint32_t new_length = (*array)->length + ARRAY_EXPAND_RATE;
+	Array* new_array = realloc(*array, sizeof(Array) + new_length * (*array)->element_size, "array_expand");
+	check_memory(new_array);
+	// update new array
+	new_array->data = (uint8_t*)new_array + sizeof(Array);
+	new_array->length = new_length;
+	*array = new_array;
 
-	array->length = new_length;
-	array->data = new_data;
 	return SUCCESS;
 
 error:
@@ -116,7 +115,6 @@ void array_show(Array* array, ShowElem show) {
 	for (i = 0; i < array->length; ++i) {
 		show(array_get(array, i));
 	}
-	printf("\n");
 
 error:
 	return;
@@ -148,7 +146,7 @@ Status array_swap(Array* array, uint32_t i, uint32_t j) {
 
 	void* data1 = array_get_fast(array, i);
 	void* data2 = array_get_fast(array, j);
-	void* aux = malloc(array->element_size);
+	void* aux = malloc(array->element_size, "array_swap");
 	check_memory(aux);
 
 	memcpy(aux, data1, array->element_size);

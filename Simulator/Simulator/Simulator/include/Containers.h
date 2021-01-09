@@ -1,13 +1,8 @@
 #ifndef __GENERIC_ARRAY_H__
 #define __GENERIC_ARRAY_H__
 
-#include <stdint.h>
-#include <string.h>
 
-#include "debug.h"
-
-
-typedef uint8_t bool;
+#include "config.h"
 
 /*
 reset - function that knows how to free the memory inside an element (not the memory of the element itself)
@@ -18,13 +13,13 @@ typedef void (*ElemReset) (void* elem);
 /*************************************************************
 * General Printing Functionality
 *************************************************************/
-typedef void(*ShowElem)(void*);
+typedef void(*ShowElem) (void*);
 void show_float(void* data);
 void show_bool(void* data);
+void show_status(void* data);
 void show_uint8_t(void* data);
 void show_uint16_t(void* data);
 void show_uint32_t(void* data);
-void show_status(void* data);
 
 
 /*************************************************************
@@ -34,6 +29,7 @@ void show_status(void* data);
 // Use this when you already know how many elements you will save
 typedef struct Array {
 	uint32_t length;
+	// TODO: you have 4 bytes of padding, YOU CAN add type of erray if consider neccesary
 	size_t element_size; // in bytes
 	uint8_t* data;
 } Array;
@@ -50,27 +46,17 @@ Verify that an @array is valid, meaning:
 3. array->element_size > 0
 2. array->data != NULL
 */
-Status array_is_valid(Array* array);
+bool array_is_valid(Array* array);
 
 Array* array_create(uint32_t length, size_t element_size);
-
-// resets the content of the @array->data, @array remains valid
-void array_reset(Array* array, ElemReset reset);
-
+void array_reset(Array* array, ElemReset reset); // resets the content of the @array->data, @array remains valid
 void array_destroy(Array* array, ElemReset reset);
-
 void* array_get(Array* array, uint32_t index);
-
 Status array_set(Array* array, uint32_t index, void* data);
-
-// TODO: maybe it is better to use a more personalised value here, don't know, this may be sufficient
-Status array_expand(Array* array);
-
+Status array_expand(Array** array);
 void array_show(Array* array, ShowElem show);
 
-// UNTESTED
 void array_copy_data(Array* array, void* data, uint32_t start_idx, uint32_t elem_cnt);
-
 Status array_swap(Array* array, uint32_t i, uint32_t j);
 
 

@@ -1,12 +1,11 @@
 #ifndef __LAYER_H__
 #define __LAYER_H__
 
+#include "config.h"
 #include "debug.h"
 #include "Neuron.h"
 #include "Synapse.h"
 #include "Containers.h"
-
-#include <stdint.h>
 
 
 struct Layer;

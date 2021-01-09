@@ -2,11 +2,10 @@
 #define __NETWORK_H__
 
 
-#include "debug.h"
+#include "config.h"
 #include "Layer.h"
 #include "Containers.h"
 
-#include <stdint.h>
 
 // TO DO: need a structure for input/output spikes, input Current, output voltages per neuron???
 typedef float Spike;

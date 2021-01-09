@@ -1,7 +1,8 @@
 #ifndef __MEMORY_MANAGEMENT__
 #define __MEMORY_MANAGEMENT__
 
-#include "debug.h"
+#include "config.h"
+
 
 // number of memory allocations that are currently not freed
 uint32_t memory_manage_memory_blocks();
@@ -29,7 +30,7 @@ void memory_manage_free(void* ptr);
 #define free(ptr)					memory_manage_free(ptr)
 
 #else
-#define malloc(s_data, desc) malloc(size)
+#define malloc(s_data, desc) malloc(s_data)
 #define calloc(n_elem, s_elem, desc) calloc(n_elem, s_elem)
 #define realloc(p, s_data, desc) realloc(p, s_data)
 #define free(p) free(p)
