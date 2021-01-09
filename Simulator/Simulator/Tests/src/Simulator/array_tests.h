@@ -3,8 +3,6 @@
 
 #include "../testing.h"
 
-#include <stdint.h>
-
 
 TestStatus array_create_test();
 TestStatus array_destroy_test();

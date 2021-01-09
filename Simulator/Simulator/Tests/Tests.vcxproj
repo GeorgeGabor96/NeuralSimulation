@@ -120,7 +120,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Simulator/bin/x64/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Simulator/bin/x64/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Simulator.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -154,7 +154,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Simulator/bin/x64/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)Simulator/bin/x64/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Simulator.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -162,6 +162,7 @@
     <ClInclude Include="src\debug.h" />
     <ClInclude Include="src\Simulator\array_tests.h" />
     <ClInclude Include="src\Simulator\layer_tests.h" />
+    <ClInclude Include="src\Simulator\memory_management_tests.h" />
     <ClInclude Include="src\Simulator\network_tests.h" />
     <ClInclude Include="src\Simulator\neuron_tests.h" />
     <ClInclude Include="src\Simulator\queue_tests.h" />
@@ -174,6 +175,7 @@
   <ItemGroup>
     <ClCompile Include="src\Simulator\array_tests.c" />
     <ClCompile Include="src\Simulator\layer_tests.c" />
+    <ClCompile Include="src\Simulator\memory_management_tests.c" />
     <ClCompile Include="src\Simulator\network_tests.c" />
     <ClCompile Include="src\Simulator\neuron_tests.c" />
     <ClCompile Include="src\Simulator\queue_tests.c" />

@@ -1,40 +1,44 @@
 #include "MemoryManagement.h"
 
-// add the define from header, this code should only be added 
 #undef malloc
 #undef calloc
 #undef realloc
 #undef free
 
-// TODO: Do we need a allocated description, are constant strings enough?
-
 
 typedef struct Node {
-	char* desc; // description
-	void* ptr; // pointer value
-	size_t size; // how many bytes
-	Node* next;
+	char* desc;
+	void* ptr;
+	size_t size;
+	struct Node* next;
+	struct Node* prev;
 } Node;
+
 
 typedef struct List {
 	Node* first;
 	Node* last;
 } List;
 
-/*
-* This will kept nodes, where every node has the info about one memory allocation
-* When memory is freed, a node is removed from here 
-* NOTE -- Don't care about performance here, used only for debug
-*/
+
+/********************************************************************************
+* This will keep nodes, where every node has the info about one memory allocation
+* When memory is freed, a node is removed from here
+* 
+* NOTE -- Don't care about performance here, used only to find memory leaks
+********************************************************************************/
 static List allocated_memory;
 
 
 static inline Node* create_node(void* ptr, size_t size, char* desc) {
 	Node* node = (Node*)malloc(sizeof(Node));
+	if (node == NULL) return node;
 	node->desc = desc;
-	node->next = NULL;
 	node->ptr = ptr;
 	node->size = size;
+	node->next = NULL;
+	node->prev = NULL;
+	return node;
 }
 
 
@@ -45,7 +49,27 @@ static inline void add_node(Node* node) {
 	}
 	else {
 		allocated_memory.last->next = node;
-		allocated_memory.last = node->next;
+		node->prev = allocated_memory.last;
+		allocated_memory.last = node;
+	}
+}
+
+static inline void remove_node(Node* node) {
+	if (node == allocated_memory.first && node == allocated_memory.last) {
+		allocated_memory.first = NULL;
+		allocated_memory.last = NULL;
+	}
+	else if (node == allocated_memory.first) {
+		node->next->prev = NULL;
+		allocated_memory.first = node->next;
+	}
+	else if (node == allocated_memory.last) {
+		node->prev->next = NULL;
+		allocated_memory.last = node->prev;
+	}
+	else {
+		node->prev->next = node->next;
+		node->next->prev = node->prev;
 	}
 }
 
@@ -61,7 +85,6 @@ static inline bool update_node(void* old_ptr, void* new_ptr, size_t new_size, ch
 	Node* iter = find_node(old_ptr);
 	check(iter != NULL, "%p pointer does not have a node", old_ptr);
 
-	// update information
 	iter->ptr = new_ptr;
 	iter->size = new_size;
 	iter->desc = new_desc;
@@ -73,6 +96,30 @@ error:
 }
 
 
+uint32_t memory_manage_memory_blocks() {
+	Node* iter = allocated_memory.first;
+	uint32_t memory_blocks = 0;
+
+	while (iter != NULL) {
+		memory_blocks++;
+		iter = iter->next;
+	}
+	return memory_blocks;
+}
+
+
+size_t memory_manage_memory_size() {
+	Node* iter = allocated_memory.first;
+	size_t memory_size = 0;
+
+	while (iter != NULL) {
+		memory_size += iter->size;
+		iter = iter->next;
+	}
+	return memory_size;
+}
+
+
 bool memory_manage_is_empty() {
 	// if there is an element in the list then their is memory that is not deallocated
 	if (allocated_memory.first != NULL) return FALSE;
@@ -80,17 +127,28 @@ bool memory_manage_is_empty() {
 }
 
 
-void memory_manage_report();
+void memory_manage_report() {
+	Node* iter = NULL;
+	size_t n_nodes = 0;
+	size_t total_memory = 0;
+
+	log_info("UNFREED MEMORY");
+	for (iter = allocated_memory.first; iter != NULL; iter = iter->next) {
+		printf("Node %llu - desc: %s ptr: %p size: %llu BYTES\n", n_nodes, iter->desc, iter->ptr, iter->size);
+		n_nodes++;
+		total_memory += iter->size;
+	}
+	log_info("Summary %llu nodes, %llu BYTES not freed", n_nodes, total_memory);
+}
 
 
 void* memory_manage_malloc(size_t size, char* desc) {
-	// allocate the memory
 	void* ptr = malloc(size);
 	check_memory(ptr);
 
-	// save the information
 	Node* node = create_node(ptr, size, desc);
 	add_node(node);
+	return ptr;
 
 error:
 	return NULL;
@@ -98,16 +156,14 @@ error:
 
 
 void* memory_manage_calloc(size_t nitems, size_t size, char* desc) {
-	// allocate the memory
 	void* ptr = calloc(nitems, size);
 	check_memory(ptr);
 
-	// save the information
-	Node* node = create_node(ptr, size, desc);
+	Node* node = create_node(ptr, nitems * size, desc);
 	add_node(node);
-	
-error:
 	return ptr;
+error:
+	return NULL;
 }
 
 
@@ -116,8 +172,8 @@ void* memory_manage_realloc(void* ptr, size_t size, char* desc) {
 	void* n_ptr = realloc(ptr, size);
 	check_memory(ptr);
 
-	// update the node with the new information
 	update_node(ptr, n_ptr, size, desc);
+	return n_ptr;
 
 error:
 	// realloc failed return old data
@@ -126,10 +182,12 @@ error:
 
 
 void memory_manage_free(void* ptr) {
+	// find node and remove it from list
 	Node* node = find_node(ptr);
 	check(node != NULL, "Node should exist for %p", ptr);
 
-	// need previous
+	remove_node(node);
+	free(node);
 
 error:
 	return;

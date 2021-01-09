@@ -71,8 +71,7 @@ void array_show(Array* array, ShowElem show);
 // UNTESTED
 void array_copy_data(Array* array, void* data, uint32_t start_idx, uint32_t elem_cnt);
 
-
-void array_swap(Array* array, uint32_t i, uint32_t j);
+Status array_swap(Array* array, uint32_t i, uint32_t j);
 
 
 

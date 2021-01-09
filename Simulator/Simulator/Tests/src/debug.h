@@ -2,11 +2,16 @@
 #define __DEBUG_H__
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 #include <errno.h>
 #include <string.h>
 
+typedef uint8_t bool;
+#define TRUE 1ui8
+#define FALSE 0ui8
 
-typedef enum { SUCCESS = 0, FAIL = 1, FALSE = 0, TRUE = 1 } Status;
+typedef enum { SUCCESS = 0, FAIL = 1 } Status;
 
 // Helper error string generators
 #define invalid_argument(a) "INVALID @" a
@@ -24,8 +29,6 @@ typedef enum { SUCCESS = 0, FAIL = 1, FALSE = 0, TRUE = 1 } Status;
 
 // An info is something of interest that happends in the execution (ex: the execution starts a new processing step and it prints that to inform the user)
 #define log_info(M, ...) fprintf(stderr, "[INFO] (%s:%d) " M "\n", __FILE__, __LINE__, ##__VA_ARGS__)
-
-#define print(M, ...) fprintf(stdout, M, ##__VA_ARGS__)
 
 #ifdef NDEBUG
 

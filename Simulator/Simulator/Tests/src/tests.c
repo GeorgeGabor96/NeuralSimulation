@@ -3,6 +3,9 @@
 #include "testing.h"
 #include "debug.h"
 
+#include "Simulator/memory_management_tests.h"
+
+// need rework
 #include "Simulator/array_tests.h"
 #include "Simulator/string_tests.h"
 #include "Simulator/stack_tests.h"
@@ -14,6 +17,12 @@
 #include "Simulator/network_tests.h"
 
 
+TestInfo tests[] = {
+	{ memory_management_general_test, "memory_management_general_test" },
+	{ memory_manage_report_test, "memory_manage_report_test" },
+};
+
+/*
 TestInfo tests[] = {
 
 	// ARRAY
@@ -73,7 +82,7 @@ TestInfo tests[] = {
 	// NETWORK
 	{ network_create_compile_destroy_test, "network_create_compile_destroy_test" },
 	{ network_step_test, "network_step_test" },
-};
+};*/
 
 
 int main() {
