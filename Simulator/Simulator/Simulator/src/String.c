@@ -1,93 +1,101 @@
 #include "Containers.h"
 
-#define STRING_LIMIT 256
 
-
-static inline size_t safe_strlen(char* string) {
-	size_t i = 0;
+static inline uint32_t safe_strlen(char* c_string_p) {
+	uint32_t i = 0;
 	for (i = 0; i < STRING_LIMIT; ++i) {
-		if (string[i] == 0) {
+		if (c_string_p[i] == 0) {
 			break;
 		}
 	}
 	if (i == STRING_LIMIT) {
-		string[i - 1] = 0;
+		c_string_p[i - 1] = 0;
 	}
 	return i + 1;
 }
 
 
-Array* string_create(char* c_string) {
-	size_t n_chars = safe_strlen(c_string);
-	Array* string = array_create((uint32_t)n_chars, 0, sizeof(char));
-	check_memory(string);
+String* string_create(char* c_string_p) {
+	check(c_string_p != NULL, null_argument("c_string_p"));
+	uint32_t n_chars = safe_strlen(c_string_p);
+	String* string_p = array_create(n_chars, n_chars, sizeof(char));
+	check_memory(string_p);
+	array_copy_data(string_p, c_string_p, 0, n_chars);
 
-	array_copy_data(string, c_string, 0, (uint32_t)n_chars);
-
-	return string;
+	return string_p;
 
 error:
 	return NULL;
 }
 
 
-void string_destroy(Array* array) {
-	check(array_is_valid(array) == TRUE, invalid_argument("array"));
-	array_destroy(array, NULL);
+void string_destroy(String* string_p) {
+	check(array_is_valid(string_p) == TRUE, invalid_argument("string_p"));
+	array_destroy(string_p, NULL);
 
 error:
 	return;
 }
 
 
-Array* strings_create(char** strings, uint32_t cnt) {
+Array* strings_create(char** strings_pp, uint32_t cnt) {
 	uint32_t i = 0;
-	Array* safe_strings = array_create(cnt, 0, sizeof(Array*));
-	check_memory(safe_strings);
-	Array* string = NULL;
+	Array* safe_strings_p = NULL;
+	String* string_p = NULL;
+
+	check(cnt > 0, "@cnt == 0");
+	check(strings_pp != NULL, null_argument("strings_pp"));
+
+	// because strings are variable in size, need to save the pointers
+	safe_strings_p = array_create(cnt, 0, sizeof(String*));
+	check_memory(safe_strings_p);
 	
 	for (i = 0; i < cnt; ++i) {
-		string = string_create(strings[i]);
-		array_append(safe_strings, &string);
+		string_p = string_create(strings_pp[i]);
+		check_memory(string_p);
+		array_append(&safe_strings_p, &string_p);
 	}
-
-	return safe_strings;
+	return safe_strings_p;
 
 error:
-	--i;
-	// because unsigned
-	while (i < cnt) {
-		string = *((Array**)array_get(safe_strings, i));
-		string_destroy(string);
-		--i;
+	if (safe_strings_p != NULL) {
+		--i; // because unsigned
+		String** string_pp = NULL;
+		while (i < cnt) {
+			string_pp = ((String**)array_get(safe_strings_p, i));
+			string_destroy(*string_pp);
+			--i;
+		}
 	}
-
 	return NULL;
 }
 
 
-void strings_destroy(Array* strings) {
-	check(array_is_valid(strings) == TRUE, invalid_argument("strings"));
+void strings_destroy(Array* strings_p) {
+	check(array_is_valid(strings_p) == TRUE, invalid_argument("strings_p"));
 	uint32_t i = 0;
-	Array* string = NULL;
+	String** string_pp = NULL;
 
-	for (i = 0; i < strings->length; ++i) {
-		string = *((Array**)array_get(strings, i));
-		string_destroy(string);
+	// array contains pointers so we can't make a function to reset them
+	for (i = 0; i < strings_p->length; ++i) {
+		string_pp = ((String**)array_get(strings_p, i));
+		check(array_is_valid(*string_pp) == TRUE, invalid_argument("string_pp"));
+		string_destroy(*string_pp);
 	}
-
+	array_destroy(strings_p, NULL);
 error:
 	return;
 }
 
 
-int string_compare(Array* string1, Array* string2) {
-	check(array_is_valid(string1), invalid_argument("string1"));
-	check(array_is_valid(string2), invalid_argument("string2"));
-	check(string1->element_size == string2->element_size, "@string1->element_size != @string2->element_size");
-	check(string1->length == string2->length, "@string1->length != @string2->length");
-	
-	return memcmp(string1->data, string2->data, string1->element_size * string1->length);
+int string_compare(String* string1_p, String* string2_p) {
+	check(array_is_valid(string1_p), invalid_argument("string1_p"));
+	check(array_is_valid(string2_p), invalid_argument("string2_p"));
+	check(string1_p->length == string2_p->length, "@string1_p->length != @string2_p->length");
+	check(string1_p->max_length == string2_p->max_length, "@string1_p->max_length != @string2_p->max_length");
+	check(string1_p->element_size == string2_p->element_size, "@string1_p->element_size != @string2_p->element_size");
+
+	return memcmp(string1_p->data, string2_p->data, string1_p->element_size * string1_p->length);
 error:
 	return -1;
 }

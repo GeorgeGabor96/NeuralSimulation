@@ -64,6 +64,20 @@ Status array_swap(Array* array, uint32_t i, uint32_t j);
 
 
 /*************************************************************
+* String Functionality
+*************************************************************/
+// string have at most 256 chars currently
+#define STRING_LIMIT 256
+typedef Array String;
+String* string_create(char* c_string_p);
+void string_destroy(String* string_p);
+Array* strings_create(char** strings_pp, uint32_t cnt);
+void strings_destroy(Array* strings_p);
+int string_compare(String* string1_p, String* string2_p);
+
+
+
+/*************************************************************
 * Stack Functionality
 *************************************************************/
 typedef struct Stack {
@@ -130,15 +144,5 @@ void* queue_dequeue(Queue* queue);
 
 void* queue_head(Queue* queue);
 
-
-/*************************************************************
-* String Functionality
-*************************************************************/
-// string have at most 256 chars currently
-Array* string_create(char* string);
-Array* strings_create(char** strings, uint32_t cnt);
-void string_destroy(Array* array);
-void strings_destroy(Array* strings);
-int string_compare(Array* string1, Array* string2);
 
 #endif // __GENERIC_ARRAY_H__

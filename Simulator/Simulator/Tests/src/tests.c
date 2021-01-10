@@ -8,6 +8,7 @@
 // need rework
 #include "Simulator/array_tests.h"
 #include "Simulator/string_tests.h"
+
 #include "Simulator/stack_tests.h"
 #include "Simulator/queue_tests.h"
 #include "Simulator/synapse_tests.h"
@@ -27,6 +28,11 @@ TestInfo tests[] = {
 	{ array_show_test, "array_show_test" },
 	{ array_copy_data_test, "array_copy_data_test" },
 	{ array_swap_test, "array_swap_test" },
+
+	// String
+	{ string_create_destroy_test, "string_create_destroy_test" },
+	{ strings_create_destroy_test, "strings_create_destroy_test" },
+	{ string_memory_stress_test, "string_memory_stress_test" },
 };
 
 /*
