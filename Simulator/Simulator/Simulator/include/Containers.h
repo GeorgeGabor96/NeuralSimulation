@@ -22,14 +22,12 @@ void show_uint16_t(void* data);
 void show_uint32_t(void* data);
 
 
-/*************************************************************
-* Array Functionality
-*************************************************************/
-
-// Use this when you already know how many elements you will save
+/*******************************************************************
+* Array Functionality - use when you know how many elements you need
+*******************************************************************/
 typedef struct Array {
 	uint32_t length;
-	// TODO: you have 4 bytes of padding, YOU CAN add type of erray if consider neccesary
+	// TODO: you have 4 bytes of padding, YOU CAN add type of array if consider neccesary
 	size_t element_size; // in bytes
 	uint8_t* data;
 } Array;
@@ -38,6 +36,9 @@ typedef struct Array {
 #define array_get_fast(a, i) ((a)->data + (a)->element_size * (i))
 #define array_set_fast(a, i, d) memcpy((a)->data + (a)->element_size * (i), (void*) (d), (a)->element_size)
 #define array_get_cast(a, i, t) ((t) array_get(a, i))
+#define array_data_size(a) ((a)->length * (a)->element_size)
+#define array_data_reset(a) (memset((a)->data, 0, array_data_size(a))) // sets all bytes in data to 0
+#define array_size(length, element_size) (sizeof(Array) + (length) * (element_size))
 
 /*
 Verify that an @array is valid, meaning:
@@ -47,7 +48,6 @@ Verify that an @array is valid, meaning:
 2. array->data != NULL
 */
 bool array_is_valid(Array* array);
-
 Array* array_create(uint32_t length, size_t element_size);
 void array_reset(Array* array, ElemReset reset); // resets the content of the @array->data, @array remains valid
 void array_destroy(Array* array, ElemReset reset);
@@ -55,7 +55,6 @@ void* array_get(Array* array, uint32_t index);
 Status array_set(Array* array, uint32_t index, void* data);
 Status array_expand(Array** array);
 void array_show(Array* array, ShowElem show);
-
 void array_copy_data(Array* array, void* data, uint32_t start_idx, uint32_t elem_cnt);
 Status array_swap(Array* array, uint32_t i, uint32_t j);
 

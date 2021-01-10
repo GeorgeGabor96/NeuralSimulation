@@ -25,6 +25,8 @@ TestInfo tests[] = {
 	{ array_create_set_get_destroy_test, "array_create_set_get_destroy_test" },
 	{ array_expand_test, "array_expand_test" },
 	{ array_show_test, "array_show_test" },
+	{ array_copy_data_test, "array_copy_data_test" },
+	{ array_swap_test, "array_swap_test" },
 };
 
 /*

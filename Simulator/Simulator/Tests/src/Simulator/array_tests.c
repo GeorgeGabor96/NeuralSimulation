@@ -129,3 +129,89 @@ TestStatus array_show_test() {
 error:
 	return status;
 }
+
+
+TestStatus array_copy_data_test() {
+	TestStatus status = FAIL;
+	Array* array = array_create(10, sizeof(uint32_t));
+	uint32_t i = 0;
+	uint32_t data[5] = { 0 };
+	uint32_t value = 0;
+	for (i = 0; i < 5; ++i) data[i] = i;
+
+	uint32_t start_idx = 5;
+	array_copy_data(array, data, start_idx, 5);
+	for (i = start_idx; i < start_idx + 5; ++i) {
+		value = *((uint32_t*)array_get(array, i));
+		assert(value == data[i - start_idx], "@values is %u, not %u", value, data[i - start_idx]);
+	}
+	array_data_reset(array);
+
+	start_idx = 2;
+	array_copy_data(array, data, start_idx, 5);
+	for (i = start_idx; i < start_idx + 5; ++i) {
+		value = *((uint32_t*)array_get(array, i));
+		assert(value == data[i - start_idx], "@values is %u, not %u", value, data[i - start_idx]);
+	}
+	array_data_reset(array);
+
+	// trucate case
+	start_idx = 8;
+	array_copy_data(array, data, start_idx, 5);
+	for (i = start_idx; i < start_idx + 2; ++i) {
+		value = *((uint32_t*)array_get(array, i));
+		assert(value == data[i - start_idx], "@values is %u, not %u", value, data[i - start_idx]);
+	}
+
+	// corner cases
+	array_copy_data(NULL, data, 0, 5);
+	array_copy_data(array, NULL, 0, 5);
+	array_copy_data(array, data, 10, 5);
+	array_copy_data(array, data, 0, 0);
+
+	array_destroy(array, NULL);
+	assert(memory_leak() == TRUE, "Memory leak");
+
+	status = TEST_SUCCESS;
+error:
+	return status;
+}
+
+
+TestStatus array_swap_test() {
+	TestStatus status = TEST_FAILED;
+	Array* array = array_create(10, sizeof(uint32_t));
+	uint32_t value_1 = 123;
+	uint32_t value_2 = 321;
+	uint32_t idx_1 = 1;
+	uint32_t idx_2 = 5;
+	uint32_t value = 0;
+
+	array_set(array, idx_1, &value_1);
+	array_set(array, idx_2, &value_2);
+
+	array_swap(array, idx_1, idx_2);
+	value = *((uint32_t*)array_get(array, idx_1));
+	assert(value == value_2, "@value is %u, not %u", value, value_2);
+	value = *((uint32_t*)array_get(array, idx_2));
+	assert(value == value_1, "@value is %u, not %u", value, value_1);
+
+	array_swap(array, idx_1, idx_2);
+	value = *((uint32_t*)array_get(array, idx_1));
+	assert(value == value_1, "@value is %u, not %u", value, value_1);
+	value = *((uint32_t*)array_get(array, idx_2));
+	assert(value == value_2, "@value is %u, not %u", value, value_2);
+
+	// corner cases
+	array_swap(NULL, 0, 1);
+	array_swap(array, 100, 1);
+	array_swap(array, 0, 100);
+
+	array_destroy(array, NULL);
+	assert(memory_leak() == TRUE, "Memory leak");
+
+	status = TEST_SUCCESS;
+
+error:
+	return status;
+}

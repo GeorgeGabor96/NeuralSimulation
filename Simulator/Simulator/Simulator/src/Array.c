@@ -24,7 +24,7 @@ error:
 *************************************************************/
 Array* array_create(uint32_t length, size_t element_size) {
 	// allocate also the element memory
-	Array* array = (Array*)malloc(sizeof(Array) + length * element_size, "array_create");
+	Array* array = (Array*)malloc(array_size(length, element_size), "array_create");
 	check_memory(array);
 
 	array->element_size = element_size;
@@ -93,7 +93,7 @@ Status array_expand(Array** array) {
 	check(array_is_valid(*array) == TRUE, invalid_argument("array"));
 
 	uint32_t new_length = (*array)->length + ARRAY_EXPAND_RATE;
-	Array* new_array = realloc(*array, sizeof(Array) + new_length * (*array)->element_size, "array_expand");
+	Array* new_array = realloc(*array, array_size(new_length, (*array)->element_size), "array_expand");
 	check_memory(new_array);
 	// update new array
 	new_array->data = (uint8_t*)new_array + sizeof(Array);
@@ -136,7 +136,6 @@ void array_copy_data(Array* array, void* data, uint32_t start_idx, uint32_t elem
 error:
 	return;
 }
-
 
 
 Status array_swap(Array* array, uint32_t i, uint32_t j) {
