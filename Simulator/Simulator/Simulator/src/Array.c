@@ -23,14 +23,15 @@ error:
 /*************************************************************
 * Array Functionality
 *************************************************************/
-Array* array_create(uint32_t length, size_t element_size) {
+Array* array_create(uint32_t length, uint32_t initial_length, size_t element_size) {
 	check(length > 0, "@length is 0");
+	check(initial_length <= length, "@initial_length > @length");
 	check(element_size > 0, "@element_size is 0");
 	// allocate also the element memory
 	Array* array = (Array*)malloc(array_size(length, element_size), "array_create");
 	check_memory(array);
 
-	array->length = 0;
+	array->length = initial_length;
 	array->max_length = length;
 	array->element_size = element_size;
 	array->data = (uint8_t*)array + sizeof(Array);

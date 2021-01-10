@@ -55,7 +55,7 @@ TestStatus layer_step_test() {
 	uint32_t i = 0;
 
 	// test case 1: force spike on every neuron, make a step, and verify that no neuron has spiked
-	Array* spikes = array_create(layer->neurons->length, sizeof(Status));
+	Array* spikes = array_create(layer->neurons->length, 0, sizeof(Status));
 	for (i = 0; i < spikes->length; ++i) {
 		spike = TRUE;
 		array_set(spikes, i, &spike);

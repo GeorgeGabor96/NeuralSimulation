@@ -148,10 +148,10 @@ Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
 	check(neuron != NULL, null_argument("neuron"));
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
 
-	neuron->in_synapses = array_create(NEURON_INITIAL_SYNAPSE_LENGTH, sizeof(Synapse));
+	neuron->in_synapses = array_create(NEURON_INITIAL_SYNAPSE_LENGTH, 0, sizeof(Synapse));
 	check_memory(neuron->in_synapses);
 
-	neuron->out_synapses_refs = array_create(NEURON_INITIAL_SYNAPSE_LENGTH, sizeof(Synapse*));
+	neuron->out_synapses_refs = array_create(NEURON_INITIAL_SYNAPSE_LENGTH, 0, sizeof(Synapse*));
 	check_memory(neuron->out_synapses_refs);
 
 	neuron->n_class = neuron_class;

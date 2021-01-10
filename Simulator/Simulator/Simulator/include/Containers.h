@@ -51,7 +51,7 @@ Verify that an @array is valid, meaning:
 5. array->data != NULL
 */
 bool array_is_valid(Array* array);
-Array* array_create(uint32_t length, size_t element_size);
+Array* array_create(uint32_t length, uint32_t initial_length, size_t element_size);
 void array_reset(Array* array, ElemReset reset); // resets the content of the @array->data, @array remains valid
 void array_destroy(Array* array, ElemReset reset);
 Status array_append(Array** array, void* data);

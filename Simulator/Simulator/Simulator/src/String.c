@@ -19,7 +19,7 @@ static inline size_t safe_strlen(char* string) {
 
 Array* string_create(char* c_string) {
 	size_t n_chars = safe_strlen(c_string);
-	Array* string = array_create((uint32_t)n_chars, sizeof(char));
+	Array* string = array_create((uint32_t)n_chars, 0, sizeof(char));
 	check_memory(string);
 
 	array_copy_data(string, c_string, 0, (uint32_t)n_chars);
@@ -42,7 +42,7 @@ error:
 
 Array* strings_create(char** strings, uint32_t cnt) {
 	uint32_t i = 0;
-	Array* safe_strings = array_create(cnt, sizeof(Array*));
+	Array* safe_strings = array_create(cnt, 0, sizeof(Array*));
 	check_memory(safe_strings);
 	Array* string = NULL;
 	

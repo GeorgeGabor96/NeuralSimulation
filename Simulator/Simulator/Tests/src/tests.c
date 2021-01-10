@@ -22,6 +22,7 @@ TestInfo tests[] = {
 
 	// ARRAY
 	{ array_general_use_case_test, "array_general_use_case_test" },
+	{ array_memory_test, "array_memory_test" },
 	{ array_expand_test, "array_expand_test" },
 	{ array_show_test, "array_show_test" },
 	{ array_copy_data_test, "array_copy_data_test" },

@@ -42,7 +42,7 @@ Status layer_init(
 	check(array_is_valid(name) == TRUE, invalid_argument("name"));
 	check(array_is_valid(input_names) == TRUE, invalid_argument("input_names"));
 
-	layer->neurons = array_create(n_neurons, sizeof(Neuron));
+	layer->neurons = array_create(n_neurons, 0, sizeof(Neuron));
 	check_memory(layer->neurons);
 
 	layer->type = type;
@@ -158,7 +158,7 @@ Array* layer_get_spikes(Layer* layer) {
 	uint32_t i = 0;
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	
-	spikes = array_create(layer->neurons->length, sizeof(Status));
+	spikes = array_create(layer->neurons->length, 0, sizeof(Status));
 	check_memory(spikes);
 
 	for (i = 0; i < layer->neurons->length; ++i) {
@@ -179,7 +179,7 @@ Array* layer_get_voltages(Layer* layer) {
 	uint32_t i = 0;
 	check(layer_is_valid(layer) == TRUE, "@layer is not valid");
 	
-	voltages = array_create(layer->neurons->length, sizeof(float));
+	voltages = array_create(layer->neurons->length, 0, sizeof(float));
 	check_memory(voltages);
 	log_info("voltages %p", voltages);
 	for (i = 0; i < layer->neurons->length; ++i) {

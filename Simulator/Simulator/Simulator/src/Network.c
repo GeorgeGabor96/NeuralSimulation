@@ -27,11 +27,11 @@ Network* network_create() {
 	Network* network = (Network*)calloc(1, sizeof(Network));
 	check_memory(network);
 
-	network->layers = array_create(1, sizeof(Layer));
+	network->layers = array_create(1, 0, sizeof(Layer));
 	check_memory(network->layers);
-	network->input_layers = array_create(1, sizeof(Layer*));
+	network->input_layers = array_create(1, 0, sizeof(Layer*));
 	check_memory(network->input_layers);
-	network->output_layers = array_create(1, sizeof(Layer*));
+	network->output_layers = array_create(1, 0, sizeof(Layer*));
 	check_memory(network->output_layers);
 	network->compiled = FALSE;
 
@@ -265,7 +265,7 @@ error:
 
 
 Array* network_get_outputs(Network* network, NetworkValueType type) {
-	Array* outputs = array_create(network->output_layers->length, sizeof(NetworkValues));
+	Array* outputs = array_create(network->output_layers->length, 0, sizeof(NetworkValues));
 	log_info("outputs-%p", outputs->data);
 	check_memory(outputs);
 	uint32_t i = 0;

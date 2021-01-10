@@ -5,6 +5,7 @@
 
 
 TestStatus array_general_use_case_test();
+TestStatus array_memory_test();
 TestStatus array_expand_test();
 TestStatus array_show_test();
 TestStatus array_copy_data_test();
