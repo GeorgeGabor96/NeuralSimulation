@@ -11,7 +11,6 @@
 #include "Simulator/stack_tests.h"
 #include "Simulator/queue_tests.h"
 #include "Simulator/synapse_tests.h"
-#include "Simulator/vector_tests.h"
 #include "Simulator/neuron_tests.h"
 #include "Simulator/layer_tests.h"
 #include "Simulator/network_tests.h"
@@ -22,7 +21,7 @@ TestInfo tests[] = {
 	{ memory_manage_report_test, "memory_manage_report_test" },
 
 	// ARRAY
-	{ array_create_set_get_destroy_test, "array_create_set_get_destroy_test" },
+	{ array_general_use_case_test, "array_general_use_case_test" },
 	{ array_expand_test, "array_expand_test" },
 	{ array_show_test, "array_show_test" },
 	{ array_copy_data_test, "array_copy_data_test" },

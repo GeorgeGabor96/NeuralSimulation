@@ -29,23 +29,23 @@ TestStatus string_vector_create_destroy_test() {
 	char* c_s3 = "test 3";
 	char* c_strings[2] = { c_s1, c_s2 };
 
-	Vector* strings = string_vector_create(c_strings, 2);
+	Array* strings = strings_create(c_strings, 2);
 	Array* string = string_create(c_s3);
-	vector_append(strings, &string);
+	array_append(strings, &string);
 
-	string = *((Array**)vector_get(strings, 0));
+	string = *((Array**)array_get(strings, 0));
 	assert(string != NULL, null_argument("string"));
 	assert(memcmp(string->data, c_s1, string->length * string->element_size) == 0, invalid_argument("string->data"));
 
-	string = *((Array**)vector_get(strings, 1));
+	string = *((Array**)array_get(strings, 1));
 	assert(string != NULL, null_argument("string"));
 	assert(memcmp(string->data, c_s2, string->length * string->element_size) == 0, invalid_argument("string->data"));
 
-	string = *((Array**)vector_get(strings, 2));
+	string = *((Array**)array_get(strings, 2));
 	assert(string != NULL, null_argument("string"));
 	assert(memcmp(string->data, c_s3, string->length * string->element_size) == 0, invalid_argument("string->data"));
 
-	string_vector_destroy(strings);
+	strings_destroy(strings);
 
 	status = TEST_SUCCESS;
 

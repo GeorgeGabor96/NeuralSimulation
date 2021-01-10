@@ -168,7 +168,6 @@
     <ClInclude Include="src\Simulator\stack_tests.h" />
     <ClInclude Include="src\Simulator\string_tests.h" />
     <ClInclude Include="src\Simulator\synapse_tests.h" />
-    <ClInclude Include="src\Simulator\vector_tests.h" />
     <ClInclude Include="src\testing.h" />
   </ItemGroup>
   <ItemGroup>
@@ -181,7 +180,6 @@
     <ClCompile Include="src\Simulator\stack_tests.c" />
     <ClCompile Include="src\Simulator\string_tests.c" />
     <ClCompile Include="src\Simulator\synapse_tests.c" />
-    <ClCompile Include="src\Simulator\vector_tests.c" />
     <ClCompile Include="src\tests.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

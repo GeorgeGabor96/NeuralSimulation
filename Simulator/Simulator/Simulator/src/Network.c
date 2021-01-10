@@ -9,9 +9,9 @@
 *************************************************************/
 Status network_is_valid(Network* network) {
 	check(network != NULL, null_argument("network"));
-	check(vector_is_valid(network->layers) == TRUE, invalid_argument("network->layers"));
-	check(vector_is_valid(network->input_layers) == TRUE, invalid_argument("network->input_layers"));
-	check(vector_is_valid(network->output_layers) == TRUE, invalid_argument("network->output_layers"));
+	check(array_is_valid(network->layers) == TRUE, invalid_argument("network->layers"));
+	check(array_is_valid(network->input_layers) == TRUE, invalid_argument("network->input_layers"));
+	check(array_is_valid(network->output_layers) == TRUE, invalid_argument("network->output_layers"));
 
 	return TRUE;
 
@@ -27,11 +27,11 @@ Network* network_create() {
 	Network* network = (Network*)calloc(1, sizeof(Network));
 	check_memory(network);
 
-	network->layers = vector_create(1, sizeof(Layer));
+	network->layers = array_create(1, sizeof(Layer));
 	check_memory(network->layers);
-	network->input_layers = vector_create(1, sizeof(Layer*));
+	network->input_layers = array_create(1, sizeof(Layer*));
 	check_memory(network->input_layers);
-	network->output_layers = vector_create(1, sizeof(Layer*));
+	network->output_layers = array_create(1, sizeof(Layer*));
 	check_memory(network->output_layers);
 	network->compiled = FALSE;
 
@@ -39,9 +39,9 @@ Network* network_create() {
 
 error:
 	if (network != NULL) {
-		if (network->layers != NULL) vector_destroy(network->layers, layer_reset);
-		if (network->output_layers != NULL) vector_destroy(network->output_layers, NULL);
-		if (network->input_layers != NULL) vector_destroy(network->input_layers, NULL);
+		if (network->layers != NULL) array_destroy(network->layers, layer_reset);
+		if (network->output_layers != NULL) array_destroy(network->output_layers, NULL);
+		if (network->input_layers != NULL) array_destroy(network->input_layers, NULL);
 		free(network);
 	}
 	return NULL;
@@ -54,9 +54,9 @@ void network_destroy(Network* network) {
 	uint32_t i = 0;
 	Layer* layer = NULL;
 
-	vector_destroy(network->layers, layer_reset);
-	vector_destroy(network->input_layers, NULL);
-	vector_destroy(network->output_layers, NULL);
+	array_destroy(network->layers, layer_reset);
+	array_destroy(network->input_layers, NULL);
+	array_destroy(network->output_layers, NULL);
 	free(network);
 
 error:
@@ -69,24 +69,24 @@ Status network_add_layer(Network* network, Layer* layer, Status should_free, Sta
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 
 	Status status = FAIL;
-	status = vector_append(network->layers, layer);
+	status = array_append(network->layers, layer);
 	check(status == SUCCESS, "Could not add layer");
 	// may need to remove the memory that contain the info about the layer, which we copied
 	if (should_free == TRUE) free(layer);
 
 	if (is_input == TRUE) {
-		Layer* network_layer = (Layer*)vector_get(network->layers, network->layers->length - 1);
+		Layer* network_layer = (Layer*)array_get(network->layers, network->layers->length - 1);
 		check(layer_is_valid(network_layer) == TRUE, invalid_argument("network_layer"));
 		// save reference to the current layer
-		status = vector_append(network->input_layers, &network_layer);
+		status = array_append(network->input_layers, &network_layer);
 		check(status == SUCCESS, "Could not add input_layer");
 	}
 
 	if (is_output == TRUE) {
-		Layer* network_layer = (Layer*)vector_get(network->layers, network->layers->length - 1);
+		Layer* network_layer = (Layer*)array_get(network->layers, network->layers->length - 1);
 		check(layer_is_valid(network_layer) == TRUE, invalid_argument("network_layer"));
 		// save reference to the current layer
-		status = vector_append(network->output_layers, &network_layer);
+		status = array_append(network->output_layers, &network_layer);
 		check(status == SUCCESS, "Could not add output_layer");
 	}
 
@@ -102,7 +102,7 @@ Layer* network_get_layer_by_idx(Network* network, uint32_t layer_idx) {
 	check(network_is_valid(network) == TRUE, invalid_argument("network"));
 	check(layer_idx < network->layers->length, "@layer_idx is too big");
 
-	Layer* layer = vector_get(network->layers, layer_idx);
+	Layer* layer = array_get(network->layers, layer_idx);
 	check(layer != NULL, null_argument("layer"));
 	return layer;
 
@@ -118,7 +118,7 @@ Layer* network_get_layer_by_name(Network* network, Array* name) {
 	Layer* layer = NULL;
 
 	for (i = 0; i < network->layers->length; ++i) {
-		layer = (Layer*)vector_get(network->layers, i);
+		layer = (Layer*)array_get(network->layers, i);
 		if (string_compare(layer->name, name) == 0) {
 			return layer;
 		}
@@ -136,7 +136,7 @@ uint32_t network_get_layer_idx_by_name(Network* network, Array* name) {
 	Layer* layer = NULL;
 
 	for (i = 0; i < network->layers->length; ++i) {
-		layer = (Layer*)vector_get(network->layers, i);
+		layer = (Layer*)array_get(network->layers, i);
 		if (string_compare(layer->name, name) == 0) {
 			return i;
 		}
@@ -164,16 +164,16 @@ Status network_compile(Network* network) {
 	Layer* input_layer = NULL;
 	Array* layer_name = NULL;
 	Array* input_name = NULL;
-	Vector* inputs_layers_names = NULL;
+	Array* inputs_layers_names = NULL;
 
 	// check every layer is valid
 	for (i = 0; i < network->layers->length; ++i) {
-		layer = (Layer*)vector_get(network->layers, i);
+		layer = (Layer*)array_get(network->layers, i);
 		check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 
 		// check that the input layers exist
 		for (j = 0; j < layer->input_names->length; ++j) {
-			layer_name = *((Array**)vector_get(layer->input_names, j));
+			layer_name = *((Array**)array_get(layer->input_names, j));
 			input_layer = network_get_layer_by_name(network, layer_name);
 			check(input_layer != NULL, null_argument("input_layer"));
 		}
@@ -184,17 +184,17 @@ Status network_compile(Network* network) {
 	// NOTE: multiple solutions for the same network
 	for (i = 0; i < network->layers->length - 1; i++) {
 loop1:
-		layer = (Layer*)vector_get(network->layers, i);
+		layer = (Layer*)array_get(network->layers, i);
 
 		for (j = 0; j < layer->input_names->length; j++) {
-			input_name = *((Array**)vector_get(layer->input_names, j));
+			input_name = *((Array**)array_get(layer->input_names, j));
 
 			for (k = i + 1; k < network->layers->length; k++) {
-				layer = (Layer*)vector_get(network->layers, k);
+				layer = (Layer*)array_get(network->layers, k);
 
 				// check if layer k is input for layer i, where i < k
 				if (string_compare(layer->name, input_name) == 0) {
-					vector_swap(network->layers, i, k);
+					array_swap(network->layers, i, k);
 					// start over from the same layer
 					goto loop1; // know is bad practice, but is elegant
 				}
@@ -204,10 +204,10 @@ loop1:
 
 	// link the layers
 	for (i = 0; i < network->layers->length; ++i) {
-		layer = (Layer*)vector_get(network->layers, i);
+		layer = (Layer*)array_get(network->layers, i);
 		
 		for (j = 0; j < layer->input_names->length; ++j) {
-			layer_name = *((Array**)vector_get(layer->input_names, j));
+			layer_name = *((Array**)array_get(layer->input_names, j));
 			input_layer = network_get_layer_by_name(network, layer_name);
 			status = layer->link(layer, input_layer);
 			check(status == SUCCESS, "Could not link layers");
@@ -226,9 +226,9 @@ error:
 
 
 // TODO: what if the inputs can be NULL, just to see the evolution
-void network_step(Network* network, Vector* inputs, uint32_t time) {
+void network_step(Network* network, Array* inputs, uint32_t time) {
 	check(network_is_valid(network) == TRUE, invalid_argument("network"));
-	check(vector_is_valid(inputs) == TRUE, invalid_argument("inputs"));
+	check(array_is_valid(inputs) == TRUE, invalid_argument("inputs"));
 	check(inputs->length == network->input_layers->length, "@inputs->length %d should equal @network->input_layers->lenght %d", inputs->length, network->input_layers->length);
 	check(network->compiled == TRUE, invalid_argument("network->compiled"));
 
@@ -237,8 +237,8 @@ void network_step(Network* network, Vector* inputs, uint32_t time) {
 	NetworkValues* input = NULL;
 
 	for (i = 0; i < inputs->length; ++i) {
-		input = (NetworkValues*)vector_get(inputs, i);
-		layer = *((Layer**)vector_get(network->input_layers, i));
+		input = (NetworkValues*)array_get(inputs, i);
+		layer = *((Layer**)array_get(network->input_layers, i));
 		//check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 		check(input->values->length == layer->neurons->length, "for input %u - input lenght %u while layer length %u", i, input->values->length, layer->neurons->length);
 		if (input->type == SPIKES) {
@@ -253,7 +253,7 @@ void network_step(Network* network, Vector* inputs, uint32_t time) {
 	}
 	// TODO: vezi ca la layere de input dai step de 2 ori
 	for (i = 0; i < network->layers->length; ++i) {
-		layer = (Layer*)vector_get(network->layers, i);
+		layer = (Layer*)array_get(network->layers, i);
 		check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 		
 		layer_step(layer, time);
@@ -274,7 +274,7 @@ Array* network_get_outputs(Network* network, NetworkValueType type) {
 	NetworkValues net_values;
 
 	for (i = 0; i < network->output_layers->length; ++i) {
-		output_layer = *((Layer**)vector_get(network->output_layers, i));
+		output_layer = *((Layer**)array_get(network->output_layers, i));
 		check(layer_is_valid(output_layer) == TRUE, invalid_argument("output_layer"));
 
 		if (type == SPIKES) {

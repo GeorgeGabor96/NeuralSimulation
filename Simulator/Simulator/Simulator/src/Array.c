@@ -9,7 +9,8 @@
 *************************************************************/
 bool array_is_valid(Array* array) {
 	check(array != NULL, null_argument("array"));
-	check(array->length > 0, "@array->length == 0");
+	check(array->length <= array->max_length, "@array->length > @array->max_length");
+	check(array->max_length > 0, "@array->max_length == 0");
 	check(array->element_size > 0, "@array->element_size == 0");
 	check(array->data != NULL, null_argument("array->data"));
 
@@ -23,12 +24,15 @@ error:
 * Array Functionality
 *************************************************************/
 Array* array_create(uint32_t length, size_t element_size) {
+	check(length > 0, "@length is 0");
+	check(element_size > 0, "@element_size is 0");
 	// allocate also the element memory
 	Array* array = (Array*)malloc(array_size(length, element_size), "array_create");
 	check_memory(array);
 
+	array->length = 0;
+	array->max_length = length;
 	array->element_size = element_size;
-	array->length = length;
 	array->data = (uint8_t*)array + sizeof(Array);
 
 	return array;
@@ -47,6 +51,7 @@ void array_reset(Array* array, ElemReset reset) {
 			reset(elem);
 		}
 	}
+	array->length = 0;
 
 error:
 	return;
@@ -77,10 +82,28 @@ error:
 
 Status array_set(Array* array, uint32_t index, void* data) {
 	check(array_is_valid(array) == TRUE, invalid_argument("array"));
-	check(data != NULL, null_argument("src_data"));
-	check(index < array->length, "Out of bound value for @index: %u; @array->max_lenght: %u", index, array->length);
+	check(data != NULL, null_argument("data"));
+	check(index < array->length, "@index %u >= array->length %u. Consider using @array_append", index, array->length);
 	
 	array_set_fast(array, index, data);
+	return SUCCESS;
+
+error:
+	return FAIL;
+}
+
+
+Status array_append(Array** array, void* data) {
+	check(array != NULL, null_argument("array"));
+	check(array_is_valid(*array) == TRUE, invalid_argument("vector"));
+	check(data != NULL, null_argument("data"));
+
+	if (array_is_full(*array)) {
+		check(array_expand(array) == SUCCESS, "Array is full and could not allocate more memory");
+	}
+	array_set_fast(*array, (*array)->length, data);
+	((*array)->length)++;
+
 	return SUCCESS;
 
 error:
@@ -92,12 +115,12 @@ Status array_expand(Array** array) {
 	check(array != NULL, null_argument("array"));
 	check(array_is_valid(*array) == TRUE, invalid_argument("array"));
 
-	uint32_t new_length = (*array)->length + ARRAY_EXPAND_RATE;
-	Array* new_array = realloc(*array, array_size(new_length, (*array)->element_size), "array_expand");
+	uint32_t new_max_length = (*array)->length + ARRAY_EXPAND_RATE;
+	Array* new_array = realloc(*array, array_size(new_max_length, (*array)->element_size), "array_expand");
 	check_memory(new_array);
 	// update new array
 	new_array->data = (uint8_t*)new_array + sizeof(Array);
-	new_array->length = new_length;
+	new_array->max_length = new_max_length;
 	*array = new_array;
 
 	return SUCCESS;

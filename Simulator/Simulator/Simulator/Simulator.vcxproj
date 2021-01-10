@@ -160,7 +160,6 @@
     <ClCompile Include="src\Stack.c" />
     <ClCompile Include="src\String.c" />
     <ClCompile Include="src\Synapse.c" />
-    <ClCompile Include="src\Vector.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\config.h" />

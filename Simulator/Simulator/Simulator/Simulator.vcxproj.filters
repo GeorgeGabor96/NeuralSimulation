@@ -59,9 +59,6 @@
     <ClCompile Include="src\Neuron.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Vector.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Network.c">
       <Filter>Source Files</Filter>
     </ClCompile>

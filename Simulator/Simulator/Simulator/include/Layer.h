@@ -37,7 +37,7 @@ struct Layer {
 	Array* neurons;				 // managed by the layer
 	Layer_link link;			 // pointer to link function
 	Array* name;				 // array of char's
-	Vector* input_names;		 // vector of array's of char's
+	Array* input_names;		 // vector of array's of char's
 };
 
 /*
@@ -59,7 +59,7 @@ Status layer_init(
 	NeuronClass* neuron_class,		// valid
 	SynapseClass* synapse_class,	// valid
 	Array* name,					// valid
-	Vector* input_names);			// valid
+	Array* input_names);			// valid
 
 Status layer_init_fully_connected(
 	Layer* layer, 
@@ -67,7 +67,7 @@ Status layer_init_fully_connected(
 	NeuronClass* neuron_class, 
 	SynapseClass* synapse_class, 
 	Array* name, 
-	Vector* input_names);
+	Array* input_names);
 
 Layer* layer_create(
 	LayerType type, 
@@ -75,14 +75,14 @@ Layer* layer_create(
 	NeuronClass* neuron_class, 
 	SynapseClass* synapse_class,
 	Array* name,
-	Vector* input_names);
+	Array* input_names);
 
 Layer* layer_create_fully_connected(
 	uint32_t n_neurons, 
 	NeuronClass* neuron_class, 
 	SynapseClass* synapse_class,
 	Array* name,
-	Vector* input_names);
+	Array* input_names);
 
 void layer_reset(Layer* layer);
 

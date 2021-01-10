@@ -6,7 +6,7 @@
 static inline Layer* layer_get_default(NeuronClass* n_class, SynapseClass* s_class) {
 	Array* l_name = string_create("Layer test");
 	char* input_names[2] = { "Layer input 1", "Layer input 2" };
-	Vector* l_input_names = string_vector_create(input_names, 2);
+	Array* l_input_names = strings_create(input_names, 2);
 	return layer_create(LAYER_FULLY_CONNECTED, 100, n_class, s_class, l_name, l_input_names);
 }
 
@@ -32,7 +32,7 @@ TestStatus layer_create_destroy_test() {
 	}
 	assert(layer->link == layer_link_fc, invalid_argument("layer->link"));
 	assert(array_is_valid(layer->name) == TRUE, invalid_argument("layer->name"));
-	assert(vector_is_valid(layer->input_names) == TRUE, invalid_argument("layer->input_names"));
+	assert(array_is_valid(layer->input_names) == TRUE, invalid_argument("layer->input_names"));
 
 	layer_destroy(layer);
 

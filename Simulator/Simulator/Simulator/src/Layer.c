@@ -14,7 +14,7 @@ Status layer_is_valid(Layer* layer) {
 	check(synapse_class_is_valid(layer->synapse_class) == TRUE, invalid_argument("layer->synapse_class"));
 	check(array_is_valid(layer->neurons) == TRUE, invalid_argument("layer->neurons"));
 	check(array_is_valid(layer->name) == TRUE, invalid_argument("layer->name"));
-	check(vector_is_valid(layer->input_names) == TRUE, invalid_argument("layer->input_names"));
+	check(array_is_valid(layer->input_names) == TRUE, invalid_argument("layer->input_names"));
 
 	return TRUE;
 
@@ -33,14 +33,14 @@ Status layer_init(
 		NeuronClass* neuron_class, 
 		SynapseClass* synapse_class,
 		Array* name,
-		Vector* input_names) {
+		Array* input_names) {
 	// checks
 	check(layer != NULL, null_argument("layer"));
 	check(n_neurons > 0, "@n_neurons is 0");
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
 	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
 	check(array_is_valid(name) == TRUE, invalid_argument("name"));
-	check(vector_is_valid(input_names) == TRUE, invalid_argument("input_names"));
+	check(array_is_valid(input_names) == TRUE, invalid_argument("input_names"));
 
 	layer->neurons = array_create(n_neurons, sizeof(Neuron));
 	check_memory(layer->neurons);
@@ -86,7 +86,7 @@ Status layer_init_fully_connected(
 		NeuronClass* neuron_class, 
 		SynapseClass* synapse_class, 
 		Array* name, 
-		Vector* input_names) {
+		Array* input_names) {
 	return layer_init(layer, LAYER_FULLY_CONNECTED, n_neurons, neuron_class, synapse_class, name, input_names);
 }
 
@@ -97,7 +97,7 @@ Layer* layer_create(
 		NeuronClass* neuron_class, 
 		SynapseClass* synapse_class,
 		Array* name,
-		Vector* input_names) {
+		Array* input_names) {
 	Layer* layer = (Layer*)malloc(sizeof(Layer));
 	check_memory(layer);
 
@@ -119,7 +119,7 @@ Layer* layer_create_fully_connected(
 		NeuronClass* neuron_class, 
 		SynapseClass* synapse_class,
 		Array* name,
-		Vector* input_names) {
+		Array* input_names) {
 	return layer_create(LAYER_FULLY_CONNECTED, n_neurons, neuron_class, synapse_class, name, input_names);
 }
 
@@ -134,7 +134,7 @@ void layer_reset(Layer* layer) {
 	array_destroy(layer->neurons, neuron_reset);
 	layer->link = NULL;
 	string_destroy(layer->name);
-	string_vector_destroy(layer->input_names);
+	strings_destroy(layer->input_names);
 
 error:
 	return;
@@ -218,7 +218,7 @@ Status layer_link_fc(Layer* layer, Layer* input_layer) {
 
 			// copy the synapse into the @neuron_layer and get it back to have the reference fot the @neuron_input_layer
 			neuron_add_in_synapse(neuron_layer, synapse, TRUE);
-			synapse = (Synapse*)vector_get(neuron_layer->in_synapses, neuron_layer->in_synapses->length - 1);
+			synapse = (Synapse*)array_get(neuron_layer->in_synapses, neuron_layer->in_synapses->length - 1);
 			check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 			neuron_add_out_synapse(neuron_input_layer, synapse);
 		}

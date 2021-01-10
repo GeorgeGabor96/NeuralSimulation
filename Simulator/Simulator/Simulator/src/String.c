@@ -40,15 +40,15 @@ error:
 }
 
 
-Vector* string_vector_create(char** strings, uint32_t cnt) {
+Array* strings_create(char** strings, uint32_t cnt) {
 	uint32_t i = 0;
-	Vector* safe_strings = vector_create(cnt, sizeof(Array*));
+	Array* safe_strings = array_create(cnt, sizeof(Array*));
 	check_memory(safe_strings);
 	Array* string = NULL;
 	
 	for (i = 0; i < cnt; ++i) {
 		string = string_create(strings[i]);
-		vector_append(safe_strings, &string);
+		array_append(safe_strings, &string);
 	}
 
 	return safe_strings;
@@ -57,7 +57,7 @@ error:
 	--i;
 	// because unsigned
 	while (i < cnt) {
-		string = *((Array**)vector_get(safe_strings, i));
+		string = *((Array**)array_get(safe_strings, i));
 		string_destroy(string);
 		--i;
 	}
@@ -66,13 +66,13 @@ error:
 }
 
 
-void string_vector_destroy(Vector* strings) {
-	check(vector_is_valid(strings) == TRUE, invalid_argument("strings"));
+void strings_destroy(Array* strings) {
+	check(array_is_valid(strings) == TRUE, invalid_argument("strings"));
 	uint32_t i = 0;
 	Array* string = NULL;
 
 	for (i = 0; i < strings->length; ++i) {
-		string = *((Array**)vector_get(strings, i));
+		string = *((Array**)array_get(strings, i));
 		string_destroy(string);
 	}
 

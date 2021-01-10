@@ -31,9 +31,9 @@ typedef struct Network {
 	/*
 	A layer in @layers can simultaneously be an input oand an output layer (usefull for debuging)
 	*/
-	Vector* layers; // will be added one by one
-	Vector* output_layers; // one or more, keeps references to @layers
-	Vector* input_layers; // one or more, keeps references to @layers
+	Array* layers; // will be added one by one
+	Array* output_layers; // one or more, keeps references to @layers
+	Array* input_layers; // one or more, keeps references to @layers
 	Status compiled; // if the network has been compiled TODO: integrate this
 } Network;
 
@@ -75,7 +75,7 @@ Status network_compile(Network* network);
 
 // forward of the network for an input
 // NOTE the inputs vector should have the same length as the number of input layers and the same number of values
-void network_step(Network* network, Vector* inputs, uint32_t time);
+void network_step(Network* network, Array* inputs, uint32_t time);
 
 Array* network_get_outputs(Network* network, NetworkValueType type);
 

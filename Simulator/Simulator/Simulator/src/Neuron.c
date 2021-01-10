@@ -58,7 +58,7 @@ static inline void neuron_update_out_synapses(Neuron* neuron, uint32_t simulatio
 	Synapse* synapse = NULL;
 
 	for (i = 0u; i < neuron->out_synapses_refs->length; i++) {
-		synapse = *(Synapse**)vector_get(neuron->out_synapses_refs, i);
+		synapse = *(Synapse**)array_get(neuron->out_synapses_refs, i);
 		synapse_add_spike_time(synapse, simulation_time);
 	}
 }
@@ -71,7 +71,7 @@ static inline float neuron_compute_psc(Neuron* neuron, uint32_t simulation_time)
 	Synapse* synapse = NULL;
 
 	for (i = 0u; i < neuron->in_synapses->length; i++) {
-		synapse = (Synapse*)vector_get(neuron->in_synapses, i);
+		synapse = (Synapse*)array_get(neuron->in_synapses, i);
 		PSC += synapse_compute_PSC(synapse, neuron->u);
 		synapse_step(synapse, simulation_time);
 	}
@@ -148,10 +148,10 @@ Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
 	check(neuron != NULL, null_argument("neuron"));
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
 
-	neuron->in_synapses = vector_create(NEURON_INITIAL_SYNAPSE_LENGTH, sizeof(Synapse));
+	neuron->in_synapses = array_create(NEURON_INITIAL_SYNAPSE_LENGTH, sizeof(Synapse));
 	check_memory(neuron->in_synapses);
 
-	neuron->out_synapses_refs = vector_create(NEURON_INITIAL_SYNAPSE_LENGTH, sizeof(Synapse*));
+	neuron->out_synapses_refs = array_create(NEURON_INITIAL_SYNAPSE_LENGTH, sizeof(Synapse*));
 	check_memory(neuron->out_synapses_refs);
 
 	neuron->n_class = neuron_class;
@@ -164,7 +164,7 @@ error:
 	if (neuron != NULL) {
 		// @neuron->out_synapses FAIL
 		if (neuron->in_synapses != NULL) {
-			vector_destroy(neuron->in_synapses, synapse_reset);
+			array_destroy(neuron->in_synapses, synapse_reset);
 		}
 		// NOTE: the called should manage the memory of @neuron
 	}
@@ -175,8 +175,8 @@ error:
 void neuron_reset(Neuron* neuron) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
-	vector_destroy(neuron->in_synapses, synapse_reset);
-	vector_destroy(neuron->out_synapses_refs, NULL);
+	array_destroy(neuron->in_synapses, synapse_reset);
+	array_destroy(neuron->out_synapses_refs, NULL);
 	neuron->n_class = NULL;
 	// NOTE: neuron_class should be managed by the called, may be common to multiple neurons
 
@@ -221,7 +221,7 @@ Status neuron_add_in_synapse(Neuron* neuron, Synapse* synapse, Status should_fre
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 	
 	// NOTE: @neuron keeps internally its INPUT synapses, so copy its content and free it
-	check(vector_append(neuron->in_synapses, synapse) == SUCCESS, "Could not add new INPUT synapse");
+	check(array_append(neuron->in_synapses, synapse) == SUCCESS, "Could not add new INPUT synapse");
 	if (should_free == TRUE) free(synapse);
 
 	status = SUCCESS;
@@ -237,7 +237,7 @@ Status neuron_add_out_synapse(Neuron* neuron, Synapse* synapse) {
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 
 	// NOTE: @neuron keeps references to its OUTPUT synapses, so keeps a reference to it
-	check(vector_append(neuron->out_synapses_refs, &synapse) == SUCCESS, "Could not add new OUTPUT synapse");
+	check(array_append(neuron->out_synapses_refs, &synapse) == SUCCESS, "Could not add new OUTPUT synapse");
 
 	status = SUCCESS;
 

@@ -13,19 +13,19 @@ TestStatus network_create_compile_destroy_test() {
 
 	// layer 1
 	Array* name1 = string_create("layer1");
-	Vector* input_names1 = vector_create(1, sizeof(Array*));
+	Array* input_names1 = array_create(1, sizeof(Array*));
 	Layer* layer1 = layer_create_fully_connected(10, n_class, s_class, name1, input_names1);
 
 	// layer 2
 	Array* name2 = string_create("layer2");
 	char* inputs_2[1] = { "layer1" };
-	Vector* input_names2 = string_vector_create(inputs_2, 1);
+	Array* input_names2 = string_create(inputs_2, 1);
 	Layer* layer2 = layer_create_fully_connected(100, n_class, s_class, name2, input_names2);
 
 	// layer 3
 	Array* name3 = string_create("layer3");
 	char* inputs_3[1] = { "layer2" };
-	Vector* input_names3 = string_vector_create(inputs_3, 1);
+	Array* input_names3 = string_create(inputs_3, 1);
 	Layer* layer3 = layer_create_fully_connected(1, n_class, s_class, name3, input_names3);
 
 	// add layers into a network
@@ -61,14 +61,14 @@ TestStatus network_create_compile_destroy_test() {
 
 	// check network input layers
 	assert(network->input_layers->length == 1, invalid_argument("network->input_layers->length"));
-	layer = *((Layer**)vector_get(network->input_layers, 0));
+	layer = *((Layer**)array_get(network->input_layers, 0));
 	assert(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	assert(string_compare(layer->name, name1) == 0, invalid_argument("layer->name"));
 	assert(layer->neurons->length == 10, invalid_argument("layer->neurons->length"));
 	
 	// check network output layers
 	assert(network->output_layers->length == 1, invalid_argument("network->output_layers->length"));
-	layer = *((Layer**)vector_get(network->output_layers, 0));
+	layer = *((Layer**)array_get(network->output_layers, 0));
 	assert(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	assert(string_compare(layer->name, name3) == 0, invalid_argument("layer->name"));
 	assert(layer->neurons->length == 1, invalid_argument("layer->neurons->length"));
@@ -108,19 +108,19 @@ TestStatus network_step_test() {
 	// layer 1
 	Array* name1 = string_create("layer1");
 	uint32_t input_length = 10;
-	Vector* input_names1 = vector_create(1, sizeof(Array*));
+	Array* input_names1 = array_create(1, sizeof(Array*));
 	Layer* layer1 = layer_create_fully_connected(input_length, n_class, s_class, name1, input_names1);
 
 	// layer 2
 	Array* name2 = string_create("layer2");
 	char* inputs_2[1] = { "layer1" };
-	Vector* input_names2 = string_vector_create(inputs_2, 1);
+	Array* input_names2 = string_create(inputs_2, 1);
 	Layer* layer2 = layer_create_fully_connected(100, n_class, s_class, name2, input_names2);
 
 	// layer 3
 	Array* name3 = string_create("layer3");
 	char* inputs_3[1] = { "layer2" };
-	Vector* input_names3 = string_vector_create(inputs_3, 1);
+	Array* input_names3 = strings_create(inputs_3, 1);
 	Layer* layer3 = layer_create_fully_connected(1, n_class, s_class, name3, input_names3);
 
 	// add layers into a network
@@ -133,7 +133,7 @@ TestStatus network_step_test() {
 	network_compile(network);
 
 	// build input for network
-	Vector* inputs = vector_create(1, sizeof(NetworkValues));
+	Array* inputs = array_create(1, sizeof(NetworkValues));
 	Array* values = array_create(input_length, sizeof(float));
 	float PSC = 1.0f;
 	for (i = 0; i < values->length; ++i) array_set(values, i, &PSC);
@@ -141,7 +141,7 @@ TestStatus network_step_test() {
 	NetworkValues net_input;
 	net_input.type = CURRENT;
 	net_input.values = values;
-	vector_append(inputs, &net_input);
+	array_append(inputs, &net_input);
 
 	for (int i = 0; i < 100; ++i) {
 		log_info("Loop %d", i);

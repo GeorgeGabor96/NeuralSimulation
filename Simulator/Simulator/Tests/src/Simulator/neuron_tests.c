@@ -128,8 +128,8 @@ TestStatus neuron_destroy_test() {
 	n_class.type = LIF_NEURON;
 	neuron_class_set_LIF_parameters(&n_class, LIF_U_TH, LIF_U_REST, LIF_R, LIF_C);
 	Neuron* neuron = neuron_create(&n_class);
-	Vector* in_synapses = neuron->in_synapses;
-	Vector* out_synapses = neuron->out_synapses_refs;
+	Array* in_synapses = neuron->in_synapses;
+	Array* out_synapses = neuron->out_synapses_refs;
 
 	// call with @neuron = NULL
 	neuron_destroy(NULL);
@@ -156,8 +156,8 @@ TestStatus neuron_add_in_synapse_test() {
 	TestStatus status = TEST_FAILED;
 	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
 	Neuron* neuron = neuron_create(n_class);
-	Vector* in_synapses = neuron->in_synapses;
-	Vector* out_synapses = neuron->out_synapses_refs;
+	Array* in_synapses = neuron->in_synapses;
+	Array* out_synapses = neuron->out_synapses_refs;
 	
 	// create tests synapses
 	SynapseClass* s_class = synapse_class_create_default();
@@ -189,9 +189,9 @@ TestStatus neuron_add_in_synapse_test() {
 	assert(neuron->in_synapses->length == 2, "@neuron->in_synapses->lenght should be 2 not %u", neuron->in_synapses->length);
 	
 	// check synapses
-	sy = (Synapse*)vector_get(neuron->in_synapses, 0);
+	sy = (Synapse*)array_get(neuron->in_synapses, 0);
 	assert(memcmp(sy, &sy1_copy, sizeof(Synapse)) == 0, "@sy and @sy1_copy should have the same values");
-	sy = (Synapse*)vector_get(neuron->in_synapses, 1);
+	sy = (Synapse*)array_get(neuron->in_synapses, 1);
 	assert(memcmp(sy, &sy2_copy, sizeof(Synapse)) == 0, "@sy and @sy2_copy should have the same values");
 
 	status = TEST_SUCCESS;
@@ -210,8 +210,8 @@ TestStatus neuron_add_out_synapse_test() {
 	TestStatus status = TEST_FAILED;
 	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
 	Neuron* neuron = neuron_create(n_class);
-	Vector* in_synapses = neuron->in_synapses;
-	Vector* out_synapses = neuron->out_synapses_refs;
+	Array* in_synapses = neuron->in_synapses;
+	Array* out_synapses = neuron->out_synapses_refs;
 
 	// create tests synapses
 	float w1 = 1.1f;
@@ -244,10 +244,10 @@ TestStatus neuron_add_out_synapse_test() {
 	assert(neuron->out_synapses_refs->length == 2, "@neuron->in_synapses->lenght should be 2 not %u", neuron->in_synapses->length);
 
 	// check synapses
-	sy = *(Synapse**)vector_get(neuron->out_synapses_refs, 0);
+	sy = *(Synapse**)array_get(neuron->out_synapses_refs, 0);
 	assert(sy == sy1, "@sy should be %p not %p", sy1, sy);
 	assert(memcmp(sy, &sy1_copy, sizeof(Synapse)) == 0, "@sy and @sy1_copy should have the same values");
-	sy = *(Synapse**)vector_get(neuron->out_synapses_refs, 1);
+	sy = *(Synapse**)array_get(neuron->out_synapses_refs, 1);
 	assert(sy == sy2, "@sy should be %p not %p", sy2, sy);
 	assert(memcmp(sy, &sy2_copy, sizeof(Synapse)) == 0, "@sy and @sy2_copy should have the same values");
 
@@ -281,8 +281,8 @@ TestStatus neuron_step_test() {
 	neuron_add_in_synapse(neuron, synapse_create(s_class, 2.0f), FALSE);
 	neuron_add_out_synapse(neuron, sy_out);
 
-	sy_in_1 = (Synapse*)vector_get(neuron->in_synapses, 0);
-	sy_in_2 = (Synapse*)vector_get(neuron->in_synapses, 1);
+	sy_in_1 = (Synapse*)array_get(neuron->in_synapses, 0);
+	sy_in_2 = (Synapse*)array_get(neuron->in_synapses, 1);
 
 	// case 1: no spyke due to low conductances
 	sy_in_1->g = 1.0f;

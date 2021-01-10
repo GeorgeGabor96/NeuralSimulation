@@ -55,8 +55,8 @@ Status neuron_class_set_LIF_parameters(NeuronClass* neuron_class, float u_th, fl
 typedef struct Neuron {
 	NeuronClass* n_class;
 	float u;
-	Vector* in_synapses;		// input synapses are kept in the neuron
-	Vector* out_synapses_refs;  // references to output synapses
+	Array* in_synapses;		// input synapses are kept in the neuron
+	Array* out_synapses_refs;  // references to output synapses
 	Status spike;
 } Neuron;
 

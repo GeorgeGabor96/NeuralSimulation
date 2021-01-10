@@ -4,7 +4,7 @@
 #include "../testing.h"
 
 
-TestStatus array_create_set_get_destroy_test();
+TestStatus array_general_use_case_test();
 TestStatus array_expand_test();
 TestStatus array_show_test();
 TestStatus array_copy_data_test();
