@@ -218,7 +218,7 @@ Status layer_link_fc(Layer* layer, Layer* input_layer) {
 
 			// copy the synapse into the @neuron_layer and get it back to have the reference fot the @neuron_input_layer
 			neuron_add_in_synapse(neuron_layer, synapse, TRUE);
-			synapse = (Synapse*)array_get(neuron_layer->in_synapses, neuron_layer->in_synapses->length - 1);
+			synapse = (Synapse*)array_get(&(neuron_layer->in_synapses), neuron_layer->in_synapses.length - 1);
 			check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 			neuron_add_out_synapse(neuron_input_layer, synapse);
 		}

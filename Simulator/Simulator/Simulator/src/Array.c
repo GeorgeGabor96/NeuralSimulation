@@ -54,6 +54,7 @@ Status array_init(Array* array, uint32_t length, uint32_t initial_length, size_t
 	return SUCCESS;
 
 error:
+	array->data = NULL;
 	return FAIL;
 }
 

@@ -40,11 +40,8 @@ typedef struct NeuronClass {
 2. neuron_class->type is a valid one
 */
 Status neuron_class_is_valid(NeuronClass* neuron_class);
-
 NeuronClass* neuron_class_create(NeuronType type);
-
 void neuron_class_destroy(NeuronClass* neuron_class);
-
 Status neuron_class_set_LIF_parameters(NeuronClass* neuron_class, float u_th, float u_rest, float r, float c);
 
 
@@ -54,10 +51,10 @@ Status neuron_class_set_LIF_parameters(NeuronClass* neuron_class, float u_th, fl
 
 typedef struct Neuron {
 	NeuronClass* n_class;
+	Array in_synapses;		// input synapses are kept in the neuron
+	Array out_synapses_refs;  // references to output synapses
 	float u;
-	Array* in_synapses;		// input synapses are kept in the neuron
-	Array* out_synapses_refs;  // references to output synapses
-	Status spike;
+	bool spike;
 } Neuron;
 
 
@@ -67,22 +64,19 @@ typedef struct Neuron {
 General function to verify that a neuron is valid
 A @neuron is valid if:
 1. @neuron != NULL
-2. @neuron->in_synapses_refs != NULL
-3. @neuron->out_synapses_refs != NULL
+2. @neuron->n_class is valid
+3. @neuron->in_synapses_refs is valid
+4. @neuron->out_synapses_refs is valid
 */
 Status neuron_is_valid(Neuron* neuron);
-
-// Used to fill a neuron structure already allocated
 Status neuron_init(Neuron* neuron, NeuronClass* neuron_class);
-// release information stored in neuron
 void neuron_reset(Neuron* neuron);
-
 Neuron* neuron_create(NeuronClass* neuron_class);
 void neuron_destroy(Neuron* neuron);
 
 /*
 * THIS will copy the content of @synapse and free it if should_free is TRUE
-* Synapses are kept by the neuron for which they are input
+* Synapses are kept and freed by the neuron for which they are input
 */
 Status neuron_add_in_synapse(Neuron* neuron, Synapse* synapse, Status should_free);
 
@@ -106,8 +100,6 @@ Status neuron_force_spike(Neuron* neuron, uint32_t simulation_time);
 * input synapses
 */
 Status neuron_inject_current(Neuron* neuron, float PSC, uint32_t simulation_time);
-
-// TODO: may be a usecase when you want to force spikes and also inject current??
 
 
 #endif // __NEURON_H__

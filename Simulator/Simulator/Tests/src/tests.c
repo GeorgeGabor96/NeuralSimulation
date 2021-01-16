@@ -50,6 +50,10 @@ TestInfo tests[] = {
 	{ synapse_add_spike_time_test, "synapse_add_spike_time_test" },
 	{ synapse_compute_PSC_test, "synapse_compute_PSC_test" },
 	{ synapse_step_test, "synapse_step_test" },
+
+	// NEURON
+	{ neuron_general_use_case_test, "neuron_general_use_case_test" },
+	{ neuron_memory_test, "neuron_memory_test" },
 };
 
 
