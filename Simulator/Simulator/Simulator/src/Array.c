@@ -24,35 +24,53 @@ error:
 * Array Functionality
 *************************************************************/
 Array* array_create(uint32_t length, uint32_t initial_length, size_t element_size) {
+	Array* array = NULL;
+	Status status = FAIL;
+
 	check(length > 0, "@length is 0");
 	check(initial_length <= length, "@initial_length > @length");
 	check(element_size > 0, "@element_size is 0");
-	// allocate also the element memory
-	Array* array = (Array*)malloc(array_size(length, element_size), "array_create");
+
+	array = (Array*)calloc(1, sizeof(Array), "array_create");
 	check_memory(array);
 
-	array->length = initial_length;
-	array->max_length = length;
-	array->element_size = element_size;
-	array->data = (uint8_t*)array + sizeof(Array);
+	status = array_init(array, length, initial_length, element_size);
+	check(status == SUCCESS, "Could not initialize @array");
 
 	return array;
 
 error:
+	if (array != NULL) free(array);
 	return NULL;
 }
 
 
+Status array_init(Array* array, uint32_t length, uint32_t initial_length, size_t element_size) {
+	array->length = initial_length;
+	array->max_length = length;
+	array->element_size = element_size;
+	array->data = (uint8_t*)array + sizeof(Array);
+	array->data = malloc(length * element_size, "array_init");
+	check_memory(array->data);
+	return SUCCESS;
+
+error:
+	return FAIL;
+}
+
+
 void array_reset(Array* array, ElemReset reset) {
+	void* elem = NULL;
 	check(array_is_valid(array) == TRUE, invalid_argument("array"));
+
 	if (reset != NULL) {
-		void* elem = NULL;
 		for (uint32_t i = 0; i < array->length; ++i) {
 			elem = array_get(array, i);
 			reset(elem);
 		}
 	}
 	array->length = 0;
+	free(array->data);
 
 error:
 	return;
@@ -94,16 +112,18 @@ error:
 }
 
 
-Status array_append(Array** array, void* data) {
+Status array_append(Array* array, void* data) {
+	Status status = FAIL;
 	check(array != NULL, null_argument("array"));
-	check(array_is_valid(*array) == TRUE, invalid_argument("vector"));
+	check(array_is_valid(array) == TRUE, invalid_argument("vector"));
 	check(data != NULL, null_argument("data"));
 
-	if (array_is_full(*array)) {
-		check(array_expand(array) == SUCCESS, "Array is full and could not allocate more memory");
+	if (array_is_full(array)) {
+		status = array_expand(array);
+		check(status == SUCCESS, "Array is full and could not allocate more memory");
 	}
-	array_set_fast(*array, (*array)->length, data);
-	((*array)->length)++;
+	array_set_fast(array, array->length, data);
+	(array->length)++;
 
 	return SUCCESS;
 
@@ -112,17 +132,19 @@ error:
 }
 
 
-Status array_expand(Array** array) {
-	check(array != NULL, null_argument("array"));
-	check(array_is_valid(*array) == TRUE, invalid_argument("array"));
+Status array_expand(Array* array) {
+	uint32_t new_max_length = 0;
+	void* new_data = NULL;
 
-	uint32_t new_max_length = (*array)->length + ARRAY_EXPAND_RATE;
-	Array* new_array = realloc(*array, array_size(new_max_length, (*array)->element_size), "array_expand");
-	check_memory(new_array);
-	// update new array
-	new_array->data = (uint8_t*)new_array + sizeof(Array);
-	new_array->max_length = new_max_length;
-	*array = new_array;
+	check(array != NULL, null_argument("array"));
+	check(array_is_valid(array) == TRUE, invalid_argument("array"));
+
+	new_max_length = array->length + ARRAY_EXPAND_RATE;
+	new_data = realloc(array->data, new_max_length * array->element_size, "array_expand");
+	check_memory(new_data);
+
+	array->data = (uint8_t*) new_data;
+	array->max_length = new_max_length;
 
 	return SUCCESS;
 
@@ -132,10 +154,11 @@ error:
 
 
 void array_show(Array* array, ShowElem show) {
+	uint32_t i = 0;
+	
 	check(array_is_valid(array) == TRUE, invalid_argument("array"));
 	check(show != NULL, null_argument("show"));
 
-	uint32_t i = 0;
 	for (i = 0; i < array->length; ++i) {
 		show(array_get(array, i));
 	}
@@ -163,13 +186,17 @@ error:
 
 
 Status array_swap(Array* array, uint32_t i, uint32_t j) {
+	void* data1 = NULL;
+	void* data2 = NULL;
+	void* aux = NULL;
+	
 	check(array_is_valid(array) == TRUE, invalid_argument("array"));
 	check(i < array->length, "Out of bound value for @i: %u; @array->length: %u", i, array->length);
 	check(j < array->length, "Out of bound value for @j: %u; @array->length: %u", j, array->length);
 
-	void* data1 = array_get_fast(array, i);
-	void* data2 = array_get_fast(array, j);
-	void* aux = malloc(array->element_size, "array_swap");
+	data1 = array_get_fast(array, i);
+	data2 = array_get_fast(array, j);
+	aux = malloc(array->element_size, "array_swap");
 	check_memory(aux);
 
 	memcpy(aux, data1, array->element_size);

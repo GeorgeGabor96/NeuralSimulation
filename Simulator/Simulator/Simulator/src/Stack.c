@@ -4,94 +4,48 @@
 #include "debug.h"
 
 
-/*************************************************************
-* CHECKS FUNCTIONS
-*************************************************************/
-Status stack_is_valid(Stack* stack) {
-	check(stack != NULL, null_argument("stack"));
-	check(array_is_valid(&(stack->array)) == TRUE, invalid_argument("stack->array"));
-	check(stack->top <= stack->array.length, "@stack->top is bigger than @stack->array.length");
-
-	return TRUE;
-error:
-	return FALSE;
-}
-
-
-/*************************************************************
-* Stack Functionality
-*************************************************************/
-Stack* stack_create(uint32_t length, size_t element_size) {
-	Stack* stack = (Stack*)malloc(sizeof(Stack));
-	check_memory(stack);
-
-	stack->array.data = malloc(length * element_size);
-	check_memory(stack->array.data);
-
-	stack->top = 0;
-	stack->array.length = length;
-	stack->array.element_size = element_size;
-
-	return stack;
-
-error:
-	if (stack != NULL) {
-		free(stack);
-	}
-	return NULL;
-}
-
-
-void stack_destroy(Stack* stack, ElemReset reset) {
-	check(stack_is_valid(stack), invalid_argument("stack"));
-	array_reset(&(stack->array), reset);
-	free(stack->array.data);
-	free(stack);
-
-error:
-	return;
-}
-
-
-Status stack_push(Stack* stack, void* data) {
+Status stack_push(Stack* stack_p, void* data_p) {
 	Status status = FAIL;
-	check(stack_is_valid(stack), invalid_argument("stack"));
-	check(data != NULL, "NULL value for @data");
+	check(stack_is_valid(stack_p), invalid_argument("stack_p"));
+	check(data_p != NULL, "NULL value for @data_p");
 
-	if (stack_is_full(stack)) {
-		check(array_expand(&(stack->array)) == SUCCESS, "Stack is full and could not allocate more memory");
+	if (stack_is_full(stack_p)) {
+		status = array_expand(stack_p);
+		check(status == SUCCESS, "Stack is full and could not allocate more memory");
 	}
 
-	array_set_fast(&(stack->array), (stack->top)++, data);
+	array_set_fast(stack_p, stack_p->length, data_p);
+	++(stack_p->length);
 
-	status = SUCCESS;
+	return SUCCESS;
 
 error:
-	return status;
+	return FAIL;
 }
 
 
-void* stack_pop(Stack* stack) {
-	void* element = NULL;
-	check(stack_is_valid(stack), invalid_argument("stack"));
+void* stack_pop(Stack* stack_p) {
+	void* element_p = NULL;
+	check(stack_is_valid(stack_p), invalid_argument("stack_p"));
 
-	if (!stack_is_empty(stack)) {
-		element = array_get_fast(&(stack->array), --(stack->top));
+	if (!stack_is_empty(stack_p)) {
+		--(stack_p->length);
+		element_p = array_get_fast(stack_p, stack_p->length);
 	}
 
 error:
-	return element;
+	return element_p;
 }
 
 
-void* stack_top(Stack* stack) {
-	void* element = NULL;
-	check(stack_is_valid(stack), invalid_argument("stack"));
+void* stack_top(Stack* stack_p) {
+	void* element_p = NULL;
+	check(stack_is_valid(stack_p), invalid_argument("stack_p"));
 
-	if (!stack_is_empty(stack)) {
-		element = array_get_fast(&(stack->array), stack->top - 1);
+	if (!stack_is_empty(stack_p)) {
+		element_p = array_get_fast(stack_p, stack_p->length - 1);
 	}
 
 error:
-	return element;
+	return element_p;
 }

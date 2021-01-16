@@ -53,7 +53,7 @@ Array* strings_create(char** strings_pp, uint32_t cnt) {
 	for (i = 0; i < cnt; ++i) {
 		string_p = string_create(strings_pp[i]);
 		check_memory(string_p);
-		array_append(&safe_strings_p, &string_p);
+		array_append(safe_strings_p, &string_p);
 	}
 	return safe_strings_p;
 
@@ -74,13 +74,13 @@ error:
 void strings_destroy(Array* strings_p) {
 	check(array_is_valid(strings_p) == TRUE, invalid_argument("strings_p"));
 	uint32_t i = 0;
-	String** string_pp = NULL;
+	String* string_p = NULL;
 
 	// array contains pointers so we can't make a function to reset them
 	for (i = 0; i < strings_p->length; ++i) {
-		string_pp = ((String**)array_get(strings_p, i));
-		check(array_is_valid(*string_pp) == TRUE, invalid_argument("string_pp"));
-		string_destroy(*string_pp);
+		string_p = *((String**)array_get(strings_p, i));
+		check(array_is_valid(string_p) == TRUE, invalid_argument("string_pp"));
+		string_destroy(string_p);
 	}
 	array_destroy(strings_p, NULL);
 error:

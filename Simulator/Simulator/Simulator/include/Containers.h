@@ -39,8 +39,8 @@ typedef struct Array {
 #define array_get_cast(a, i, t) ((t) array_get(a, i))
 #define array_data_size(a) ((a)->length * (a)->element_size)
 #define array_data_reset(a) (memset((a)->data, 0, array_data_size(a))) // sets all bytes in data to 0
-#define array_size(length, element_size) (sizeof(Array) + (length) * (element_size))
 #define array_is_full(a) ((a)->length == (a)->max_length)
+#define array_is_empty(a) ((a)->length == 0)
 
 /*
 Verify that an @array is valid, meaning:
@@ -52,15 +52,32 @@ Verify that an @array is valid, meaning:
 */
 bool array_is_valid(Array* array);
 Array* array_create(uint32_t length, uint32_t initial_length, size_t element_size);
+Status array_init(Array* array, uint32_t length, uint32_t initial_length, size_t element_size);
 void array_reset(Array* array, ElemReset reset); // resets the content of the @array->data, @array remains valid
 void array_destroy(Array* array, ElemReset reset);
-Status array_append(Array** array, void* data);
+Status array_append(Array* array, void* data);
 Status array_set(Array* array, uint32_t index, void* data);
 void* array_get(Array* array, uint32_t index);
-Status array_expand(Array** array);
+Status array_expand(Array* array);
 void array_show(Array* array, ShowElem show);
 void array_copy_data(Array* array, void* data, uint32_t start_idx, uint32_t elem_cnt);
 Status array_swap(Array* array, uint32_t i, uint32_t j);
+
+// stack functionality
+typedef Array Stack;
+#define stack_is_full(stack) array_is_full(stack)
+#define stack_is_empty(stack) array_is_empty(stack)
+
+/*
+Stack is valid == array is valid
+*/
+#define stack_is_valid(stack) array_is_valid(stack)
+#define stack_create(length, element_size) array_create(length, 0, element_size)
+#define stack_destroy(stack, reset) array_destroy(stack, reset)
+
+Status stack_push(Stack* stack_p, void* data_p);
+void* stack_pop(Stack* stack_p);
+void* stack_top(Stack* stack_p);
 
 
 /*************************************************************
@@ -74,39 +91,6 @@ void string_destroy(String* string_p);
 Array* strings_create(char** strings_pp, uint32_t cnt);
 void strings_destroy(Array* strings_p);
 int string_compare(String* string1_p, String* string2_p);
-
-
-
-/*************************************************************
-* Stack Functionality
-*************************************************************/
-typedef struct Stack {
-	uint32_t top;   // points to the next element
-	Array array;
-} Stack;
-
-#define stack_is_full(s) ((s)->top == (s)->array.length)
-#define stack_is_empty(s) ((s)->top == 0)
-#define stack_pop_cast(s, t) ((t) stack_pop(s))
-#define stack_top_cast(s, t) ((t) stack_top(s))
-
-/*
-Verify that the @stack is valid, meaning:
-1. stack != NULL
-2. stack->array is valid
-3. stack->top <= stack->array.length
-*/
-Status stack_is_valid(Stack* stack);
-
-Stack* stack_create(uint32_t length, size_t element_size);
-
-void stack_destroy(Stack* stack, ElemReset reset);
-
-Status stack_push(Stack* stack, void* data);
-
-void* stack_pop(Stack* stack);
-
-void* stack_top(Stack* stack);
 
 
 /*************************************************************

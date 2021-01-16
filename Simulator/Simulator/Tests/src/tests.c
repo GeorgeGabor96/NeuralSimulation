@@ -8,8 +8,8 @@
 // need rework
 #include "Simulator/array_tests.h"
 #include "Simulator/string_tests.h"
-
 #include "Simulator/stack_tests.h"
+
 #include "Simulator/queue_tests.h"
 #include "Simulator/synapse_tests.h"
 #include "Simulator/neuron_tests.h"
@@ -33,6 +33,10 @@ TestInfo tests[] = {
 	{ string_create_destroy_test, "string_create_destroy_test" },
 	{ strings_create_destroy_test, "strings_create_destroy_test" },
 	{ string_memory_stress_test, "string_memory_stress_test" },
+
+	// STACK
+	{ stack_general_use_case_test, "stack_general_use_case_test" },
+	{ stack_memory_test, "stack_memory_test" },
 };
 
 /*

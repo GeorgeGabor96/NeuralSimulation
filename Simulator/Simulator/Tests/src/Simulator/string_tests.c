@@ -32,7 +32,7 @@ TestStatus strings_create_destroy_test() {
 	Array* strings_p = strings_create(c_strings_pp, 2);
 	String* string_p = string_create(c_s3_p);
 	String** string_pp = NULL;
-	array_append(&strings_p, &string_p);
+	array_append(strings_p, &string_p);
 
 	string_pp = (String**)array_get(strings_p, 0);
 	assert(string_pp != NULL, null_argument("string_pp"));

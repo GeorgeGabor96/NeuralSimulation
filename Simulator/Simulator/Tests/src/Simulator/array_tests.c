@@ -20,14 +20,14 @@ TestStatus array_general_use_case_test() {
 	assert(array->element_size == element_size, "@array->element_size is %llu, not %llu", array->element_size, element_size);
 
 	// append
-	for (i = 0; i < array->max_length; ++i) assert(array_append(&array, &i) == SUCCESS, "@array_append failed");
+	for (i = 0; i < array->max_length; ++i) assert(array_append(array, &i) == SUCCESS, "@array_append failed");
 	for (i = 0; i < array->length; ++i) {
 		value = *((uint32_t*)array_get(array, i));
 		assert(value == i, "@value is %u, not %u", value, i);
 	}
 
 	value = 25;
-	assert(array_append(&array, &value) == SUCCESS, "@array_expand failed");
+	assert(array_append(array, &value) == SUCCESS, "@array_expand failed");
 	assert(array->max_length == 10 + ARRAY_EXPAND_RATE, "@array->max_length is %u, not %u", array->max_length, 10 + ARRAY_EXPAND_RATE);
 	assert(array->length == 11, "@array->length is %u, not %u", array->length, 11);
 	value = *((uint32_t*)array_get(array, 10));
@@ -55,7 +55,7 @@ TestStatus array_general_use_case_test() {
 	assert(array_create(1, 0, 0) == NULL, "Should fail for invalid @element_size");
 
 	assert(array_append(NULL, &value) == FAIL, "Should fail for invalid @array");
-	assert(array_append(&array, NULL) == FAIL, "Should fail for invalid @data");
+	assert(array_append(array, NULL) == FAIL, "Should fail for invalid @data");
 
 	assert(array_set(NULL, 1, &val_1) == FAIL, "Should fail for invalid array");
 	assert(array_set(array, 11, &val_1) == FAIL, "Should fail for invalid index");
@@ -83,7 +83,11 @@ TestStatus array_memory_test() {
 	// allocate a lot of arrays and check memory
 	Array* arrays[1000] = { NULL };
 	uint32_t i = 0;
-	for (i = 0; i < 1000; ++i) arrays[i] = array_create(100, 0, sizeof(uint32_t));
+	uint32_t j = 0;
+	for (i = 0; i < 1000; ++i) {
+		arrays[i] = array_create(100, 0, sizeof(uint32_t));
+		for (j = 0; j < 1000; ++j) array_append(arrays[i], &j);
+	}
 	for (i = 0; i < 1000; ++i) array_destroy(arrays[i], NULL);
 	assert(memory_leak() == TRUE, "Memory leak");
 
@@ -103,11 +107,11 @@ TestStatus array_expand_test() {
 	Array* array = array_create(length_orig, 0,sizeof(uint32_t));
 	// add elements
 	for (i = 0; i < length_orig; ++i) {
-		array_append(&array, &(a[i]));
+		array_append(array, &(a[i]));
 	}
 
 	memory_leak();
-	assert(array_expand(&array) == SUCCESS, "Should be able to expand @array");
+	assert(array_expand(array) == SUCCESS, "Should be able to expand @array");
 	assert(array->max_length == length_orig + ARRAY_EXPAND_RATE, "@array->max_length is %u, not %u", array->max_length, length_orig + ARRAY_EXPAND_RATE);
 	assert(array->length == 2, "@array->length is %u, not %u", array->length, 2);
 	memory_leak();
@@ -115,7 +119,7 @@ TestStatus array_expand_test() {
 	memset(array->data + array->element_size * length_orig, 0, array->element_size * (array->length - length_orig));
 
 	for (i = length_orig; i < 4; ++i) {
-		array_append(&array, &(a[i]));
+		array_append(array, &(a[i]));
 	}
 
 	// check content
@@ -147,7 +151,7 @@ TestStatus array_show_test() {
 	uint32_t i = 0;
 
 	for (i = 0; i < 10; i++) {
-		array_append(&array, &i);
+		array_append(array, &i);
 	}
 
 	array_show(array, show_uint32_t);
