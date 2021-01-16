@@ -1,6 +1,8 @@
-#include "Synapse.h"
 #include <math.h>
-#include <stdlib.h>
+
+#include "Synapse.h"
+#include "MemoryManagement.h"
+
 
 
 /*************************************************************
@@ -21,7 +23,7 @@ error:
 Status synapse_is_valid(Synapse* synapse) {
 	check(synapse != NULL, null_argument("synapse"));
 	check(synapse->s_class != NULL, null_argument("synapse->s_class"));
-	check(synapse->spike_times != NULL, null_argument("synapse->spike_times"));
+	check(queue_is_valid(&(synapse->spike_times)) == TRUE, invalid_argument("synapse->spike_times"));
 
 	return TRUE;
 
@@ -38,7 +40,7 @@ SynapseClass* synapse_class_create(float rev_potential, float tau_ms, uint32_t d
 	check(simulation_step_ms > 0.0, "@simulation_step_ms should be > 0");
 	check(type == CONDUCTANCE_SYNAPCE || type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("type"));
 
-	SynapseClass* synapse_class = (SynapseClass*)malloc(sizeof(SynapseClass));
+	SynapseClass* synapse_class = (SynapseClass*)malloc(sizeof(SynapseClass), "synapse_class_create");
 	check_memory(synapse_class);
 
 	synapse_class->E = rev_potential;
@@ -70,29 +72,26 @@ error:
 * Synapse Functionality
 *************************************************************/
 Status synapse_init(Synapse* synapse, SynapseClass* s_class, float w) {
+	Status status = FAIL;
 	check(synapse != NULL, null_argument("synapse"));
 	check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
 
-	synapse->spike_times = queue_create(SYNAPSE_INITIAL_SPIKE_CAPACITY, sizeof(uint32_t));
-	check_memory(synapse->spike_times);
+	status = queue_init(&(synapse->spike_times), SYNAPSE_INITIAL_SPIKE_CAPACITY, sizeof(uint32_t));
+	check(status == SUCCESS, "Could not init @synapse->spike_times");
 	synapse->s_class = s_class;
 	synapse->w = w;
 	synapse->g = 0.0f;
 
-	return SUCCESS;
-
 error:
-	// queue allocation failed
-	return FAIL;
+	return status;
 }
 
 
 void synapse_reset(Synapse* synapse) {
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 
-	queue_destroy(synapse->spike_times, NULL);
+	queue_reset(&(synapse->spike_times), NULL);
 	synapse->s_class = NULL;
-	// NOTE: synapse->s_class should be managed by caller
 
 error:
 	return;
@@ -101,11 +100,13 @@ error:
 
 Synapse* synapse_create(SynapseClass* s_class, float w) {
 	Synapse* synapse = NULL;
+	Status status = FAIL;
 
-	synapse = (Synapse*)malloc(sizeof(Synapse));
+	synapse = (Synapse*)malloc(sizeof(Synapse), "synapse_create");
 	check_memory(synapse);
-
-	check(synapse_init(synapse, s_class, w) == SUCCESS, init_argument("synapse"));
+		
+	status = synapse_init(synapse, s_class, w);
+	check(status == SUCCESS, init_argument("synapse"));
 
 	return synapse;
 
@@ -119,7 +120,6 @@ error:
 
 
 void synapse_destroy(Synapse* synapse) {
-	// TODO: vezi ca fara acest check daca pusca in reset tu dai free si nu stiu daca asta se doreste
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 
 	synapse_reset(synapse);
@@ -134,9 +134,10 @@ Status synapse_add_spike_time(Synapse* synapse, uint32_t spike_time) {
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 	// add synaptic delay
 	spike_time += synapse->s_class->delay;
-	if_check(!queue_is_empty(synapse->spike_times), *(uint32_t*)queue_head(synapse->spike_times) < spike_time, "Spike should not be older than the head");
-	
-	queue_enqueue(synapse->spike_times, &spike_time);
+
+	// current spike time should be older than one already in queue
+	if_check(queue_is_empty(&(synapse->spike_times)) == FALSE, *((uint32_t*)queue_head(&(synapse->spike_times))) < spike_time, "Spike should not be older than the head");
+	queue_enqueue(&(synapse->spike_times), &spike_time);
 
 	return SUCCESS;
 
@@ -173,9 +174,9 @@ Status synapse_step(Synapse* synapse, uint32_t simulation_time) {
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 
 	// check if there is a spike that arrives at this time step
-	if (!queue_is_empty(synapse->spike_times) && *(uint32_t*)queue_head(synapse->spike_times) == simulation_time) {
+	if ((queue_is_empty(&(synapse->spike_times)) == FALSE) && (*((uint32_t*)queue_head(&(synapse->spike_times))) == simulation_time)) {
 		synapse->g += 1.0f;
-		queue_dequeue(synapse->spike_times);
+		queue_dequeue(&(synapse->spike_times));
 	}
 	else {
 		/* The conductance should never be negative, at least this is what I understand now */

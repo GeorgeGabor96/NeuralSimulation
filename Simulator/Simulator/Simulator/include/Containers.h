@@ -113,7 +113,9 @@ Verify that a queue is in a valid state, meaning:
 4. queue->tail < queue->array.length
 */
 Status queue_is_valid(Queue* queue);
+Status queue_init(Queue* queue_p, uint32_t length, size_t element_size);
 Queue* queue_create(uint32_t length, size_t element_size);
+void queue_reset(Queue* queue, ElemReset reset);
 void queue_destroy(Queue* queue, ElemReset reset);
 Status queue_enqueue(Queue* queue, void* data);
 void* queue_dequeue(Queue* queue);

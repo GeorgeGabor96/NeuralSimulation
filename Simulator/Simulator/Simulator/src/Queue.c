@@ -1,5 +1,3 @@
-#include <stdlib.h>
-
 #include "Containers.h"
 #include "debug.h"
 
@@ -27,11 +25,8 @@ Queue* queue_create(uint32_t length, size_t element_size) {
 	Status status = FAIL;
 	check_memory(queue);
 
-	queue->head = 0;
-	queue->tail = 0;
-	status = array_init(&(queue->array), length, 0, element_size);
-	check(status == SUCCESS, "Could not init @queue->array");
-	check(array_is_valid(&(queue->array)), invalid_argument("queue->array"));
+	status = queue_init(queue, length, element_size);
+	check(status == SUCCESS, "Could not init @queue");
 
 	return queue;
 
@@ -43,9 +38,32 @@ error:
 }
 
 
+Status queue_init(Queue* queue_p, uint32_t length, size_t element_size) {
+	Status status = FAIL;
+	queue_p->head = 0;
+	queue_p->tail = 0;
+	status = array_init(&(queue_p->array), length, 0, element_size);
+	check(status == SUCCESS, "Could not init @queue->array");
+	check(array_is_valid(&(queue_p->array)), invalid_argument("queue->array"));
+error:
+	return status;
+}
+
+
+void queue_reset(Queue* queue, ElemReset reset) {
+	check(queue_is_valid(queue) == TRUE, invalid_argument("queue"));
+	queue->head = 0;
+	queue->tail = 0;
+	array_reset(&(queue->array), reset);
+
+error:
+	return;
+}
+
+
 void queue_destroy(Queue* queue, ElemReset reset) {
 	check(queue_is_valid(queue) == TRUE, invalid_argument("queue"));
-	array_reset(&(queue->array), reset);
+	queue_reset(queue, reset);
 	free(queue);
 
 error:

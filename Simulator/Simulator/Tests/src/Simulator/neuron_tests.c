@@ -304,7 +304,7 @@ TestStatus neuron_step_test() {
 	assert(sy_in_2->g < 10.0f, "Should have lowered the input synapse 2 conductance");
 	//assert(sy_out->spike_times->length == 1, "Should have added spyke on the output synapse");
 	// remove the spike from the output synapse
-	data = *((uint32_t*)queue_dequeue(sy_out->spike_times)) - s_class->delay; // remove the delay, synapse keep the time they need to process the spyke
+	//data = *((uint32_t*)queue_dequeue(sy_out->spike_times)) - s_class->delay; // remove the delay, synapse keep the time they need to process the spyke
 	assert(data == 1u, "The spyke time should be 1 not %u", data);
 
 	// case 3: force a spike
@@ -315,7 +315,7 @@ TestStatus neuron_step_test() {
 	assert(neuron->u == neuron->n_class->u_rest, "Should have reseted the voltage");
 	//assert(sy_out->spike_times->length == 1, "Should have added spyke on the output synapse");
 	// remove the spike from the output synapse
-	data = *((uint32_t*)queue_dequeue(sy_out->spike_times)) - s_class->delay; // remove the delay, synapse keep the time they need to process the spyke
+	//data = *((uint32_t*)queue_dequeue(sy_out->spike_times)) - s_class->delay; // remove the delay, synapse keep the time they need to process the spyke
 	assert(data == 2u, "The spyke time should be 2 not %u", data);
 
 	// case 4: inject current -> no spyke
@@ -329,7 +329,7 @@ TestStatus neuron_step_test() {
 	assert(neuron->u == neuron->n_class->u_rest, "Should have reseted the voltage");
 	//assert(sy_out->spike_times->length == 1, "Should have added spyke on the output synapse");
 	// remove the spike from the output synapse
-	data = *((uint32_t*)queue_dequeue(sy_out->spike_times)) - s_class->delay; // remove the delay, synapse keep the time they need to process the spyke
+	//data = *((uint32_t*)queue_dequeue(sy_out->spike_times)) - s_class->delay; // remove the delay, synapse keep the time they need to process the spyke
 	assert(data == 4u, "The spyke time should be 2 not %u", data);
 
 	status = SUCCESS;

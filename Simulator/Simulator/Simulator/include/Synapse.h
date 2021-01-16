@@ -58,7 +58,7 @@ typedef struct Synapse {
 	SynapseClass* s_class;
 	float w; // synaptic weight
 	float g; // synaptic conductance
-	Queue* spike_times;
+	Queue spike_times;
 } Synapse;
 
 #define SYNAPSE_INITIAL_SPIKE_CAPACITY 10
@@ -68,16 +68,12 @@ typedef struct Synapse {
 * A @synapse is valid if:
 * 1. @synapse != NULL
 * 2. @synapse->s_class != NULL
-* 3. @synapse->spike_times != NULL
+* 3. @synapse->spike_times is valid
 */
 Status synapse_is_valid(Synapse* synapse);
-
 Status synapse_init(Synapse* synapse, SynapseClass* s_class, float w);
-
 void synapse_reset(Synapse* synapse);
-
 Synapse* synapse_create(SynapseClass* s_class, float w);
-
 void synapse_destroy(Synapse* synapse);
 
 /*

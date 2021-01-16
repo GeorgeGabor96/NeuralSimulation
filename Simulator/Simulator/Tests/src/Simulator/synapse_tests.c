@@ -4,7 +4,7 @@
 #include <math.h>
 
 
-TestStatus synapse_class_create_test() {
+TestStatus synapse_class_create_destroy_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
 	SynapseClass* synapse_class = NULL;
@@ -35,29 +35,29 @@ TestStatus synapse_class_create_test() {
 	// call with @type = 2
 	synapse_class = synapse_class_create(rev_potential, tau_ms, delay, 2, simuation_time_ms);
 	assert(synapse_class == NULL, "@synapse_class should be NULL for @type = 2");
+	
+	// destroy with NULL
+	synapse_class_destroy(NULL);
 
+	assert(memory_leak() == TRUE, "Memory leak");
 	status = TEST_SUCCESS;
 
-	// cleanup
 error:
 	return status;
 }
 
 
-TestStatus synapse_class_destroy_test() {
-	// setup
+TestStatus synapse_class_memory_test() {
 	TestStatus status = TEST_FAILED;
-	SynapseClass* synapse_class = synapse_class_create(0.0f, 15.0f, 1, CONDUCTANCE_SYNAPCE, 1.0f);
+	SynapseClass* synapse_classes[1000] = { NULL };
+	uint32_t i = 0;
 
-	// call normal
-	synapse_class_destroy(synapse_class);
+	for (i = 0; i < 1000; ++i) synapse_classes[i] = synapse_class_create_default();
+	for (i = 0; i < 1000; ++i) synapse_class_destroy(synapse_classes[i]);
 
-	// call with NULL
-	synapse_class_destroy(NULL);
-
+	assert(memory_leak() == TRUE, "Memory leak");
 	status = TEST_SUCCESS;
-
-	// cleaup
+error:
 	return status;
 }
 
@@ -70,7 +70,7 @@ void synapse_class_set_default_values(SynapseType type, SynapseClass* s_class) {
 }
 
 
-TestStatus synapse_create_test() {
+TestStatus synapse_create_destroy_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
 	SynapseClass s_class;
@@ -81,57 +81,50 @@ TestStatus synapse_create_test() {
 	// calls
 	synapse = synapse_create(&s_class, w);
 	assert(synapse != NULL, "@synapse should not be NULL");
-	assert(synapse->spike_times != NULL, "@synapse->spike_times should not be NULL");
-	assert(synapse->spike_times->array.length == SYNAPSE_INITIAL_SPIKE_CAPACITY, "@synapse->spike_times->array.length should be %u not %u", SYNAPSE_INITIAL_SPIKE_CAPACITY, synapse->spike_times->array.length);
-	assert(queue_is_empty(synapse->spike_times), "@synapse->spike_times should be empty");
+	assert(queue_is_valid(&(synapse->spike_times)) == TRUE, invalid_argument("synapse->spike_times"));
+	assert(synapse->spike_times.array.max_length == SYNAPSE_INITIAL_SPIKE_CAPACITY, "@synapse->spike_times.array.max_length should be %u not %u", SYNAPSE_INITIAL_SPIKE_CAPACITY, synapse->spike_times.array.max_length);
+	assert(synapse->spike_times.array.length == 0, "@synapse->spike_times.array.length should be %u not %u", 0, synapse->spike_times.array.length);
+	assert(queue_is_empty(&(synapse->spike_times)), "@synapse->spike_times should be empty");
 	assert(synapse->s_class == &s_class, "@synapse->s_class should be %p not %p", &s_class, synapse->s_class);
 	assert(synapse->w == w, "@synapse->w should be %f not %f", w, synapse->w);
 	assert(synapse->g == 0.0f, "@synapse->g should be 0");
-	synapse_destroy(synapse);
 
-	// call with class NULL
-	synapse = synapse_create(NULL, w);
-	assert(synapse == NULL, "@synapse should be NULL for @s_class = NULL");
+	// corner cases
+	assert(synapse_create(NULL, 1.0f) == NULL, "Should return NULL for invalid @s_class");
+	synapse_destroy(NULL);
+
+	synapse_destroy(synapse);
+	assert(memory_leak() == TRUE, "Memory leak");
 
 	status = TEST_SUCCESS;
 
-	// cleaup
 error:
 	return status;
 }
 
 
-TestStatus synapse_destroy_test() {
-	// setup
+TestStatus synapse_memory_test() {
 	TestStatus status = TEST_FAILED;
 	SynapseClass s_class;
-	float w = 1.0f;
-	s_class.type = CONDUCTANCE_SYNAPCE;
-	Synapse* synapse = synapse_create(&s_class, w);
-	Queue* spike_times = NULL;
-	
-	// call with @synapse = NULL
-	synapse_destroy(NULL);
-	
-	// call with @synapse->s_class = NULL
-	synapse->s_class = NULL;
-	synapse_destroy(synapse);
-	synapse->s_class = &s_class;
+	synapse_class_set_default_values(CONDUCTANCE_SYNAPCE, &s_class);
+	Synapse* synapses[1000] = { NULL };
+	uint32_t i = 0;
+	uint32_t j = 0;
 
-	// call with @synapse->spike_times = NULL
-	spike_times = synapse->spike_times;
-	synapse->spike_times = NULL;
-	synapse_destroy(synapse);
-	synapse->spike_times = spike_times;
-
-	// calls
-	synapse_destroy(synapse);
-
+	for (i = 0; i < 1000; ++i) {
+		synapses[i] = synapse_create(&s_class, 1.0f);
+		for (j = 0; j < 1000; ++j) {
+			synapse_add_spike_time(synapses[i], j);
+		}
+	}
+	for (i = 0; i < 1000; ++i) synapse_destroy(synapses[i]);
+	assert(memory_leak() == TRUE, "Memory leak");
 	status = TEST_SUCCESS;
 
-	// cleanup
+error:
 	return status;
 }
+
 
 
 TestStatus synapse_add_spike_time_test() {
@@ -148,6 +141,21 @@ TestStatus synapse_add_spike_time_test() {
 	uint32_t spike_time3 = 1;
 	uint32_t spike_time;
 
+	// normal calls
+	assert(synapse_add_spike_time(synapse, spike_time1) == SUCCESS, "Should work");
+	assert(synapse->spike_times.array.length == 1, "@synapse->spike_times.array.length should be 1");
+	spike_time = *((uint32_t*)queue_head(&(synapse->spike_times)));
+	assert(spike_time == spike_time1, "Head of @synapse->spike_times should be %u not %u", spike_time1, spike_time);
+
+	assert(synapse_add_spike_time(synapse, spike_time2) == SUCCESS, "Should work");
+	assert(synapse->spike_times.array.length == 2, "@synapse->spike_times.array.length should be 2");
+	spike_time = *((uint32_t*)array_get_fast(&(synapse->spike_times.array), synapse->spike_times.tail - 1));
+	assert(spike_time == spike_time2, "Tail of @synapse->spike_times should be %u", spike_time2);
+	
+	// add spike with older time stamp
+	assert(synapse_add_spike_time(synapse, spike_time3) == FAIL, "Should fail for older spike");
+	assert(synapse->spike_times.array.length == 2, "@synapse->spike_times.array.length should be 2");
+
 	// call with @synapse == NULL
 	assert(synapse_add_spike_time(NULL, 0) == FAIL, "Should fail for @synapse = NULL");
 
@@ -156,33 +164,12 @@ TestStatus synapse_add_spike_time_test() {
 	assert(synapse_add_spike_time(synapse, 0) == FAIL, "Should fail for @synapse->s_class = NULL");
 	synapse->s_class = &s_class;
 
-	// call with @synapse->spike_times == NULL
-	spike_times = synapse->spike_times;
-	synapse->spike_times = NULL;
-	assert(synapse_add_spike_time(synapse, 0) == FAIL, "Should fail for @synapse->spike_times = NULL");
-	synapse->spike_times = spike_times;
-
-	// normal calls
-	assert(synapse_add_spike_time(synapse, spike_time1) == SUCCESS, "Should work");
-	//assert(synapse->spike_times->length == 1, "@synapse->spike->times should be 1");
-	spike_time = *(uint32_t*)queue_head(synapse->spike_times);
-	assert(spike_time == spike_time1, "Head of @synapse->spike_times should be %u not %u", spike_time1, spike_time);
-
-	assert(synapse_add_spike_time(synapse, spike_time2) == SUCCESS, "Should work");
-	//assert(synapse->spike_times->length == 2, "@synapse->spike->times should be 2");
-	assert(*(uint32_t*)array_get_fast(&(synapse->spike_times->array), synapse->spike_times->tail - 1) == spike_time2, "Tail of @synapse->spike_times should be %u", spike_time2);
-	
-	// add spike with older time stamp
-	assert(synapse_add_spike_time(synapse, spike_time3) == FAIL, "Should faile for older spike");
-	//assert(synapse->spike_times->length == 2, "@synapse->spike->times should be 2");
+	synapse_destroy(synapse);
+	assert(memory_leak() == TRUE, "Memory leak");
 
 	status = TEST_SUCCESS;
 
-	// cleaup
 error:
-	if (synapse != NULL) {
-		synapse_destroy(synapse);
-	}
 	return status;
 }
 
@@ -199,29 +186,11 @@ TestStatus synapse_compute_PSC_test() {
 	float g = 1.3f;
 	float synapse_I = 0.0f;
 	Synapse* synapse = synapse_create(&s_class, w);
-	Queue* spike_times = synapse->spike_times;
-
-	synapse->s_class = NULL;
-	synapse->spike_times = NULL;
-	synapse->g = 1.3f;
-
-	// call for @synapse = NULL
-	assert(synapse_compute_PSC(NULL, u) == 0.0f, "Should return 0.0 for @synapse = NULL");
-
-	// call for @synapse->s_class = NULL
-	assert(synapse_compute_PSC(synapse, u) == 0.0f, "Should return 0.0 for @synapse->s_class = NULL");
-	synapse->s_class = &s_class;
-
-	// call for @synapse->spike_times = NULL
-	assert(synapse_compute_PSC(synapse, u) == 0.0f, "Should return 0.0 for @synapse->spike_times = NULL");
-	synapse->spike_times = spike_times;
-
-	// call for undifined synapse type
-	s_class.type = 5;
-	assert(synapse_compute_PSC(synapse, u) == 0.0f, "Should return 0.0 for undifined @synapse->s_class->type");
+	//Queue* spike_times = synapse->spike_times;
 
 	// TEST CONDUCTANCE_SYNAPSE
 	s_class.type = CONDUCTANCE_SYNAPCE;
+	synapse->g = g;
 	I = w * g;
 	synapse_I = synapse_compute_PSC(synapse, u);
 	assert(float_test(I, synapse_I), "Synapse PSC should be %f not %f", I, synapse_I);
@@ -232,13 +201,26 @@ TestStatus synapse_compute_PSC_test() {
 	synapse_I = synapse_compute_PSC(synapse, u);
 	assert(float_test(I, synapse_I), "Synapse PSC should be %f not %f", I, synapse_I);
 
+	// corner cases
+	synapse->s_class = NULL;
+
+	// call for @synapse = NULL
+	assert(synapse_compute_PSC(NULL, u) == 0.0f, "Should return 0.0 for @synapse = NULL");
+
+	// call for @synapse->s_class = NULL
+	assert(synapse_compute_PSC(synapse, u) == 0.0f, "Should return 0.0 for @synapse->s_class = NULL");
+	synapse->s_class = &s_class;
+
+	// call for undifined synapse type
+	s_class.type = 5;
+	assert(synapse_compute_PSC(synapse, u) == 0.0f, "Should return 0.0 for undifined @synapse->s_class->type");
+
+	synapse_destroy(synapse);
+	assert(memory_leak() == TRUE, "Memory leak");
+
 	status = TEST_SUCCESS;
 
-	// cleaup
 error:
-	if (synapse != NULL) {
-		synapse_destroy(synapse);
-	}
 	return status;
 }
 
@@ -252,25 +234,11 @@ TestStatus synapse_step_test() {
 	s_class.tau_exp = 0.5f;
 
 	Synapse* synapse = synapse_create(&s_class, 0.0f);
-	Queue* spike_times = synapse->spike_times;
+	//Queue* spike_times = synapse->spike_times;
 	uint32_t spike_time1 = 1;
 	uint32_t spike_time2 = 3;
 	uint32_t simulation_time = 0;
 	float g = 0.0f;
-
-	synapse->s_class = NULL;
-	synapse->spike_times = NULL;
-
-	// call with @synapse = NULL
-	assert(synapse_step(NULL, simulation_time) == FAIL, "Should fail for @synapse = NULL");
-	
-	// call with @synapse->s_class = NULL
-	assert(synapse_step(synapse, simulation_time) == FAIL, "Should fail for @synapse->s_class = NULL");
-	synapse->s_class = &s_class;
-
-	// call with @synapse->spike_times = NULL
-	assert(synapse_step(synapse, simulation_time) == FAIL, "Should fail for @synapse->spike_times = NULL");
-	synapse->spike_times = spike_times;
 
 	// add spikes in synapse
 	synapse_add_spike_time(synapse, spike_time1);
@@ -316,12 +284,21 @@ TestStatus synapse_step_test() {
 	g = 0.1875;
 	assert(float_test(synapse->g, g), "At time %u conductance should be %f not %f", simulation_time, g, synapse->g);
 
+	// corner cases
+	synapse->s_class = NULL;
+
+	// call with @synapse = NULL
+	assert(synapse_step(NULL, simulation_time) == FAIL, "Should fail for @synapse = NULL");
+
+	// call with @synapse->s_class = NULL
+	assert(synapse_step(synapse, simulation_time) == FAIL, "Should fail for @synapse->s_class = NULL");
+	synapse->s_class = &s_class;
+
+	synapse_destroy(synapse);
+	assert(memory_leak() == TRUE, "Memory leak");
+
 	status = TEST_SUCCESS;
 
-	// cleanup
 error:
-	if (synapse != NULL) {
-		synapse_destroy(synapse);
-	}
 	return status;
 }

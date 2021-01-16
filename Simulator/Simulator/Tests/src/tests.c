@@ -41,67 +41,16 @@ TestInfo tests[] = {
 	// QUEUE
 	{ queue_general_use_case_test, "queue_general_use_case_test" },
 	{ queue_memory_test, "queue_memory_test" },
-};
 
-/*
-TestInfo tests[] = {
-
-	
-	{ array_destroy_test, "array_destroy_test" },
-	{ array_set_get_test, "array_set_get_test" },
-	{ array_show_test, "array_show_test" },
-
-	// STRING
-	{ string_create_destroy_test, "string_create_destroy_test" },
-	{ string_vector_create_destroy_test, "string_vector_create_destroy_test" },
-
-	// STACK
-	{ stack_create_test, "stack_create_test" },
-	{ stack_destroy_test, "stack_destroy_test" },
-	{ stack_push_test, "stack_push_test" },
-	{ stack_pop_test, "stack_pop_test" },
-	{ stack_top_test, "stack_top_test" },
-
-	// QUEUE
-	{ queue_create_test, "queue_create_test" },
-	{ queue_destroy_test, "queue_destroy_test" },
-	{ queue_enqueue_test, "queue_enqueue_test" },
-	{ queue_dequeue_test, "queue_dequeue_test" },
-	{ queue_head_test, "queue_head_test" },
-
-	// VECTOR
-	{ vector_create_test, "vector_create_test" },
-	{ vector_destroy_test, "vector_destroy_test" },
-	{ vector_append_get_set_test, "vector_append_get_set_test" },
-	{ vector_show_test, "vector_show_test" },
-
-	// SYNAPSE --> TODO: Need to be rethinked
-	{ synapse_class_create_test, "synapse_class_create_test" },
-	{ synapse_class_destroy_test, "synapse_class_destroy_test" },
-	{ synapse_create_test, "synapse_create_test" },
-	{ synapse_destroy_test, "synapse_destroy_test" },
+	// SYNAPSE
+	{ synapse_class_create_destroy_test, "synapse_class_create_destroy_test" },
+	{ synapse_class_memory_test, "synapse_class_memory_test" },
+	{ synapse_create_destroy_test, "synapse_create_destroy_test" },
+	{ synapse_class_memory_test, "synapse_class_memory_test" },
 	{ synapse_add_spike_time_test, "synapse_add_spike_time_test" },
 	{ synapse_compute_PSC_test, "synapse_compute_PSC_test" },
 	{ synapse_step_test, "synapse_step_test" },
-
-	// NEURON --> TODO: Need to be rethinked
-	{ neuron_class_create_test, "neuron_class_create_test" },
-	{ neuron_class_destroy_test, "neuron_class_destroy_test" },
-	{ neuron_class_set_LIF_parameters_test, "neuron_class_set_LIF_parameters_test" },
-	{ neuron_create_test, "neuron_create_test" },
-	{ neuron_destroy_test, "neuron_destroy_test" },
-	{ neuron_add_in_synapse_test, "neuron_add_in_synapse_test" },
-	{ neuron_add_out_synapse_test, "neuron_add_out_synapse_test" },
-	{ neuron_step_test, "neuron_step_test" },
-
-	// LAYER
-	{ layer_create_destroy_test, "layer_create_destroy_test" },
-	{ layer_step_test, "layer_step_test" },
-
-	// NETWORK
-	{ network_create_compile_destroy_test, "network_create_compile_destroy_test" },
-	{ network_step_test, "network_step_test" },
-};*/
+};
 
 
 int main() {
