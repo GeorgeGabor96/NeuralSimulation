@@ -6,11 +6,7 @@
 #include <stdint.h>
 
 
-TestStatus queue_create_test();
-TestStatus queue_destroy_test();
-TestStatus queue_enqueue_test();
-TestStatus queue_dequeue_test();
-TestStatus queue_head_test();
-
+TestStatus queue_general_use_case_test();
+TestStatus queue_memory_test();
 
 #endif // __SIMULATOR_QUEUE_TESTS__

@@ -53,7 +53,7 @@ Verify that an @array is valid, meaning:
 bool array_is_valid(Array* array);
 Array* array_create(uint32_t length, uint32_t initial_length, size_t element_size);
 Status array_init(Array* array, uint32_t length, uint32_t initial_length, size_t element_size);
-void array_reset(Array* array, ElemReset reset); // resets the content of the @array->data, @array remains valid
+void array_reset(Array* array, ElemReset reset);
 void array_destroy(Array* array, ElemReset reset);
 Status array_append(Array* array, void* data);
 Status array_set(Array* array, uint32_t index, void* data);
@@ -97,35 +97,26 @@ int string_compare(String* string1_p, String* string2_p);
 * Queue Functionality
 *************************************************************/
 typedef struct Queue {
-	uint32_t length;
 	uint32_t head;		// removed
 	uint32_t tail;		// added
 	Array array;
 } Queue;
 
-#define queue_is_full(q) ((q)->length == (q)->array.length)
-#define queue_is_empty(q) ((q)->length == 0)
-#define queue_dequeue_cast(q, t) ((t) queue_dequeue(q))
-#define queue_head_cast(q, t) ((t) queue_head(q))
+#define queue_is_full(q) array_is_full(&((q)->array))
+#define queue_is_empty(q) array_is_empty(&((q)->array))
 
 /*
 Verify that a queue is in a valid state, meaning:
 1. queue != NULL
 2. queue->array is valid
-3. queue->length <= queue->array.length
-4. queue->head < queue->array.length
-5. queue->tail < queue->array.length
+3. queue->head < queue->array.length
+4. queue->tail < queue->array.length
 */
 Status queue_is_valid(Queue* queue);
-
 Queue* queue_create(uint32_t length, size_t element_size);
-
 void queue_destroy(Queue* queue, ElemReset reset);
-
 Status queue_enqueue(Queue* queue, void* data);
-
 void* queue_dequeue(Queue* queue);
-
 void* queue_head(Queue* queue);
 
 

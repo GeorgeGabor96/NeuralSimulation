@@ -39,6 +39,8 @@ TestStatus stack_general_use_case_test() {
 
 	assert(stack_pop(NULL) == NULL, "Should return NULL for invalid @stack");
 
+	assert(stack_top(NULL) == NULL, "Should return NULL for invalid @stack");
+
 	stack_destroy(NULL, NULL);
 
 	stack_destroy(stack, NULL);

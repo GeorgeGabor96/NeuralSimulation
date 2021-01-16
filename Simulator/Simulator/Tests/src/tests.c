@@ -37,6 +37,10 @@ TestInfo tests[] = {
 	// STACK
 	{ stack_general_use_case_test, "stack_general_use_case_test" },
 	{ stack_memory_test, "stack_memory_test" },
+
+	// QUEUE
+	{ queue_general_use_case_test, "queue_general_use_case_test" },
+	{ queue_memory_test, "queue_memory_test" },
 };
 
 /*

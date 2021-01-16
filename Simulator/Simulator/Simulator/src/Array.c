@@ -27,10 +27,6 @@ Array* array_create(uint32_t length, uint32_t initial_length, size_t element_siz
 	Array* array = NULL;
 	Status status = FAIL;
 
-	check(length > 0, "@length is 0");
-	check(initial_length <= length, "@initial_length > @length");
-	check(element_size > 0, "@element_size is 0");
-
 	array = (Array*)calloc(1, sizeof(Array), "array_create");
 	check_memory(array);
 
@@ -46,10 +42,13 @@ error:
 
 
 Status array_init(Array* array, uint32_t length, uint32_t initial_length, size_t element_size) {
+	check(length > 0, "@length is 0");
+	check(initial_length <= length, "@initial_length > @length");
+	check(element_size > 0, "@element_size is 0"); 
+	
 	array->length = initial_length;
 	array->max_length = length;
 	array->element_size = element_size;
-	array->data = (uint8_t*)array + sizeof(Array);
 	array->data = malloc(length * element_size, "array_init");
 	check_memory(array->data);
 	return SUCCESS;

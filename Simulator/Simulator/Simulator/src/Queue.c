@@ -10,9 +10,8 @@
 Status queue_is_valid(Queue* queue) {
 	check(queue != NULL, null_argument("queue"));
 	check(array_is_valid(&(queue->array)) == TRUE, invalid_argument("queue->array"));
-	check(queue->length <= queue->array.length, "@queue->length is bigger than @queue->array.length");
-	check(queue->head < queue->array.length, "@queue->head >= @queue->array.length");
-	check(queue->tail < queue->array.length, "@queue->tail >= @queue->array.length");
+	check(queue->head < queue->array.max_length, "@queue->head >= @queue->array.length");
+	check(queue->tail < queue->array.max_length, "@queue->tail >= @queue->array.length");
 
 	return TRUE;
 error:
@@ -24,17 +23,15 @@ error:
 * Queue Functionality
 *************************************************************/
 Queue* queue_create(uint32_t length, size_t element_size) {
-	Queue* queue = (Queue*)malloc(sizeof(Queue));
+	Queue* queue = (Queue*)calloc(1, sizeof(Queue));
+	Status status = FAIL;
 	check_memory(queue);
 
-	queue->array.data = malloc(length * element_size);
-	check_memory(queue->array.data);
-	
-	queue->length = 0;
 	queue->head = 0;
 	queue->tail = 0;
-	queue->array.length = length;
-	queue->array.element_size = element_size;
+	status = array_init(&(queue->array), length, 0, element_size);
+	check(status == SUCCESS, "Could not init @queue->array");
+	check(array_is_valid(&(queue->array)), invalid_argument("queue->array"));
 
 	return queue;
 
@@ -49,7 +46,6 @@ error:
 void queue_destroy(Queue* queue, ElemReset reset) {
 	check(queue_is_valid(queue) == TRUE, invalid_argument("queue"));
 	array_reset(&(queue->array), reset);
-	free(queue->array.data);
 	free(queue);
 
 error:
@@ -63,7 +59,7 @@ Status queue_enqueue(Queue* queue, void* data) {
 	check(data != NULL, "NULL value for @data");
 
 	if (queue_is_full(queue)) {
-		uint32_t old_array_length = queue->array.length;
+		uint32_t old_array_length = queue->array.max_length;
 		check(array_expand(&(queue->array)) == SUCCESS, "Queue is full and could not allocate more memory");
 		// reorder the queue if necessary
 		if (queue->head != 0) {
@@ -77,10 +73,10 @@ Status queue_enqueue(Queue* queue, void* data) {
 	}
 
 	array_set_fast(&(queue->array), (queue->tail)++, data);
-	if (queue->tail == queue->array.length) {
+	if (queue->tail == queue->array.max_length) {
 		queue->tail = 0;
 	}
-	(queue->length)++;
+	(queue->array.length)++;
 	status = SUCCESS;
 
 error:
@@ -94,10 +90,10 @@ void* queue_dequeue(Queue* queue) {
 
 	if (!queue_is_empty(queue)) {
 		element = array_get_fast(&(queue->array), (queue->head)++);
-			if (queue->head == queue->array.length) {
-				queue->head = 0;
-			}
-		(queue->length)--;
+		if (queue->head == queue->array.max_length) {
+			queue->head = 0;
+		}
+		(queue->array.length)--;
 	}
 
 error:
