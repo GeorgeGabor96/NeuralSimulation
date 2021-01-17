@@ -110,11 +110,9 @@ TestStatus array_expand_test() {
 		array_append(array, &(a[i]));
 	}
 
-	memory_leak();
 	assert(array_expand(array) == SUCCESS, "Should be able to expand @array");
 	assert(array->max_length == length_orig + ARRAY_EXPAND_RATE, "@array->max_length is %u, not %u", array->max_length, length_orig + ARRAY_EXPAND_RATE);
 	assert(array->length == 2, "@array->length is %u, not %u", array->length, 2);
-	memory_leak();
 	// set the new memory to 0
 	memset(array->data + array->element_size * length_orig, 0, array->element_size * (array->length - length_orig));
 

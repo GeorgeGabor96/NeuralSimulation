@@ -24,10 +24,10 @@ TestStatus layer_create_destroy_test() {
 	assert(layer->type == LAYER_FULLY_CONNECTED, invalid_argument("layer->type"));
 	assert(neuron_class_is_valid(layer->neuron_class) == TRUE, invalid_argument("layer->neuron_class"));
 	assert(synapse_class_is_valid(layer->synapse_class) == TRUE, invalid_argument("layer->synapse_class"));
-	assert(array_is_valid(layer->neurons) == TRUE, invalid_argument("layer->neurons"));
-	assert(layer->neurons->length == 100, invalid_argument("layer->neurons->length"));
-	for (i = 0; i < layer->neurons->length; ++i) {
-		neuron = (Neuron*)array_get(layer->neurons, i);
+	assert(array_is_valid(&(layer->neurons)) == TRUE, invalid_argument("layer->neurons"));
+	assert(layer->neurons.length == 100, invalid_argument("layer->neurons->length"));
+	for (i = 0; i < layer->neurons.length; ++i) {
+		neuron = (Neuron*)array_get(&(layer->neurons), i);
 		assert(neuron_is_valid(neuron) == TRUE, "neuron %u is invalid", i);
 	}
 	assert(layer->link == layer_link_fc, invalid_argument("layer->link"));
@@ -55,7 +55,7 @@ TestStatus layer_step_test() {
 	uint32_t i = 0;
 
 	// test case 1: force spike on every neuron, make a step, and verify that no neuron has spiked
-	Array* spikes = array_create(layer->neurons->length, 0, sizeof(Status));
+	Array* spikes = array_create(layer->neurons.length, 0, sizeof(Status));
 	for (i = 0; i < spikes->length; ++i) {
 		spike = TRUE;
 		array_set(spikes, i, &spike);
@@ -63,8 +63,8 @@ TestStatus layer_step_test() {
 	layer_set_spikes(layer, spikes, 0);
 	array_destroy(spikes, NULL);
 
-	for (i = 0; i < layer->neurons->length; ++i) {
-		neuron = (Neuron*)array_get(layer->neurons, i);
+	for (i = 0; i < layer->neurons.length; ++i) {
+		neuron = (Neuron*)array_get(&(layer->neurons), i);
 		assert(neuron->spike == TRUE, "neuron %u didn't spike", i);
 	}
 

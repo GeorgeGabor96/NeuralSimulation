@@ -33,6 +33,13 @@ typedef struct Array {
 	uint8_t* data;
 } Array;
 
+typedef Array ArrayBool;
+typedef Array ArrayFloat;
+typedef Array ArrayUint8;
+typedef Array ArrayUint16;
+typedef Array ArrayUint32;
+
+
 #define ARRAY_EXPAND_RATE 10 // TODO: if this is too much consider using a doubleling or some value per array that you give in the create
 #define array_get_fast(a, i) ((a)->data + (a)->element_size * (i))
 #define array_set_fast(a, i, d) memcpy((a)->data + (a)->element_size * (i), (void*) (d), (a)->element_size)
@@ -86,6 +93,7 @@ void* stack_top(Stack* stack_p);
 // string have at most 256 chars currently
 #define STRING_LIMIT 256
 typedef Array String;
+#define string_is_valid(s) array_is_valid(s)
 String* string_create(char* c_string_p);
 void string_destroy(String* string_p);
 Array* strings_create(char** strings_pp, uint32_t cnt);

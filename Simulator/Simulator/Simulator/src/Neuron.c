@@ -33,8 +33,8 @@ error:
 /*************************************************************
 * UPDATE functions for neurons
 *************************************************************/
-static inline Status neuron_update(Neuron* neuron, float PSC) {
-	Status spike = FALSE;
+static inline bool neuron_update(Neuron* neuron, float PSC) {
+	bool spike = FALSE;
 	
 	switch (neuron->n_class->type)
 	{
@@ -138,7 +138,6 @@ error:
 /*************************************************************
 * Neuron Functionality
 *************************************************************/
-
 
 // TODO: maybe we can allocate from start the amount of input, output synapses we need -> more efficient use of memory
 Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
@@ -260,8 +259,6 @@ Status neuron_force_spike(Neuron* neuron, uint32_t simulation_time) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
 	neuron->spike = TRUE;
-	// parca aveam problema aici daca tin bine minte
-	// TODO cand ajungi la network probabil va aparea
 	neuron_update_out_synapses(neuron, simulation_time);
 
 	return SUCCESS;
@@ -275,8 +272,6 @@ Status neuron_inject_current(Neuron* neuron, float PSC, uint32_t simulation_time
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
 	neuron->spike = neuron_update(neuron, PSC);
-	// la fel ca la force spike
-	// gen era ca se facea de doua ori parca sau ceva de genul
 	if (neuron->spike == TRUE) {
 		neuron_update_out_synapses(neuron, simulation_time);
 	}

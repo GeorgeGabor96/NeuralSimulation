@@ -34,21 +34,22 @@ struct Layer {
 	LayerType type;
 	NeuronClass* neuron_class;   // managed by the simulator
 	SynapseClass* synapse_class; // managed by the simulator
-	Array* neurons;				 // managed by the layer
 	Layer_link link;			 // pointer to link function
 	Array* name;				 // array of char's
-	Array* input_names;		 // vector of array's of char's
+	Array* input_names;			 // vector of array's of char's
+	Array neurons;				 // managed by the layer
+	bool is_input;				 // if the step function was called for this layer
 };
 
 /*
 * A @layer is valid if:
 * 1. @layer != NULL
 * 2. @layer->type is one of the supported ones
-* 2. @layer->neuron_class is valid
-* 3. @layer->synapse_class is valid
-* 4. @layer->neurons is valid
+* 3. @layer->neuron_class is valid
+* 4. @layer->synapse_class is valid
 * 5. @layer->name is valid
 * 6. @layer->input_names is valid
+* 7. @layer->neurons is valid
 */
 Status layer_is_valid(Layer* layer);
 
@@ -58,7 +59,7 @@ Status layer_init(
 	uint32_t n_neurons,				// > 0
 	NeuronClass* neuron_class,		// valid
 	SynapseClass* synapse_class,	// valid
-	Array* name,					// valid
+	String* name,					// valid
 	Array* input_names);			// valid
 
 Status layer_init_fully_connected(
@@ -66,7 +67,7 @@ Status layer_init_fully_connected(
 	uint32_t n_neurons, 
 	NeuronClass* neuron_class, 
 	SynapseClass* synapse_class, 
-	Array* name, 
+	String* name,
 	Array* input_names);
 
 Layer* layer_create(
@@ -74,14 +75,14 @@ Layer* layer_create(
 	uint32_t n_neurons, 
 	NeuronClass* neuron_class, 
 	SynapseClass* synapse_class,
-	Array* name,
+	String* name,
 	Array* input_names);
 
 Layer* layer_create_fully_connected(
 	uint32_t n_neurons, 
 	NeuronClass* neuron_class, 
 	SynapseClass* synapse_class,
-	Array* name,
+	String* name,
 	Array* input_names);
 
 void layer_reset(Layer* layer);
@@ -90,13 +91,14 @@ void layer_destroy(Layer* layer);
 
 Status layer_step(Layer* layer, uint32_t time);
 
-// get outputs
-Array* layer_get_spikes(Layer* layer);
-Array* layer_get_voltages(Layer* layer);
-
+// TO DO: typedefs for arrays??? ex: BoolArray, FloatArray
 // set inputs
-Status layer_set_spikes(Layer* layer, Array* spikes, uint32_t time);
-Status layer_set_currents(Layer* layer, Array* currents, uint32_t time);
+// get outputs
+ArrayBool* layer_get_spikes(Layer* layer);
+ArrayFloat* layer_get_voltages(Layer* layer);
+
+Status layer_set_spikes(Layer* layer, ArrayBool* spikes, uint32_t time);
+Status layer_set_currents(Layer* layer, ArrayFloat* currents, uint32_t time);
 
 // LINK functions
 Status layer_link_fc(Layer* layer, Layer* input_layer);

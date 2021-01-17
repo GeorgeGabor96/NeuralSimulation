@@ -9,12 +9,12 @@
 Status layer_is_valid(Layer* layer) {
 	check(layer != NULL, null_argument("layer"));
 	check(layer->type == LAYER_FULLY_CONNECTED, "@layer->type is %d", layer->type);
-	check(layer->link != NULL, "NULL value for @layer->link");
 	check(neuron_class_is_valid(layer->neuron_class) == TRUE, invalid_argument("layer->neuron_class"));
 	check(synapse_class_is_valid(layer->synapse_class) == TRUE, invalid_argument("layer->synapse_class"));
-	check(array_is_valid(layer->neurons) == TRUE, invalid_argument("layer->neurons"));
-	check(array_is_valid(layer->name) == TRUE, invalid_argument("layer->name"));
+	check(layer->link != NULL, "NULL value for @layer->link");
+	check(string_is_valid(layer->name) == TRUE, invalid_argument("layer->name"));
 	check(array_is_valid(layer->input_names) == TRUE, invalid_argument("layer->input_names"));
+	check(array_is_valid(&(layer->neurons)) == TRUE, invalid_argument("layer->neurons"));
 
 	return TRUE;
 
@@ -32,18 +32,21 @@ Status layer_init(
 		uint32_t n_neurons, 
 		NeuronClass* neuron_class, 
 		SynapseClass* synapse_class,
-		Array* name,
+		String* name,
 		Array* input_names) {
-	// checks
+
 	check(layer != NULL, null_argument("layer"));
 	check(n_neurons > 0, "@n_neurons is 0");
+	check(type == LAYER_FULLY_CONNECTED, "@type is %d", type);
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
 	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
 	check(array_is_valid(name) == TRUE, invalid_argument("name"));
 	check(array_is_valid(input_names) == TRUE, invalid_argument("input_names"));
 
-	layer->neurons = array_create(n_neurons, 0, sizeof(Neuron));
-	check_memory(layer->neurons);
+	uint32_t i = 0;
+	Status status = FAIL;
+	status = array_init(&(layer->neurons), n_neurons, 0, sizeof(Neuron));
+	check(status == SUCCESS, "Couldn't init @layer->neurons");
 
 	layer->type = type;
 	layer->neuron_class = neuron_class;
@@ -51,9 +54,10 @@ Status layer_init(
 	layer->name = name;
 	layer->input_names = input_names;
 
-	uint32_t i = 0;
 	for (i = 0; i < n_neurons; ++i) {
-		check(SUCCESS == neuron_init(array_get(layer->neurons, i), neuron_class), "Failed to init neuron %d", i);
+		status = neuron_init(array_get(&(layer->neurons), i), neuron_class);
+		check(status == SUCCESS, "Failed to init neuron %d", i);
+		layer->neurons.length++;
 	}
 
 	switch (type)
@@ -69,12 +73,8 @@ Status layer_init(
 
 error:
 	// reset initiliazed neurons
-	--i; // if it fail to allocated neuron i we should not reset it
-	while (i < n_neurons) {
-		neuron_reset(array_get(layer->neurons, i));
-		--i;
-	}
-	free(layer->neurons);
+	for (i = 0; i < layer->neurons.length; ++i) neuron_reset(array_get(&(layer->neurons), i));
+	array_reset(&(layer->neurons), NULL);
 
 	return FAIL;
 }
@@ -85,7 +85,7 @@ Status layer_init_fully_connected(
 		uint32_t n_neurons, 
 		NeuronClass* neuron_class, 
 		SynapseClass* synapse_class, 
-		Array* name, 
+		String* name, 
 		Array* input_names) {
 	return layer_init(layer, LAYER_FULLY_CONNECTED, n_neurons, neuron_class, synapse_class, name, input_names);
 }
@@ -96,20 +96,19 @@ Layer* layer_create(
 		uint32_t n_neurons, 
 		NeuronClass* neuron_class, 
 		SynapseClass* synapse_class,
-		Array* name,
+		String* name,
 		Array* input_names) {
+	Status status = FAIL;
 	Layer* layer = (Layer*)malloc(sizeof(Layer));
 	check_memory(layer);
 
-	check(layer_init(layer, type, n_neurons, neuron_class, synapse_class, name, input_names) == SUCCESS, "Could not initialize @layer");
+	status = layer_init(layer, type, n_neurons, neuron_class, synapse_class, name, input_names);
+	check(status == SUCCESS, "Could not initialize @layer");
 
 	return layer;
 
 error:
-	// layer_init FAILED
-	if (layer != NULL) {
-		free(layer);
-	}
+	if (layer != NULL) free(layer);
 	return NULL;
 }
 
@@ -126,13 +125,13 @@ Layer* layer_create_fully_connected(
 
 void layer_reset(Layer* layer) {
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
-	uint32_t i = 0;
 	Array* name = NULL;
 	layer->type = LAYER_INVALID;
 	layer->neuron_class = NULL;
 	layer->synapse_class = NULL;
-	array_destroy(layer->neurons, neuron_reset);
 	layer->link = NULL;
+
+	array_reset(&(layer->neurons), neuron_reset);
 	string_destroy(layer->name);
 	strings_destroy(layer->input_names);
 
@@ -152,17 +151,17 @@ error:
 }
 
 
-Array* layer_get_spikes(Layer* layer) {
-	Array* spikes = NULL;
+ArrayBool* layer_get_spikes(Layer* layer) {
+	ArrayBool* spikes = NULL;
 	Neuron* neuron = NULL;
 	uint32_t i = 0;
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	
-	spikes = array_create(layer->neurons->length, 0, sizeof(Status));
-	check_memory(spikes);
+	spikes = array_create(layer->neurons.length, layer->neurons.length, sizeof(bool));
+	check(array_is_valid(spikes) == TRUE, invalid_argument("spikes"));
 
-	for (i = 0; i < layer->neurons->length; ++i) {
-		neuron = (Neuron*)array_get(layer->neurons, i);
+	for (i = 0; i < layer->neurons.length; ++i) {
+		neuron = (Neuron*)array_get(&(layer->neurons), i);
 		check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
 		array_set(spikes, i, &(neuron->spike));
@@ -173,17 +172,17 @@ error:
 }
 
 
-Array* layer_get_voltages(Layer* layer) {
-	Array* voltages = NULL;
+ArrayFloat* layer_get_voltages(Layer* layer) {
+	ArrayFloat* voltages = NULL;
 	Neuron* neuron = NULL;
 	uint32_t i = 0;
 	check(layer_is_valid(layer) == TRUE, "@layer is not valid");
 	
-	voltages = array_create(layer->neurons->length, 0, sizeof(float));
-	check_memory(voltages);
-	log_info("voltages %p", voltages);
-	for (i = 0; i < layer->neurons->length; ++i) {
-		neuron = (Neuron*)array_get(layer->neurons, i);
+	voltages = array_create(layer->neurons.length, layer->neurons.length, sizeof(float));
+	check(array_is_valid(voltages) == TRUE, invalid_argument("voltages"));
+	
+	for (i = 0; i < layer->neurons.length; ++i) {
+		neuron = (Neuron*)array_get(&(layer->neurons), i);
 		check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
 		array_set(voltages, i, &(neuron->u));
@@ -204,11 +203,11 @@ Status layer_link_fc(Layer* layer, Layer* input_layer) {
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	check(layer_is_valid(input_layer) == TRUE, invalid_argument("input_layer"));
 
-	for (i = 0; i < layer->neurons->length; ++i) {
-		neuron_layer = (Neuron*)array_get(layer->neurons, i);
+	for (i = 0; i < layer->neurons.length; ++i) {
+		neuron_layer = (Neuron*)array_get(&(layer->neurons), i);
 
-		for (j = 0; j < input_layer->neurons->length; ++j) {
-			neuron_input_layer = (Neuron*)array_get(input_layer->neurons, j);
+		for (j = 0; j < input_layer->neurons.length; ++j) {
+			neuron_input_layer = (Neuron*)array_get(&(input_layer->neurons), j);
 
 			// TODO: POSIBLE OPTIMIZATION: can allocate all in one go, but not now
 			// NOTE: the add_in_synapse does copy the synapse into continuous memory
@@ -242,8 +241,8 @@ Status layer_step(Layer* layer, uint32_t time) {
 
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 
-	for (i = 0; i < layer->neurons->length; ++i) {
-		neuron = (Neuron*)array_get(layer->neurons, i);
+	for (i = 0; i < layer->neurons.length; ++i) {
+		neuron = (Neuron*)array_get(&(layer->neurons), i);
 		check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 		neuron_step(neuron, time);
 	}
@@ -254,20 +253,19 @@ error:
 }
 
 
-Status layer_set_spikes(Layer* layer, Array* spikes, uint32_t time) {
+Status layer_set_spikes(Layer* layer, ArrayBool* spikes, uint32_t time) {
 	check(layer_is_valid(layer), invalid_argument("layer"));
 	check(array_is_valid(spikes), invalid_argument("spikes"));
-	check(layer->neurons->length == spikes->length, "Lenght of @layer %d different from length of @spikes %d at time %d", layer->neurons->length, spikes->length, time);
+	check(layer->neurons.length == spikes->length, "@layer->neurons.length is %u and @spikes->length is %u at time %u", layer->neurons.length, spikes->length, time);
 
 	uint32_t i = 0;
-	Status* spike = NULL;
+	bool spike = NULL;
 	Neuron* neuron = NULL;
 
 	for (i = 0; i < spikes->length; ++i) {
-		spike = (Status*)array_get(spikes, i);
-		check(spike != NULL, null_argument("spike"));
-		if (*spike == TRUE) {
-			neuron = (Neuron*)array_get(layer->neurons, i);
+		spike = *((bool*)array_get(spikes, i));
+		if (spike == TRUE) {
+			neuron = (Neuron*)array_get(&(layer->neurons), i);
 			check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 			neuron_force_spike(neuron, time);
 		}
@@ -279,23 +277,21 @@ error:
 }
 
 
-Status layer_set_currents(Layer* layer, Array* currents, uint32_t time) {
+Status layer_set_currents(Layer* layer, ArrayFloat* currents, uint32_t time) {
 	check(layer_is_valid(layer), invalid_argument("layer"));
 	check(array_is_valid(currents), invalid_argument("currents"));
-	check(layer->neurons->length == currents->length, "Lenght of @layer %d different from length of @currents %d at time %d", layer->neurons->length, currents->length, time);
+	check(layer->neurons.length == currents->length, "@layer->neurons.length is %u and @currents->length is %u at time %u", layer->neurons.length, currents->length, time);
 
 	uint32_t i = 0;
-	float* current = NULL;
+	float current = 0.0f;
 	Neuron* neuron = NULL;
 
 	for (i = 0; i < currents->length; ++i) {
-		current = (float*)array_get(currents, i);
-		check(current != NULL, null_argument("current"));
-
-		neuron = (Neuron*)array_get(layer->neurons, i);
+		current = *((float*)array_get(currents, i));
+		neuron = (Neuron*)array_get(&(layer->neurons), i);
 		check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
-		neuron_inject_current(neuron, *current, time);
+		neuron_inject_current(neuron, current, time);
 	}
 
 	return SUCCESS;

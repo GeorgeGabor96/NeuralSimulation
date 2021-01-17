@@ -40,38 +40,38 @@ TestStatus network_create_compile_destroy_test() {
 	layer1 = network_get_layer_by_idx(network, 0);
 	assert(layer_is_valid(layer1) == TRUE, invalid_argument("layer1"));
 	assert(string_compare(layer1->name, name1) == 0, invalid_argument("layer1->name"));
-	assert(layer1->neurons->length == 10, invalid_argument("layer1->neurons->length"));
+	assert(layer1->neurons.length == 10, invalid_argument("layer1->neurons->length"));
 	
 	layer2 = network_get_layer_by_idx(network, 1);
 	assert(layer_is_valid(layer2) == TRUE, invalid_argument("layer2"));
 	assert(string_compare(layer2->name, name2) == 0, invalid_argument("layer2->name"));
-	assert(layer2->neurons->length == 100, invalid_argument("layer2->neurons->length"));
+	assert(layer2->neurons.length == 100, invalid_argument("layer2->neurons->length"));
 	
 	layer3 = network_get_layer_by_idx(network, 2);
 	assert(layer_is_valid(layer3) == TRUE, invalid_argument("layer3"));
 	assert(string_compare(layer3->name, name3) == 0, invalid_argument("layer3->name"));
-	assert(layer3->neurons->length == 1, invalid_argument("layer3->neurons->length"));
+	assert(layer3->neurons.length == 1, invalid_argument("layer3->neurons->length"));
 
 	Array* name = string_create("layer2");
 	layer2 = network_get_layer_by_name(network, name);
 	string_destroy(name);
 	assert(layer_is_valid(layer2) == TRUE, invalid_argument("layer2"));
 	assert(string_compare(layer2->name, name2) == 0, invalid_argument("layer2->name"));
-	assert(layer2->neurons->length == 100, invalid_argument("layer2->neurons->length"));
+	assert(layer2->neurons.length == 100, invalid_argument("layer2->neurons->length"));
 
 	// check network input layers
 	assert(network->input_layers->length == 1, invalid_argument("network->input_layers->length"));
 	layer = *((Layer**)array_get(network->input_layers, 0));
 	assert(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	assert(string_compare(layer->name, name1) == 0, invalid_argument("layer->name"));
-	assert(layer->neurons->length == 10, invalid_argument("layer->neurons->length"));
+	assert(layer->neurons.length == 10, invalid_argument("layer->neurons->length"));
 	
 	// check network output layers
 	assert(network->output_layers->length == 1, invalid_argument("network->output_layers->length"));
 	layer = *((Layer**)array_get(network->output_layers, 0));
 	assert(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	assert(string_compare(layer->name, name3) == 0, invalid_argument("layer->name"));
-	assert(layer->neurons->length == 1, invalid_argument("layer->neurons->length"));
+	assert(layer->neurons.length == 1, invalid_argument("layer->neurons->length"));
 
 	// compile network
 	assert(network_compile(network) == SUCCESS, "could not compile @network");
