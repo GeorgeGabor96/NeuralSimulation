@@ -22,8 +22,8 @@ typedef struct TestInfo {
 
 
 static inline bool memory_leak() {
-	bool leak = memory_manage_is_empty();
-	if (leak == FALSE) memory_manage_report();
+	bool leak = !memory_manage_is_empty();
+	if (leak == TRUE) memory_manage_report();
 	return leak;
 }
 

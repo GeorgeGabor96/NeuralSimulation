@@ -68,7 +68,7 @@ TestStatus array_general_use_case_test() {
 
 	// destroy & check memory
 	array_destroy(array, NULL);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 
@@ -89,7 +89,7 @@ TestStatus array_memory_test() {
 		for (j = 0; j < 1000; ++j) array_append(arrays[i], &j);
 	}
 	for (i = 0; i < 1000; ++i) array_destroy(arrays[i], NULL);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 error:
@@ -135,7 +135,7 @@ TestStatus array_expand_test() {
 
 	// check memory
 	array_destroy(array, NULL);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 	status = TEST_SUCCESS;
 
 error:
@@ -159,7 +159,7 @@ TestStatus array_show_test() {
 	array_show(NULL, NULL);
 
 	array_destroy(array, NULL);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 
@@ -207,7 +207,7 @@ TestStatus array_copy_data_test() {
 	array_copy_data(array, data, 0, 0);
 
 	array_destroy(array, NULL);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 error:
@@ -245,7 +245,7 @@ TestStatus array_swap_test() {
 	array_swap(array, 0, 100);
 
 	array_destroy(array, NULL);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 

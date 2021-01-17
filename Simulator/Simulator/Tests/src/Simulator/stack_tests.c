@@ -44,7 +44,7 @@ TestStatus stack_general_use_case_test() {
 	stack_destroy(NULL, NULL);
 
 	stack_destroy(stack, NULL);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 
@@ -65,7 +65,7 @@ TestStatus stack_memory_test() {
 		for (j = 0; j < 1000; ++j) stack_push(stacks[i], &j);
 	}
 	for (i = 0; i < 1000; ++i) stack_destroy(stacks[i], NULL);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 error:

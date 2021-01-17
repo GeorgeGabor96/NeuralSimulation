@@ -30,7 +30,7 @@ TestStatus neuron_class_general_use_case_test() {
 	neuron_class_destroy(NULL);
 
 	neuron_class_destroy(n_class);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = SUCCESS;
 
@@ -50,7 +50,7 @@ TestStatus neuron_class_memory_test() {
 	uint32_t i = 0;
 	for (i = 0; i < 1000; ++i) neuron_classes[i] = neuron_class_create(LIF_NEURON);
 	for (i = 0; i < 1000; ++i) neuron_class_destroy(neuron_classes[i]);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 error:
@@ -182,7 +182,7 @@ TestStatus neuron_general_use_case_test() {
 	synapse_class_destroy(s_class);
 	synapse_destroy(sy_out_1);
 	synapse_destroy(sy_out_2);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 
@@ -206,6 +206,8 @@ TestStatus neuron_memory_test() {
 		for (j = 0; j < 100; ++j) {
 			synapse = synapse_create(s_class, 1.0f);
 			neuron_add_in_synapse(neurons[i], synapse, TRUE);
+			neuron_step(neurons[i], j);
+			check(neuron_is_valid(neurons[i]) == TRUE, invalid_argument("neurons[i]"));
 		}
 	}
 	for (i = 0; i < 100; ++i) neuron_destroy(neurons[i]);
@@ -213,7 +215,7 @@ TestStatus neuron_memory_test() {
 	neuron_class_destroy(n_class);
 	synapse_class_destroy(s_class);
 	
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 	status = TEST_SUCCESS;
 error:
 	return status;

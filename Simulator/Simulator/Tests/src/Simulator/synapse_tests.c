@@ -39,7 +39,7 @@ TestStatus synapse_class_create_destroy_test() {
 	// destroy with NULL
 	synapse_class_destroy(NULL);
 
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 	status = TEST_SUCCESS;
 
 error:
@@ -55,7 +55,7 @@ TestStatus synapse_class_memory_test() {
 	for (i = 0; i < 1000; ++i) synapse_classes[i] = synapse_class_create_default();
 	for (i = 0; i < 1000; ++i) synapse_class_destroy(synapse_classes[i]);
 
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 	status = TEST_SUCCESS;
 error:
 	return status;
@@ -94,7 +94,7 @@ TestStatus synapse_create_destroy_test() {
 	synapse_destroy(NULL);
 
 	synapse_destroy(synapse);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 
@@ -118,7 +118,7 @@ TestStatus synapse_memory_test() {
 		}
 	}
 	for (i = 0; i < 1000; ++i) synapse_destroy(synapses[i]);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 	status = TEST_SUCCESS;
 
 error:
@@ -165,7 +165,7 @@ TestStatus synapse_add_spike_time_test() {
 	synapse->s_class = &s_class;
 
 	synapse_destroy(synapse);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 
@@ -216,7 +216,7 @@ TestStatus synapse_compute_PSC_test() {
 	assert(synapse_compute_PSC(synapse, u) == 0.0f, "Should return 0.0 for undifined @synapse->s_class->type");
 
 	synapse_destroy(synapse);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 
@@ -295,7 +295,7 @@ TestStatus synapse_step_test() {
 	synapse->s_class = &s_class;
 
 	synapse_destroy(synapse);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 

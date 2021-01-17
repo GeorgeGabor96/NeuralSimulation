@@ -35,7 +35,7 @@ struct Layer {
 	NeuronClass* neuron_class;   // managed by the simulator
 	SynapseClass* synapse_class; // managed by the simulator
 	Layer_link link;			 // pointer to link function
-	Array* name;				 // array of char's
+	String* name;				 // array of char's
 	Array* input_names;			 // vector of array's of char's
 	Array neurons;				 // managed by the layer
 	bool is_input;				 // if the step function was called for this layer
@@ -47,20 +47,21 @@ struct Layer {
 * 2. @layer->type is one of the supported ones
 * 3. @layer->neuron_class is valid
 * 4. @layer->synapse_class is valid
-* 5. @layer->name is valid
-* 6. @layer->input_names is valid
-* 7. @layer->neurons is valid
+* 5. @layer->link != NULL
+* 6. @layer->name is valid
+* 7. @layer->input_names is valid
+* 8. @layer->neurons is valid
 */
 Status layer_is_valid(Layer* layer);
 
 Status layer_init(
-	Layer* layer,					// != NULL
-	LayerType type,					
-	uint32_t n_neurons,				// > 0
-	NeuronClass* neuron_class,		// valid
-	SynapseClass* synapse_class,	// valid
-	String* name,					// valid
-	Array* input_names);			// valid
+	Layer* layer,
+	LayerType type,
+	uint32_t n_neurons,
+	NeuronClass* neuron_class,
+	SynapseClass* synapse_class,
+	String* name,
+	Array* input_names);
 
 Status layer_init_fully_connected(
 	Layer* layer, 
@@ -86,19 +87,21 @@ Layer* layer_create_fully_connected(
 	Array* input_names);
 
 void layer_reset(Layer* layer);
-
 void layer_destroy(Layer* layer);
 
 Status layer_step(Layer* layer, uint32_t time);
+/*
+Use these to set the input of the network
+*/
+Status layer_force_spikes(Layer* layer, ArrayBool* spikes, uint32_t time);
+Status layer_inject_currents(Layer* layer, ArrayFloat* currents, uint32_t time);
 
-// TO DO: typedefs for arrays??? ex: BoolArray, FloatArray
-// set inputs
-// get outputs
+
+/*
+use these to get the output of the network
+*/
 ArrayBool* layer_get_spikes(Layer* layer);
 ArrayFloat* layer_get_voltages(Layer* layer);
-
-Status layer_set_spikes(Layer* layer, ArrayBool* spikes, uint32_t time);
-Status layer_set_currents(Layer* layer, ArrayFloat* currents, uint32_t time);
 
 // LINK functions
 Status layer_link_fc(Layer* layer, Layer* input_layer);

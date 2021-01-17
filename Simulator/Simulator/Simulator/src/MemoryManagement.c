@@ -76,7 +76,7 @@ static inline void remove_node(Node* node) {
 
 static inline Node* find_node(void* ptr) {
 	Node* iter = allocated_memory.first;
-	while (iter->ptr != ptr && iter != NULL) iter = iter->next;
+	while (iter != NULL && iter->ptr != ptr) iter = iter->next;
 	return iter;
 }
 

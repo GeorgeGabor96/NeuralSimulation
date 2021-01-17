@@ -49,7 +49,7 @@ TestStatus queue_general_use_case_test() {
 	queue_destroy(NULL, NULL);
 
 	queue_destroy(queue, NULL);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 error:
@@ -69,7 +69,7 @@ TestStatus queue_memory_test() {
 		for (j = 0; j < 1000; ++j) queue_enqueue(queues[i], &j);
 	}
 	for (i = 0; i < 1000; ++i) queue_destroy(queues[i], NULL);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 error:

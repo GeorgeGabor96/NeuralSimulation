@@ -242,10 +242,10 @@ void network_step(Network* network, Array* inputs, uint32_t time) {
 		//check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 		check(input->values->length == layer->neurons.length, "for input %u - input lenght %u while layer length %u", i, input->values->length, layer->neurons.length);
 		if (input->type == SPIKES) {
-			layer_set_spikes(layer, input->values, time);
+			layer_force_spikes(layer, input->values, time);
 		}
 		else if (input->type == CURRENT) {
-			layer_set_currents(layer, input->values, time);
+			layer_inject_currents(layer, input->values, time);
 		}
 		else {
 			log_error("Undefined NETWORK input type %d", input->type);

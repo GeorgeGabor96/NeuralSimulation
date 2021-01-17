@@ -54,6 +54,10 @@ TestInfo tests[] = {
 	// NEURON
 	{ neuron_general_use_case_test, "neuron_general_use_case_test" },
 	{ neuron_memory_test, "neuron_memory_test" },
+
+	// LAYER
+	{ layer_general_use_case_test, "layer_general_use_case_test" },
+	{ layer_memory_test_test, "layer_memory_test_test" },
 };
 
 

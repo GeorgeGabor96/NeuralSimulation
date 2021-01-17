@@ -13,7 +13,7 @@ TestStatus string_create_destroy_test() {
 	assert(memcmp(string_p->data, c_string_p, array_data_size(string_p)) == 0, invalid_argument("string_p->data"));
 
 	string_destroy(string_p);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 error:
@@ -50,7 +50,7 @@ TestStatus strings_create_destroy_test() {
 	assert(memcmp((*string_pp)->data, c_s3_p, array_data_size(*string_pp)) == 0, invalid_argument("(*string_pp)->data"));
 
 	strings_destroy(strings_p);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 error:
@@ -66,14 +66,14 @@ TestStatus string_memory_stress_test() {
 	uint32_t i = 0;
 	for (i = 0; i < 1000; ++i) string_pp[i] = string_create("Ana has apples");
 	for (i = 0; i < 1000; ++i) string_destroy(string_pp[i]);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	// strings_create
 	Array* strings_pp[1000] = { NULL };
 	char* c_strings_pp[2] = { "Ana has apples", "George likes Ana" };
 	for (i = 0; i < 1000; ++i) strings_pp[i] = strings_create(c_strings_pp, 2);
 	for (i = 0; i < 1000; ++i) strings_destroy(strings_pp[i]);
-	assert(memory_leak() == TRUE, "Memory leak");
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
 error:
