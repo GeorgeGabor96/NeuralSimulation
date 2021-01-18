@@ -52,7 +52,7 @@ struct Layer {
 * 7. @layer->input_names is valid
 * 8. @layer->neurons is valid
 */
-Status layer_is_valid(Layer* layer);
+bool layer_is_valid(Layer* layer);
 
 Status layer_init(
 	Layer* layer,

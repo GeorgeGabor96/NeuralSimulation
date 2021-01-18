@@ -17,47 +17,52 @@
 #include "Simulator/network_tests.h"
 
 
+// TODO: some tests take time, mark them and set a flag to run them or not
 TestInfo tests[] = {
+	// MEMORY MANAGEMENT
 	{ memory_management_general_test, "memory_management_general_test" },
 	{ memory_manage_report_test, "memory_manage_report_test" },
 
 	// ARRAY
 	{ array_general_use_case_test, "array_general_use_case_test" },
-	{ array_memory_test, "array_memory_test" },
 	{ array_expand_test, "array_expand_test" },
 	{ array_show_test, "array_show_test" },
 	{ array_copy_data_test, "array_copy_data_test" },
 	{ array_swap_test, "array_swap_test" },
+	//{ array_memory_test, "array_memory_test" },
 
 	// String
 	{ string_create_destroy_test, "string_create_destroy_test" },
 	{ strings_create_destroy_test, "strings_create_destroy_test" },
-	{ string_memory_stress_test, "string_memory_stress_test" },
+	//{ string_memory_stress_test, "string_memory_stress_test" },
 
 	// STACK
 	{ stack_general_use_case_test, "stack_general_use_case_test" },
-	{ stack_memory_test, "stack_memory_test" },
+	//{ stack_memory_test, "stack_memory_test" },
 
 	// QUEUE
 	{ queue_general_use_case_test, "queue_general_use_case_test" },
-	{ queue_memory_test, "queue_memory_test" },
+	//{ queue_memory_test, "queue_memory_test" },
 
 	// SYNAPSE
 	{ synapse_class_create_destroy_test, "synapse_class_create_destroy_test" },
-	{ synapse_class_memory_test, "synapse_class_memory_test" },
 	{ synapse_create_destroy_test, "synapse_create_destroy_test" },
 	{ synapse_class_memory_test, "synapse_class_memory_test" },
 	{ synapse_add_spike_time_test, "synapse_add_spike_time_test" },
 	{ synapse_compute_PSC_test, "synapse_compute_PSC_test" },
 	{ synapse_step_test, "synapse_step_test" },
+	//{ synapse_class_memory_test, "synapse_class_memory_test" },
 
 	// NEURON
 	{ neuron_general_use_case_test, "neuron_general_use_case_test" },
-	{ neuron_memory_test, "neuron_memory_test" },
+	//{ neuron_memory_test, "neuron_memory_test" },
 
 	// LAYER
 	{ layer_general_use_case_test, "layer_general_use_case_test" },
-	{ layer_memory_test_test, "layer_memory_test_test" },
+	//{ layer_memory_test_test, "layer_memory_test_test" },
+
+	// NETWORK
+	{ network_compile_general_use_case_test, "network_compile_general_use_case_test" },
 };
 
 

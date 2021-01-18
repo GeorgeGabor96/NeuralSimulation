@@ -149,7 +149,6 @@ TestStatus layer_memory_test_test() {
 	TestStatus status = TEST_FAILED;
 	uint32_t i = 0;
 	uint32_t j = 0;
-	uint32_t k = 0;
 	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
 	SynapseClass* s_class = synapse_class_create_default();
 	String* l_name = NULL;

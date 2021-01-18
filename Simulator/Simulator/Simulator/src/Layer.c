@@ -5,7 +5,7 @@
 /*************************************************************
 * CHECKS FUNCTIONS
 *************************************************************/
-Status layer_is_valid(Layer* layer) {
+bool layer_is_valid(Layer* layer) {
 	check(layer != NULL, null_argument("layer"));
 	check(layer->type == LAYER_FULLY_CONNECTED, "@layer->type is %d", layer->type);
 	check(neuron_class_is_valid(layer->neuron_class) == TRUE, invalid_argument("layer->neuron_class"));

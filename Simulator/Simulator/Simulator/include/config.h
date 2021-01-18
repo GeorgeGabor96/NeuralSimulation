@@ -10,7 +10,6 @@
 #include <string.h>
 #include "debug.h"
 
-
 typedef uint8_t bool;
 #define TRUE 1ui8
 #define FALSE 0ui8
