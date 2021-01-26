@@ -64,11 +64,22 @@ TestStatus queue_memory_test() {
 	Queue* queues[1000] = { NULL };
 	uint32_t i = 0;
 	uint32_t j = 0;
+	uint32_t value = 0;
+
 	for (i = 0; i < 1000; ++i) {
 		queues[i] = queue_create(100, sizeof(uint32_t));
-		for (j = 0; j < 1000; ++j) queue_enqueue(queues[i], &j);
+		for (j = 0; j < 10000; ++j) queue_enqueue(queues[i], &j);
 	}
-	for (i = 0; i < 1000; ++i) queue_destroy(queues[i], NULL);
+	for (i = 0; i < 1000; ++i) {
+		for (j = 0; j < 10000; ++j) {
+			assert(queues[i]->array.length == 10000 - j, "queue length is %u, not %u", queues[i]->array.length, 10000 - j);
+			value = *((uint32_t*)queue_head(queues[i]));
+			assert(value == j, "@value %u, not %u - queue %u", value, j, i);
+			value = *((uint32_t*)queue_dequeue(queues[i]));
+			assert(value == j, "@value %u, not %u - queue %u", value, j, i);
+		}
+		queue_destroy(queues[i], NULL);
+	}
 	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;

@@ -2,12 +2,13 @@
 #define __CONFIG__
 
 #define MEMORY_MANAGE
-
+#define CHECKS
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <time.h>
 #include "debug.h"
 
 typedef uint8_t bool;

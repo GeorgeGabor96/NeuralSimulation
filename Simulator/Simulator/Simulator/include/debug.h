@@ -22,12 +22,13 @@
 // An info is something of interest that happends in the execution (ex: the execution starts a new processing step and it prints that to inform the user)
 #define log_info(M, ...) fprintf(stderr, "[INFO] (%s:%d) " M "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 
-#ifdef NDEBUG
+#ifndef CHECKS
 
 #define debug(M, ...)
 #define check(A, M, ...)
 #define check_memory(A)
-#define if_check(C, T)
+#define if_check(C, A, M, ...)
+#define ERROR
 
 #else
 
@@ -35,6 +36,7 @@
 #define check(A, M, ...) if (!(A)) { log_error(M, ##__VA_ARGS__); errno=0; goto error; }
 #define check_memory(A) check((A), "Out of Memory.")
 #define if_check(C, A, M, ...) if(C) { check(A, M, ##__VA_ARGS__) }
+#define ERROR error:
 
 #endif // __NDEBUG__
 

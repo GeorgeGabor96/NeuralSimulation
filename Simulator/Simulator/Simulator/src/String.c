@@ -24,7 +24,7 @@ String* string_create(char* c_string_p) {
 
 	return string_p;
 
-error:
+ERROR
 	return NULL;
 }
 
@@ -33,7 +33,7 @@ void string_destroy(String* string_p) {
 	check(array_is_valid(string_p) == TRUE, invalid_argument("string_p"));
 	array_destroy(string_p, NULL);
 
-error:
+ERROR
 	return;
 }
 
@@ -57,7 +57,7 @@ Array* strings_create(char** strings_pp, uint32_t cnt) {
 	}
 	return safe_strings_p;
 
-error:
+ERROR
 	if (safe_strings_p != NULL) {
 		--i; // because unsigned
 		String** string_pp = NULL;
@@ -83,7 +83,7 @@ void strings_destroy(Array* strings_p) {
 		string_destroy(string_p);
 	}
 	array_destroy(strings_p, NULL);
-error:
+ERROR
 	return;
 }
 
@@ -96,6 +96,6 @@ int string_compare(String* string1_p, String* string2_p) {
 	check(string1_p->element_size == string2_p->element_size, "@string1_p->element_size != @string2_p->element_size");
 
 	return memcmp(string1_p->data, string2_p->data, string1_p->element_size * string1_p->length);
-error:
+ERROR
 	return -1;
 }

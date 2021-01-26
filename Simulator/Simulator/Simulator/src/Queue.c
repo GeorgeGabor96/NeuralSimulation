@@ -1,5 +1,6 @@
 #include "Containers.h"
 #include "debug.h"
+#include "MemoryManagement.h"
 
 
 /*************************************************************
@@ -8,11 +9,11 @@
 Status queue_is_valid(Queue* queue) {
 	check(queue != NULL, null_argument("queue"));
 	check(array_is_valid(&(queue->array)) == TRUE, invalid_argument("queue->array"));
-	check(queue->head < queue->array.max_length, "@queue->head >= @queue->array.length");
-	check(queue->tail < queue->array.max_length, "@queue->tail >= @queue->array.length");
+	check(queue->head < queue->array.max_length, "@queue->head >= @queue->array.max_length");
+	check(queue->tail < queue->array.max_length, "@queue->tail >= @queue->array.max_length");
 
 	return TRUE;
-error:
+ERROR
 	return FALSE;
 }
 
@@ -21,7 +22,7 @@ error:
 * Queue Functionality
 *************************************************************/
 Queue* queue_create(uint32_t length, size_t element_size) {
-	Queue* queue = (Queue*)calloc(1, sizeof(Queue));
+	Queue* queue = (Queue*)calloc(1, sizeof(Queue), "queue_create");
 	Status status = FAIL;
 	check_memory(queue);
 
@@ -30,7 +31,7 @@ Queue* queue_create(uint32_t length, size_t element_size) {
 
 	return queue;
 
-error:
+ERROR
 	if (queue != NULL) {
 		free(queue);
 	}
@@ -45,7 +46,7 @@ Status queue_init(Queue* queue_p, uint32_t length, size_t element_size) {
 	status = array_init(&(queue_p->array), length, 0, element_size);
 	check(status == SUCCESS, "Could not init @queue->array");
 	check(array_is_valid(&(queue_p->array)), invalid_argument("queue->array"));
-error:
+ERROR
 	return status;
 }
 
@@ -56,7 +57,7 @@ void queue_reset(Queue* queue, ElemReset reset) {
 	queue->tail = 0;
 	array_reset(&(queue->array), reset);
 
-error:
+ERROR
 	return;
 }
 
@@ -66,7 +67,7 @@ void queue_destroy(Queue* queue, ElemReset reset) {
 	queue_reset(queue, reset);
 	free(queue);
 
-error:
+ERROR
 	return;
 }
 
@@ -78,7 +79,8 @@ Status queue_enqueue(Queue* queue, void* data) {
 
 	if (queue_is_full(queue)) {
 		uint32_t old_array_length = queue->array.max_length;
-		check(array_expand(&(queue->array)) == SUCCESS, "Queue is full and could not allocate more memory");
+		status = array_expand(&(queue->array));
+		check(status == SUCCESS, "Queue is full and could not allocate more memory");
 		// reorder the queue if necessary
 		if (queue->head != 0) {
 			memcpy(array_get_fast(&(queue->array), old_array_length), queue->array.data, queue->array.element_size * queue->head);
@@ -95,10 +97,11 @@ Status queue_enqueue(Queue* queue, void* data) {
 		queue->tail = 0;
 	}
 	(queue->array.length)++;
-	status = SUCCESS;
+	
+	return SUCCESS;
 
-error:
-	return status;
+ERROR
+	return FAIL;
 }
 
 
@@ -114,7 +117,7 @@ void* queue_dequeue(Queue* queue) {
 		(queue->array.length)--;
 	}
 
-error:
+ERROR
 	return element;
 }
 
@@ -127,6 +130,6 @@ void* queue_head(Queue* queue) {
 		element = array_get_fast(&(queue->array), queue->head);
 	}
 
-error:
+ERROR
 	return element;
 }

@@ -15,19 +15,19 @@ Status synapse_class_is_valid(SynapseClass* synapse_class) {
 
 	return TRUE;
 
-error:
+ERROR
 	return FALSE;
 }
 
 
 Status synapse_is_valid(Synapse* synapse) {
 	check(synapse != NULL, null_argument("synapse"));
-	check(synapse->s_class != NULL, null_argument("synapse->s_class"));
+	check(synapse_class_is_valid(synapse->s_class) == TRUE, invalid_argument("synapse->s_class"));
 	check(queue_is_valid(&(synapse->spike_times)) == TRUE, invalid_argument("synapse->spike_times"));
 
 	return TRUE;
 
-error:
+ERROR
 	return FALSE;
 }
 
@@ -49,7 +49,7 @@ SynapseClass* synapse_class_create(float rev_potential, float tau_ms, uint32_t d
 	synapse_class->type = type;
 
 	return synapse_class;
-error:
+ERROR
 	return NULL;
 }
 
@@ -63,7 +63,7 @@ void synapse_class_destroy(SynapseClass* synapse_class) {
 	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
 	free(synapse_class);
 
-error:
+ERROR
 	return;
 }
 
@@ -82,7 +82,7 @@ Status synapse_init(Synapse* synapse, SynapseClass* s_class, float w) {
 	synapse->w = w;
 	synapse->g = 0.0f;
 
-error:
+ERROR
 	return status;
 }
 
@@ -93,7 +93,7 @@ void synapse_reset(Synapse* synapse) {
 	queue_reset(&(synapse->spike_times), NULL);
 	synapse->s_class = NULL;
 
-error:
+ERROR
 	return;
 }
 
@@ -110,7 +110,7 @@ Synapse* synapse_create(SynapseClass* s_class, float w) {
 
 	return synapse;
 
-error:
+ERROR
 	if (synapse != NULL) {
 		free(synapse);
 	}
@@ -125,7 +125,7 @@ void synapse_destroy(Synapse* synapse) {
 	synapse_reset(synapse);
 	free(synapse);
 
-error:
+ERROR
 	return;
 }
 
@@ -136,12 +136,12 @@ Status synapse_add_spike_time(Synapse* synapse, uint32_t spike_time) {
 	spike_time += synapse->s_class->delay;
 
 	// current spike time should be older than one already in queue
-	if_check(queue_is_empty(&(synapse->spike_times)) == FALSE, *((uint32_t*)queue_head(&(synapse->spike_times))) < spike_time, "Spike should not be older than the head");
+	if_check(queue_is_empty(&(synapse->spike_times)) == FALSE, *((uint32_t*)queue_head(&(synapse->spike_times))) < spike_time, "Spike %u should not be older than the head %u", spike_time, *((uint32_t*)queue_head(&(synapse->spike_times))));
 	queue_enqueue(&(synapse->spike_times), &spike_time);
 
 	return SUCCESS;
 
-error:
+ERROR
 	return FAIL;
 }
 
@@ -165,7 +165,7 @@ float synapse_compute_PSC(Synapse* synapse, float u) {
 		break;
 	}
 
-error:
+ERROR
 	return I;
 }
 
@@ -192,7 +192,7 @@ Status synapse_step(Synapse* synapse, uint32_t simulation_time) {
 
 	return SUCCESS;
 
-error:
+ERROR
 	return FAIL;
 }
 

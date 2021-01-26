@@ -12,7 +12,7 @@ Status neuron_class_is_valid(NeuronClass* neuron_class) {
 
 	return TRUE;
 
-error:
+ERROR
 	return FALSE;
 }
 
@@ -25,7 +25,7 @@ Status neuron_is_valid(Neuron* neuron) {
 
 	return TRUE;
 
-error:
+ERROR
 	return FALSE;
 }
 
@@ -59,8 +59,11 @@ static inline void neuron_update_out_synapses(Neuron* neuron, uint32_t simulatio
 
 	for (i = 0u; i < neuron->out_synapses_refs.length; i++) {
 		synapse = *((Synapse**)array_get(&(neuron->out_synapses_refs), i));
+		check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 		synapse_add_spike_time(synapse, simulation_time);
 	}
+ERROR
+	return;
 }
 
 
@@ -104,7 +107,7 @@ NeuronClass* neuron_class_create(NeuronType type) {
 
 	return neuron_class;
 
-error:
+ERROR
 	return NULL;
 }
 
@@ -112,7 +115,7 @@ error:
 void neuron_class_destroy(NeuronClass* neuron_class) {
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
 	free(neuron_class);
-error:
+ERROR
 	return;
 }
 
@@ -130,7 +133,7 @@ Status neuron_class_set_LIF_parameters(NeuronClass* neuron_class, float u_th, fl
 
 	status = SUCCESS;
 
-error:
+ERROR
 	return status;
 }
 
@@ -157,7 +160,7 @@ Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
 
 	return SUCCESS;
 
-error:
+ERROR
 	// @neuron->in_synapses FAIL
 	if (neuron != NULL) {
 		if (array_is_valid(&(neuron->in_synapses)) == TRUE) array_reset(&(neuron->in_synapses), NULL);
@@ -174,7 +177,7 @@ void neuron_reset(Neuron* neuron) {
 	array_reset(&(neuron->out_synapses_refs), NULL);
 	neuron->n_class = NULL;
 
-error:
+ERROR
 	return;
 }
 
@@ -190,7 +193,7 @@ Neuron* neuron_create(NeuronClass* neuron_class) {
 
 	return neuron;
 
-error:
+ERROR
 	if (neuron != NULL) {
 		free(neuron);
 	}
@@ -204,7 +207,7 @@ void neuron_destroy(Neuron* neuron) {
 	neuron_reset(neuron);
 	free(neuron);
 
-error:
+ERROR
 	return;
 }
 
@@ -213,13 +216,13 @@ Status neuron_add_in_synapse(Neuron* neuron, Synapse* synapse, Status should_fre
 	Status status = FAIL;
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
-	
+
 	// NOTE: @neuron keeps internally its INPUT synapses, so copy its content and free it
 	status = array_append(&(neuron->in_synapses), synapse);
 	check(status == SUCCESS, "Could not add new INPUT synapse");
 	if (should_free == TRUE) free(synapse);
 
-error:
+ERROR
 	return status;
 }
 
@@ -233,7 +236,7 @@ Status neuron_add_out_synapse(Neuron* neuron, Synapse* synapse) {
 	status = array_append(&(neuron->out_synapses_refs), &synapse);
 	check(status == SUCCESS, "Could not add new OUTPUT synapse");
 
-error:
+ERROR
 	return status;
 }
 
@@ -250,7 +253,7 @@ Status neuron_step(Neuron* neuron, uint32_t simulation_time) {
 
 	status = SUCCESS;
 
-error:
+ERROR
 	return status;
 }
 
@@ -263,7 +266,7 @@ Status neuron_force_spike(Neuron* neuron, uint32_t simulation_time) {
 
 	return SUCCESS;
 
-error:
+ERROR
 	return FAIL;
 }
 
@@ -278,6 +281,6 @@ Status neuron_inject_current(Neuron* neuron, float PSC, uint32_t simulation_time
 
 	return SUCCESS;
 
-error:
+ERROR
 	return FAIL;
 }

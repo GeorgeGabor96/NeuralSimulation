@@ -15,7 +15,7 @@ bool array_is_valid(Array* array) {
 	check(array->data != NULL, null_argument("array->data"));
 
 	return TRUE;
-error:
+ERROR
 	return FALSE;
 }
 
@@ -35,7 +35,7 @@ Array* array_create(uint32_t length, uint32_t initial_length, size_t element_siz
 
 	return array;
 
-error:
+ERROR
 	if (array != NULL) free(array);
 	return NULL;
 }
@@ -53,7 +53,7 @@ Status array_init(Array* array, uint32_t length, uint32_t initial_length, size_t
 	check_memory(array->data);
 	return SUCCESS;
 
-error:
+ERROR
 	array->data = NULL;
 	return FAIL;
 }
@@ -72,7 +72,7 @@ void array_reset(Array* array, ElemReset reset) {
 	array->length = 0;
 	free(array->data);
 
-error:
+ERROR
 	return;
 }
 
@@ -82,7 +82,7 @@ void array_destroy(Array* array, ElemReset reset) {
 	array_reset(array, reset);
 	free(array);
 
-error:
+ERROR
 	return;
 }
 
@@ -94,7 +94,7 @@ void* array_get(Array* array, uint32_t index) {
 	
 	out = array_get_fast(array, index);
 	
-error:
+ERROR
 	return out;
 }
 
@@ -107,14 +107,13 @@ Status array_set(Array* array, uint32_t index, void* data) {
 	array_set_fast(array, index, data);
 	return SUCCESS;
 
-error:
+ERROR
 	return FAIL;
 }
 
 
 Status array_append(Array* array, void* data) {
 	Status status = FAIL;
-	check(array != NULL, null_argument("array"));
 	check(array_is_valid(array) == TRUE, invalid_argument("vector"));
 	check(data != NULL, null_argument("data"));
 
@@ -122,12 +121,13 @@ Status array_append(Array* array, void* data) {
 		status = array_expand(array);
 		check(status == SUCCESS, "Array is full and could not allocate more memory");
 	}
+
 	array_set_fast(array, array->length, data);
 	(array->length)++;
 
 	return SUCCESS;
 
-error:
+ERROR
 	return FAIL;
 }
 
@@ -148,7 +148,7 @@ Status array_expand(Array* array) {
 
 	return SUCCESS;
 
-error:
+ERROR
 	return FAIL;
 }
 
@@ -163,7 +163,7 @@ void array_show(Array* array, ShowElem show) {
 		show(array_get(array, i));
 	}
 
-error:
+ERROR
 	return;
 }
 
@@ -180,7 +180,7 @@ void array_copy_data(Array* array, void* data, uint32_t start_idx, uint32_t elem
 
 	memcpy(array_get(array, start_idx), data, elem_cnt * array->element_size);
 
-error:
+ERROR
 	return;
 }
 
@@ -206,6 +206,6 @@ Status array_swap(Array* array, uint32_t i, uint32_t j) {
 	free(aux);
 
 	return SUCCESS;
-error:
+ERROR
 	return FAIL;
 }

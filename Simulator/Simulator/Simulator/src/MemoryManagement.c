@@ -14,7 +14,8 @@ typedef struct Node {
 	struct Node* prev;
 } Node;
 
-
+// find is slow on a lot of elements -> cash mishes and linear time
+// TODO: if necessery consider a hast table
 typedef struct List {
 	Node* first;
 	Node* last;
@@ -91,7 +92,7 @@ static inline bool update_node(void* old_ptr, void* new_ptr, size_t new_size, ch
 
 	return TRUE;
 
-error:
+ERROR
 	return FALSE;
 }
 
@@ -150,7 +151,7 @@ void* memory_manage_malloc(size_t size, char* desc) {
 	add_node(node);
 	return ptr;
 
-error:
+ERROR
 	return NULL;
 }
 
@@ -162,7 +163,7 @@ void* memory_manage_calloc(size_t nitems, size_t size, char* desc) {
 	Node* node = create_node(ptr, nitems * size, desc);
 	add_node(node);
 	return ptr;
-error:
+ERROR
 	return NULL;
 }
 
@@ -175,7 +176,7 @@ void* memory_manage_realloc(void* ptr, size_t size, char* desc) {
 	update_node(ptr, n_ptr, size, desc);
 	return n_ptr;
 
-error:
+ERROR
 	// realloc failed return old data
 	return ptr;
 }
@@ -189,6 +190,6 @@ void memory_manage_free(void* ptr) {
 	remove_node(node);
 	free(node);
 
-error:
+ERROR
 	return;
 }

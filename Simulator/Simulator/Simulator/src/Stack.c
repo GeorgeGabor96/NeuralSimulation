@@ -19,7 +19,7 @@ Status stack_push(Stack* stack_p, void* data_p) {
 
 	return SUCCESS;
 
-error:
+ERROR
 	return FAIL;
 }
 
@@ -33,7 +33,7 @@ void* stack_pop(Stack* stack_p) {
 		element_p = array_get_fast(stack_p, stack_p->length);
 	}
 
-error:
+ERROR
 	return element_p;
 }
 
@@ -46,6 +46,6 @@ void* stack_top(Stack* stack_p) {
 		element_p = array_get_fast(stack_p, stack_p->length - 1);
 	}
 
-error:
+ERROR
 	return element_p;
 }

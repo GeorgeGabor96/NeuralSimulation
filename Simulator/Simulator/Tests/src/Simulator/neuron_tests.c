@@ -196,22 +196,55 @@ TestStatus neuron_memory_test() {
 
 	uint32_t i = 0;
 	uint32_t j = 0;
+	uint32_t k = 0;
 	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
-	Neuron* neurons[100] = { NULL };
+	Neuron* neurons[1000] = { NULL };
 	SynapseClass* s_class = synapse_class_create_default();
 	Synapse* synapse = NULL;
 
-	for (i = 0; i < 100; ++i) {
-		neurons[i] = neuron_create(n_class);
-		for (j = 0; j < 100; ++j) {
+	clock_t start, end;
+	double cpu_time_used;
+
+	uint32_t neurons_cnt = sizeof(neurons) / sizeof(Neuron*);
+	for (i = 0; i < neurons_cnt; ++i) neurons[i] = neuron_create(n_class);
+
+	for (i = 0; i < neurons_cnt; ++i) {
+		start = clock();
+		uint32_t step_runs = 1000;
+		Synapse** out_synapses = (Synapse**)calloc(step_runs, sizeof(Synapse*), "test");
+
+		for (j = 0; j < step_runs; ++j) {
+			out_synapses[j] = synapse_create(s_class, 1.0f);
+			assert(synapse_is_valid(out_synapses[j]), invalid_argument("out_synapses[j]"));
+		}
+
+		for (j = 0; j < step_runs; ++j) {
 			synapse = synapse_create(s_class, 1.0f);
 			neuron_add_in_synapse(neurons[i], synapse, TRUE);
-			neuron_step(neurons[i], j);
-			check(neuron_is_valid(neurons[i]) == TRUE, invalid_argument("neurons[i]"));
-		}
-	}
-	for (i = 0; i < 100; ++i) neuron_destroy(neurons[i]);
+			neuron_add_out_synapse(neurons[i], out_synapses[j]);
 
+			neuron_inject_current(neurons[i], 1000.0f, j);
+			neuron_step(neurons[i], j);
+			// check you have spykes on output synapses
+			for (k = 0; k <= j; ++k) {
+				assert(out_synapses[k]->spike_times.array.length == j + 1 - k, "Should have %u spikes in synapse out %u", j + 1 - k, k);
+			}
+
+			assert(neuron_is_valid(neurons[i]) == TRUE, invalid_argument("neurons[i]"));
+		}
+
+		for (j = 0; j < step_runs; ++j) {
+			synapse_destroy(out_synapses[j]);
+		}
+		free(out_synapses);
+
+		end = clock();
+		cpu_time_used = ((double)((size_t)end - start)) / CLOCKS_PER_SEC;
+		//printf("%u %llf\n", i, cpu_time_used);
+	}
+	for (i = 0; i < neurons_cnt; ++i) {
+		neuron_destroy(neurons[i]);
+	}
 	neuron_class_destroy(n_class);
 	synapse_class_destroy(s_class);
 	

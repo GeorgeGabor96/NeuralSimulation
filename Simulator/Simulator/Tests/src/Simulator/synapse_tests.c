@@ -110,14 +110,27 @@ TestStatus synapse_memory_test() {
 	Synapse* synapses[1000] = { NULL };
 	uint32_t i = 0;
 	uint32_t j = 0;
+	uint32_t value = 0;
 
 	for (i = 0; i < 1000; ++i) {
 		synapses[i] = synapse_create(&s_class, 1.0f);
-		for (j = 0; j < 1000; ++j) {
+		for (j = 0; j < 10000; ++j) {
 			synapse_add_spike_time(synapses[i], j);
 		}
+		assert(synapses[i]->spike_times.array.length == 10000, "length %u not %u for synapse %u", synapses[i]->spike_times.array.length, 10000, i);
 	}
-	for (i = 0; i < 1000; ++i) synapse_destroy(synapses[i]);
+	for (i = 0; i < 1000; ++i) {
+		for (j = 0; j < 10000; ++j) {
+			value = *((uint32_t*)array_get(&(synapses[i]->spike_times.array), j)) - 1;
+			assert(value == j, "value %u, not %u for synapse %u", value, j, i);
+		}
+		for (j = 1; j < 10001; ++j) {
+			synapse_step(synapses[i], j);
+		}
+		assert(synapses[i]->spike_times.array.length == 0, "length %u not %u for synapse %u", synapses[i]->spike_times.array.length, 0, i);
+
+		synapse_destroy(synapses[i]);
+	}
 	assert(memory_leak() == FALSE, "Memory leak");
 	status = TEST_SUCCESS;
 
