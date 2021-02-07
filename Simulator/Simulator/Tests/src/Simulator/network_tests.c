@@ -62,16 +62,19 @@ TestStatus network_compile_general_use_case_test() {
 	assert(layer_is_valid(layer3) == TRUE, invalid_argument("layer3"));
 	assert(string_compare(layer3->name, name3) == 0, invalid_argument("layer3->name"));
 	assert(layer3->neurons.length == 1, invalid_argument("layer3->neurons.length"));
+	assert(layer3->is_input == FALSE, "@layer3->is_input is TRUE");
 	
 	layer2 = network_get_layer_by_idx(network, 1);
 	assert(layer_is_valid(layer2) == TRUE, invalid_argument("layer2"));
 	assert(string_compare(layer2->name, name2) == 0, invalid_argument("layer2->name"));
 	assert(layer2->neurons.length == 100, invalid_argument("layer2->neurons.length"));
-	
+	assert(layer2->is_input == FALSE, "@layer2->is_input is TRUE");
+
 	layer1 = network_get_layer_by_idx(network, 2);
 	assert(layer_is_valid(layer1) == TRUE, invalid_argument("layer1"));
 	assert(string_compare(layer1->name, name1) == 0, invalid_argument("layer1->name"));
 	assert(layer1->neurons.length == 10, invalid_argument("layer1->neurons.length"));
+	assert(layer1->is_input == TRUE, "@layer3->is_input is FALSE");
 
 	// check network input layers
 	layer = *((Layer**)array_get(&(network->input_layers), 0));
@@ -146,7 +149,6 @@ TestStatus network_compile_general_use_case_test() {
 	synapse_class_destroy(s_class);
 	assert(memory_leak() == FALSE, "Memory leak");
 
-
 	t_status = TEST_SUCCESS;
 error:
 	return t_status;
@@ -162,63 +164,62 @@ TestStatus network_step_test() {
 	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
 	SynapseClass* s_class = synapse_class_create_default();
 
-	// layer 1
-	Array* name1 = string_create("layer1");
-	uint32_t input_length = 10;
+	// build layers
+	String* name1 = string_create("layer1");
 	Array* input_names1 = array_create(1, 0, sizeof(Array*));
-	Layer* layer1 = layer_create_fully_connected(input_length, n_class, s_class, name1, input_names1);
+	uint32_t input_neuron_length = 5;
+	Layer* layer1 = layer_create_fully_connected(input_neuron_length, n_class, s_class, name1, input_names1);
 
-	// layer 2
-	Array* name2 = string_create("layer2");
+	String* name2 = string_create("layer2");
 	char* inputs_2[] = { "layer1" };
 	Array* input_names2 = strings_create(inputs_2, 1);
 	Layer* layer2 = layer_create_fully_connected(100, n_class, s_class, name2, input_names2);
 
-	// layer 3
-	Array* name3 = string_create("layer3");
+	String* name3 = string_create("layer3");
 	char* inputs_3[] = { "layer2" };
 	Array* input_names3 = strings_create(inputs_3, 1);
-	Layer* layer3 = layer_create_fully_connected(1, n_class, s_class, name3, input_names3);
+	Layer* layer3 = layer_create_fully_connected(10, n_class, s_class, name3, input_names3);
 
 	// add layers into a network
 	Network* network = network_create();
-	assert(network != NULL, null_argument("network"));
+
 	network_add_layer(network, layer1, TRUE, TRUE, FALSE);
 	network_add_layer(network, layer2, TRUE, FALSE, FALSE);
 	network_add_layer(network, layer3, TRUE, FALSE, TRUE);
-	assert(network->layers.length == 3, invalid_argument("network->layers->length"));
+	assert(network->layers.length == 3, invalid_argument("network->layers.length"));
 	network_compile(network);
+	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
 
 	// build input for network
-	Array* inputs = array_create(1, 0, sizeof(NetworkValues));
-	Array* values = array_create(input_length, 0, sizeof(float));
-	float PSC = 1.0f;
-	for (i = 0; i < values->length; ++i) array_set(values, i, &PSC);
-	
-	NetworkValues net_input;
-	net_input.type = CURRENT;
-	net_input.values = values;
-	array_append(inputs, &net_input);
+	NetworkInputs* inputs = array_create(1, 0, sizeof(NetworkValues));
+	NetworkValues currents;
+	currents.type = CURRENT;
+	currents.values = array_create(input_neuron_length, input_neuron_length, sizeof(float));
+	float PSC = 10.0f;
+	for (i = 0; i < currents.values->length; ++i) array_set(currents.values, i, &PSC);
+	array_append(inputs, &currents);
 
-	for (int i = 0; i < 100; ++i) {
-		log_info("Loop %d", i);
+	for (i = 0; i < 100; ++i) {
 		network_step(network, inputs, i);
-		Array* outputs = network_get_outputs(network, SPIKES);
-		//continue; // WTF: it appears that after freeing the memory it works -> WHY::::::::::::::::
+		log_info("Loop %u", i);
+		NetworkOutputs* outputs = network_get_outputs(network, SPIKES);
 		for (uint32_t j = 0; j < outputs->length; ++j) {
 			NetworkValues* values = (NetworkValues*)array_get(outputs, j);
-			array_show(values->values, show_status);
+			array_show(values->values, show_bool);
 			array_destroy(values->values, NULL);
 		}
 		array_destroy(outputs, NULL);
-		//network_values_show(outputs);
 	}
-	
+	array_destroy(currents.values, NULL);
+	array_destroy(inputs, NULL);
+
+	network_destroy(network);
+	neuron_class_destroy(n_class);
+	synapse_class_destroy(s_class);
+	assert(memory_leak() == FALSE, "Memory leak");
+
 	status = TEST_SUCCESS;
 error:
-	if (network != NULL) network_destroy(network);
-	if (n_class != NULL) neuron_class_destroy(n_class);
-	if (s_class != NULL) synapse_class_destroy(s_class);
 
 	return status;
 }

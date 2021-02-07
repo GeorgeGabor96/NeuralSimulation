@@ -135,8 +135,7 @@ ERROR
 Status array_expand(Array* array) {
 	uint32_t new_max_length = 0;
 	void* new_data = NULL;
-
-	check(array != NULL, null_argument("array"));
+	
 	check(array_is_valid(array) == TRUE, invalid_argument("array"));
 
 	new_max_length = array->length + ARRAY_EXPAND_RATE;
@@ -206,6 +205,29 @@ Status array_swap(Array* array, uint32_t i, uint32_t j) {
 	free(aux);
 
 	return SUCCESS;
+ERROR
+	return FAIL;
+}
+
+
+Status array_resize(Array* array, uint32_t new_max_length) {
+	void* new_data = NULL;
+
+	check(array_is_valid(array) == TRUE, invalid_argument("array"));
+
+	new_data = realloc(array->data, new_max_length * array->element_size, "array_resize");
+	check_memory(new_data);
+
+	array->data = (uint8_t*)new_data;
+	array->max_length = new_max_length;
+
+	if (array->length > array->max_length) {
+		log_warning("@array->length %u > @array->max_length %u -> array is tructated", array->length, array->max_length);
+		array->length = array->max_length;
+	}
+
+	return SUCCESS;
+
 ERROR
 	return FAIL;
 }

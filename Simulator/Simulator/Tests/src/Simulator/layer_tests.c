@@ -201,3 +201,111 @@ TestStatus layer_memory_test_test() {
 error:
 	return status;
 }
+
+
+TestStatus layer_fully_connected_test() {
+	TestStatus status = TEST_FAILED;
+
+	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
+	SynapseClass* s_class = synapse_class_create_default();
+
+	// build 2 layers
+	String* layer_input_name = string_create("layer_input");
+	Array* layer_input_input_names = array_create(1, 0, sizeof(Array*));
+	uint32_t layer_input_length = 10;
+	Layer* layer_input = layer_create_fully_connected(layer_input_length, n_class, s_class, layer_input_name, layer_input_input_names);
+
+	String* layer_output_name = string_create("layer_output");
+	char* layer_output_inputs[1] = { "layer_input" };
+	Array* layer_output_input_names = strings_create(layer_output_inputs, 1);
+	Layer* layer_output = layer_create_fully_connected(100, n_class, s_class, layer_output_name, layer_output_input_names);
+
+	String* layer_middle_name = string_create("layer_middle");
+	char* layer_middle_inputs[] = { "layer_input" };
+	Array* layer_middle_input_names = strings_create(layer_middle_inputs, 1);
+	Layer* layer_middle = layer_create_fully_connected(100, n_class, s_class, layer_middle_name, layer_middle_input_names);
+
+
+	assert(layer_is_valid(layer_input) == TRUE, invalid_argument("layer_input"));
+	assert(layer_is_valid(layer_output) == TRUE, invalid_argument("layer_output"));
+
+	layer_middle->link(layer_middle, layer_input);
+	layer_output->link(layer_output, layer_middle);
+
+	uint32_t i = 0;
+	uint32_t j = 0;
+
+	assert(layer_is_valid(layer_input) == TRUE, invalid_argument("layer_input"));
+	assert(layer_is_valid(layer_middle) == TRUE, invalid_argument("layer_middle"));
+	assert(layer_is_valid(layer_output) == TRUE, invalid_argument("layer_output"));
+
+	// every neuron of layer_input should have 100 output synapses
+	for (i = 0; i < layer_input->neurons.length; ++i) {
+		Neuron* neuron = (Neuron*)array_get(&(layer_input->neurons), i);
+		assert(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
+
+		assert(neuron->out_synapses_refs.length == 100, "@neuron->out_synapses_refs.length is %u, not %u", neuron->out_synapses_refs.length, 100);
+		for (j = 0; j < neuron->out_synapses_refs.length; ++j) {
+			Synapse* synapse = *((Synapse**)array_get(&(neuron->out_synapses_refs), j));
+			assert(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
+		}
+	}
+
+	// every neuron of layer_middle should have 100 input synapses and 100 output synapses
+	for (i = 0; i < layer_middle->neurons.length; ++i) {
+		Neuron* neuron = (Neuron*)array_get(&(layer_middle->neurons), i);
+		assert(neuron_is_valid(neuron) == TRUE, invalid_argument("neurons"));
+
+		assert(neuron->in_synapses.length == 10, "@neuron->in_synapses.length is %u, not %u", neuron->in_synapses.length, 10);
+		for (j = 0; j < neuron->in_synapses.length; ++j) {
+			Synapse* synapse = (Synapse*)array_get(&(neuron->in_synapses), j);
+			assert(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
+		}
+
+		assert(neuron->out_synapses_refs.length == 100, "@neuron->out_synapses_refs.length is %u, not %u", neuron->out_synapses_refs.length, 100);
+		for (j = 0; j < neuron->out_synapses_refs.length; ++j) {
+			Synapse* synapse = *((Synapse**)array_get(&(neuron->out_synapses_refs), j));
+			assert(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
+		}
+	}
+
+	// every neuron of layer_output should have 100 input synapses
+	for (i = 0; i < layer_output->neurons.length; ++i) {
+		Neuron* neuron = (Neuron*)array_get(&(layer_output->neurons), i);
+		assert(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
+
+		assert(neuron->in_synapses.length == 100, "@neuron->in_synapses.length is %u, not %u", neuron->in_synapses.length, 100);
+		for (j = 0; j < neuron->in_synapses.length; ++j) {
+			Synapse* synapse = (Synapse*)array_get(&(neuron->in_synapses), j);
+			assert(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
+		}
+	}
+
+
+	for (uint32_t i = 0; i < 1000; ++i) {
+		ArrayFloat* currents = array_create(layer_input_length, layer_input_length, sizeof(float));
+		float current = 1000.0f;
+		for (j = 0; j < currents->length; ++j) array_set(currents, j, &current);
+
+		layer_step(layer_input, i);
+		layer_step(layer_middle, i);
+		layer_step(layer_output, i);
+
+		layer_inject_currents(layer_input, currents, i);
+
+		array_destroy(currents, NULL);
+	}
+
+	layer_destroy(layer_input);
+	layer_destroy(layer_middle);
+	layer_destroy(layer_output);
+	neuron_class_destroy(n_class);
+	synapse_class_destroy(s_class);
+
+	assert(memory_leak() == FALSE, "memory_leak");
+
+	status = TEST_SUCCESS;
+error:
+	return status;
+
+}

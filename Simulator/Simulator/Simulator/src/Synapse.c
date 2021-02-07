@@ -9,9 +9,9 @@
 * CHECKS FUNCTIONS
 *************************************************************/
 Status synapse_class_is_valid(SynapseClass* synapse_class) {
-	check(synapse_class != NULL, null_argument("neuron_class"));
+	check(synapse_class != NULL, null_argument("synapse_class"));
 	// NOTE: If you add more types this check needs to be updated
-	check(synapse_class->type == CONDUCTANCE_SYNAPCE || synapse_class->type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("neuron_class->type"));
+	check(synapse_class->type == CONDUCTANCE_SYNAPCE || synapse_class->type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("synapse_class->type"));
 
 	return TRUE;
 

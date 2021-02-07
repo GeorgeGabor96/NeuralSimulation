@@ -23,6 +23,19 @@ Status neuron_is_valid(Neuron* neuron) {
 	check(array_is_valid(&(neuron->in_synapses)) == TRUE, invalid_argument("neuron->in_synapses"));
 	check(array_is_valid(&(neuron->out_synapses_refs)) == TRUE, invalid_argument("neuron_>out_synapses"));
 
+	// check input synapses
+	uint32_t i = 0;
+	Synapse* synapse = NULL;
+	for (i = 0; i < neuron->in_synapses.length; ++i) {
+		synapse = (Synapse*)array_get(&(neuron->in_synapses), i);
+		check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
+	}
+	// check output synapses
+	for (i = 0; i < neuron->out_synapses_refs.length; ++i) {
+		synapse = *((Synapse**)array_get(&(neuron->out_synapses_refs), i));
+		check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
+	}
+
 	return TRUE;
 
 ERROR

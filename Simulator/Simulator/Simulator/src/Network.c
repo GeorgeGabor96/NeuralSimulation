@@ -11,9 +11,50 @@ bool network_is_valid(Network* network) {
 	check(array_is_valid(&(network->input_layers)) == TRUE, invalid_argument("network->input_layers"));
 	check(array_is_valid(&(network->output_layers)) == TRUE, invalid_argument("network->output_layers"));
 
+	uint32_t i = 0;
+	uint32_t j = 0;
+	Layer* layer = NULL;
+	Layer* layer_2 = NULL;
+	bool ok = FALSE;
+
+	for (i = 0; i < network->layers.length; ++i) {
+		layer = (Layer*)array_get(&(network->layers), i);
+		check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+	}
+
+	if (network->compiled) {
+		for (i = 0; i < network->input_layers.length; ++i) {
+			layer = *((Layer**)array_get(&(network->input_layers), i));
+			// the address of an input layer should be found in @network->layers
+			ok = FALSE;
+			for (j = 0; j < network->layers.length; ++j) {
+				layer_2 = (Layer*)array_get(&(network->layers), j);
+				if (layer == layer_2) {
+					ok = TRUE;
+					break;
+				}
+			}
+			check(ok == TRUE, "Couldn't find input layer with adress %p in @network->layers", layer);
+		}
+
+		for (i = 0; i < network->output_layers.length; ++i) {
+			layer = *((Layer**)array_get(&(network->output_layers), i));
+			// the address of an input layer should be found in @network->layers
+			ok = FALSE;
+			for (j = 0; j < network->layers.length; ++j) {
+				layer_2 = (Layer*)array_get(&(network->layers), j);
+				if (layer == layer_2) {
+					ok = TRUE;
+					break;
+				}
+			}
+			check(ok == TRUE, "Couldn't find output layer with adress %p in @network->layers", layer);
+		}
+	}
+
 	return TRUE;
 
-error:
+ERROR
 	return FALSE;
 }
 
@@ -32,11 +73,15 @@ Network* network_create() {
 	check(status == SUCCESS, "Couldn't init @network->input_layers");
 	status = array_init(&(network->output_layers), 1, 0, sizeof(Layer*));
 	check(status == SUCCESS, "Couldn't init @network->output_layers");
+	status = array_init(&(network->input_names), 1, 0, sizeof(String*));
+	check(status == SUCCESS, "Couldn't init @network->input_names");
+	status = array_init(&(network->output_names), 1, 0, sizeof(String*));
+	check(status == SUCCESS, "Couldn't init @network->output_names");
 	network->compiled = FALSE;
 
 	return network;
 
-error:
+ERROR
 	if (network != NULL) {
 		if (network->layers.data != NULL) array_reset(&(network->layers), NULL);
 		if (network->output_layers.data != NULL) array_destroy(&(network->output_layers), NULL);
@@ -56,9 +101,11 @@ void network_destroy(Network* network) {
 	array_reset(&(network->layers), layer_reset);
 	array_reset(&(network->input_layers), NULL);
 	array_reset(&(network->output_layers), NULL);
+	array_reset(&(network->input_names), NULL); // TODO, here I remove the names???
+	array_reset(&(network->output_names), NULL);
 	free(network);
 
-error:
+ERROR
 	return;
 }
 
@@ -69,18 +116,17 @@ Status network_add_layer(Network* network, Layer* layer, bool should_free, bool 
 
 	Layer* network_layer = NULL;
 	Status status = FAIL;
+	layer->is_input = FALSE;
+	
 	status = array_append(&(network->layers), layer);
 	check(status == SUCCESS, "Could not add layer");
 	// may need to remove the memory that contain the info about the layer, which we copied
 	if (should_free == TRUE) free(layer);
 
-	layer->is_input = FALSE;
-
 	if (is_input == TRUE) {
 		network_layer = (Layer*)array_get(&(network->layers), network->layers.length - 1);
 		check(layer_is_valid(network_layer) == TRUE, invalid_argument("network_layer"));
-		// save reference to the current layer
-		status = array_append(&(network->input_layers), &network_layer);
+		status = array_append(&(network->input_names), &(network_layer->name));
 		check(status == SUCCESS, "Could not add input_layer");
 		network_layer->is_input = TRUE;
 	}
@@ -88,14 +134,13 @@ Status network_add_layer(Network* network, Layer* layer, bool should_free, bool 
 	if (is_output == TRUE) {
 		network_layer = (Layer*)array_get(&(network->layers), network->layers.length - 1);
 		check(layer_is_valid(network_layer) == TRUE, invalid_argument("network_layer"));
-		// save reference to the current layer
-		status = array_append(&(network->output_layers), &network_layer);
+		status = array_append(&(network->output_names), &(network_layer->name));
 		check(status == SUCCESS, "Could not add output_layer");
 	}
 
 	return SUCCESS;
 
-error:
+ERROR
 	return FAIL;
 }
 
@@ -108,7 +153,7 @@ Layer* network_get_layer_by_idx(Network* network, uint32_t layer_idx) {
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	return layer;
 
-error:
+ERROR
 	return NULL;
 }
 
@@ -127,7 +172,7 @@ Layer* network_get_layer_by_name(Network* network, String* name) {
 		}
 	}
 
-error:
+ERROR
 	return NULL;
 }
 
@@ -146,7 +191,7 @@ uint32_t network_get_layer_idx_by_name(Network* network, String* name) {
 		}
 	}
 
-error:
+ERROR
 	return UINT32_MAX;
 }
 
@@ -218,12 +263,26 @@ loop1:
 			status = layer->link(layer, input_layer);
 			check(status == SUCCESS, "Could not link layers");
 		}
-		
 	}
+
+	// save references of input layers in @network->input_layers
+	for (i = 0; i < network->input_names.length; ++i) {
+		layer_name = *((String**)array_get(&(network->input_names), i));
+		layer = network_get_layer_by_name(network, layer_name);
+		array_append(&(network->input_layers), &layer);
+	}
+
+	// save references of output layers in @network->output_layers
+	for (i = 0; i < network->output_names.length; ++i) {
+		layer_name = *((String**)array_get(&(network->output_names), i));
+		layer = network_get_layer_by_name(network, layer_name);
+		array_append(&(network->output_layers), &layer);
+	}
+
 	network->compiled = TRUE;
 	status = SUCCESS;
 
-error:
+ERROR
 	return status;
 }
 
@@ -267,13 +326,13 @@ void network_step(Network* network, NetworkInputs* inputs, uint32_t time) {
 		}
 	}
 
-error:
+ERROR
 	return;
 }
 
 
 NetworkOutputs* network_get_outputs(Network* network, NetworkValueType type) {
-	NetworkOutputs* outputs = array_create(network->output_layers.length, 0, sizeof(NetworkValues));
+	NetworkOutputs* outputs = array_create(network->output_layers.length, network->output_layers.length, sizeof(NetworkValues));
 	check(array_is_valid(outputs) == TRUE, invalid_argument("outputs"));
 
 	uint32_t i = 0;
@@ -300,7 +359,7 @@ NetworkOutputs* network_get_outputs(Network* network, NetworkValueType type) {
 	}
 	return outputs;
 
-error:
+ERROR
 	return NULL;
 }
 

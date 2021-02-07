@@ -29,6 +29,8 @@ typedef struct Network {
 	Array layers;			// will be added one by one
 	Array output_layers;	// one or more, keeps references to @layers
 	Array input_layers;		// one or more, keeps references to @layers
+	Array input_names;		// names of the input layers
+	Array output_names;		// names of the output layers
 	bool compiled;		// if the network has been compiled
 } Network;
 

@@ -15,9 +15,15 @@ bool layer_is_valid(Layer* layer) {
 	check(array_is_valid(layer->input_names) == TRUE, invalid_argument("layer->input_names"));
 	check(array_is_valid(&(layer->neurons)) == TRUE, invalid_argument("layer->neurons"));
 
+	// check the neurons
+	for (uint32_t i = 0; i < layer->neurons.length; ++i) {
+		Neuron* neuron = (Neuron*)array_get(&(layer->neurons), i);
+		check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
+	}
+
 	return TRUE;
 
-error:
+ERROR
 	return FALSE;
 }
 
@@ -70,7 +76,7 @@ Status layer_init(
 
 	return SUCCESS;
 
-error:
+ERROR
 	// reset initiliazed neurons
 	if (i > 0) {
 		--i;
@@ -111,7 +117,7 @@ Layer* layer_create(
 
 	return layer;
 
-error:
+ERROR
 	if (layer != NULL) free(layer);
 	return NULL;
 }
@@ -137,7 +143,7 @@ void layer_reset(Layer* layer) {
 	strings_destroy(layer->input_names);
 	array_reset(&(layer->neurons), neuron_reset);
 
-error:
+ERROR
 	return;
 }
 
@@ -148,7 +154,7 @@ void layer_destroy(Layer* layer) {
 	layer_reset(layer);
 	free(layer);
 
-error:
+ERROR
 	return;
 }
 
@@ -168,7 +174,7 @@ Status layer_step(Layer* layer, uint32_t time) {
 	}
 	return SUCCESS;
 
-error:
+ERROR
 	return FAIL;
 }
 
@@ -192,7 +198,7 @@ Status layer_force_spikes(Layer* layer, ArrayBool* spikes, uint32_t time) {
 	}
 
 	return SUCCESS;
-error:
+ERROR
 	return FAIL;
 }
 
@@ -210,12 +216,11 @@ Status layer_inject_currents(Layer* layer, ArrayFloat* currents, uint32_t time) 
 		current = *((float*)array_get(currents, i));
 		neuron = (Neuron*)array_get(&(layer->neurons), i);
 		check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
-
 		neuron_inject_current(neuron, current, time);
 	}
 
 	return SUCCESS;
-error:
+ERROR
 	return FAIL;
 }
 
@@ -237,7 +242,7 @@ ArrayBool* layer_get_spikes(Layer* layer) {
 	}
 
 	return spikes;
-error:
+ERROR
 	if (spikes != NULL) array_destroy(spikes, NULL);
 	return NULL;
 }
@@ -260,7 +265,7 @@ ArrayFloat* layer_get_voltages(Layer* layer) {
 	}
 
 	return voltages;
-error:
+ERROR
 	if (voltages != NULL) array_destroy(voltages, NULL);
 	return NULL;
 }
@@ -279,6 +284,12 @@ Status layer_link_fc(Layer* layer, Layer* input_layer) {
 	for (i = 0; i < layer->neurons.length; ++i) {
 		neuron_layer = (Neuron*)array_get(&(layer->neurons), i);
 		check(neuron_is_valid(neuron_layer) == TRUE, invalid_argument("neuron_layer"));
+		// need to allocated the number of input synapses for the @neuron_layer to avoid expanding
+		// @neuron_layer->in_synapses which can cause changing the @neuron_layer->in_synapses.data pointer
+		// which will invalidate the pointers of the neurons in @input_layer
+
+		// DO I really need this resize, can't I make it work without it?
+		array_resize(&(neuron_layer->in_synapses), input_layer->neurons.length);
 
 		for (j = 0; j < input_layer->neurons.length; ++j) {
 			neuron_input_layer = (Neuron*)array_get(&(input_layer->neurons), j);
@@ -297,7 +308,7 @@ Status layer_link_fc(Layer* layer, Layer* input_layer) {
 
 	return SUCCESS;
 
-error:
+ERROR
 	// TODO: currently if a synapse is not well allocated the system goes on
 	// need to dealocate the memory -> need to define what happends then
 	// PROBABLY not a problem
