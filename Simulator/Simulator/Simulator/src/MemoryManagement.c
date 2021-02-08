@@ -5,37 +5,31 @@
 #undef realloc
 #undef free
 
+/********************************************************************************
+* This will keep nodes, where every node has the info about one memory allocation
+* When memory is freed, a node is removed from here
+*
+* NOTE -- Don't care about performance here, used only to find memory leaks
+********************************************************************************/
 
+/********************************************************************************
+* General information about a memory allocation
+* Will be stored in lists
+********************************************************************************/
 typedef struct Node {
-	char* desc;
 	void* ptr;
+	char* desc;
 	size_t size;
 	struct Node* next;
 	struct Node* prev;
 } Node;
 
-// find is slow on a lot of elements -> cash mishes and linear time
-// TODO: if necessery consider a hast table
-typedef struct List {
-	Node* first;
-	Node* last;
-} List;
-
-
-/********************************************************************************
-* This will keep nodes, where every node has the info about one memory allocation
-* When memory is freed, a node is removed from here
-* 
-* NOTE -- Don't care about performance here, used only to find memory leaks
-********************************************************************************/
-static List allocated_memory;
-
 
 static inline Node* create_node(void* ptr, size_t size, char* desc) {
 	Node* node = (Node*)malloc(sizeof(Node));
 	if (node == NULL) return node;
-	node->desc = desc;
 	node->ptr = ptr;
+	node->desc = desc;
 	node->size = size;
 	node->next = NULL;
 	node->prev = NULL;
@@ -43,30 +37,59 @@ static inline Node* create_node(void* ptr, size_t size, char* desc) {
 }
 
 
-static inline void add_node(Node* node) {
-	if (allocated_memory.first == NULL) {
-		allocated_memory.first = node;
-		allocated_memory.last = node;
+/********************************************************************************
+* List of Nodes, are used as buckets for the hash table
+********************************************************************************/
+typedef struct List {
+	Node* first;
+	Node* last;
+} List;
+
+
+static inline void list_add(List* list, Node* node) {
+	if (list->first == NULL) {
+		list->first = node;
+		list->last = node;
 	}
 	else {
-		allocated_memory.last->next = node;
-		node->prev = allocated_memory.last;
-		allocated_memory.last = node;
+		list->last->next = node;
+		node->prev = list->last;
+		list->last = node;
 	}
 }
 
-static inline void remove_node(Node* node) {
-	if (node == allocated_memory.first && node == allocated_memory.last) {
-		allocated_memory.first = NULL;
-		allocated_memory.last = NULL;
+static inline Node* list_remove_first(List* list) {
+	Node* node = NULL;
+	if (list->first != NULL) {
+		node = list->first;
+		if (node == list->last) {
+			list->first = NULL;
+			list->last = NULL;
+		}
+		else list->first = node->next;
 	}
-	else if (node == allocated_memory.first) {
+	return node;
+}
+
+static inline Node* list_find(List* list, void* ptr) {
+	Node* iter = list->first;
+	while (iter != NULL && iter->ptr != ptr) iter = iter->next;
+	return iter;
+}
+
+
+static inline void list_remove(List* list, Node* node) {
+	if (node == list->first && node == list->last) {
+		list->first = NULL;
+		list->last = NULL;
+	}
+	else if (node == list->first) {
 		node->next->prev = NULL;
-		allocated_memory.first = node->next;
+		list->first = node->next;
 	}
-	else if (node == allocated_memory.last) {
+	else if (node == list->last) {
 		node->prev->next = NULL;
-		allocated_memory.last = node->prev;
+		list->last = node->prev;
 	}
 	else {
 		node->prev->next = node->next;
@@ -75,121 +98,240 @@ static inline void remove_node(Node* node) {
 }
 
 
-static inline Node* find_node(void* ptr) {
-	Node* iter = allocated_memory.first;
-	while (iter != NULL && iter->ptr != ptr) iter = iter->next;
-	return iter;
+/********************************************************************************
+* Hash table with linked lists
+* It grows when the length / n_entries >= 0.8
+********************************************************************************/
+typedef struct HashTable {
+	List* entries;
+	size_t n_entries;
+	size_t length;
+} HashTable;
+#define TABLE_INITIAL_LENGTH 1000
+
+static inline HashTable* hash_table_create(size_t n_entries);
+static inline void hash_table_resize(HashTable* table, size_t new_size);
+static inline void hash_table_add(HashTable* table, Node* node);
+static inline Node* hash_table_remove(HashTable* table, void* key);
+
+size_t next_prime(size_t n) {
+	// TO DO
+	return n;
+}
+
+// TO DO: test i don't know if it's good
+size_t hash_f(HashTable* table, void* address_value) {
+	return (size_t)address_value % table->n_entries;
+	/*
+	uint8_t* address_p = &address_value;
+	uint8_t c = 0;
+	uint32_t i = 0;
+	size_t h = 0;
+
+	for (i = 0; i < sizeof(size_t); ++i) {
+		c = address_p[i];
+		h *= h ^ c;
+	}
+	return h % memory_table->n_entries;
+	*/
 }
 
 
-static inline bool update_node(void* old_ptr, void* new_ptr, size_t new_size, char* new_desc) {
-	Node* iter = find_node(old_ptr);
-	check(iter != NULL, "%p pointer does not have a node", old_ptr);
+static inline HashTable* hash_table_create(size_t n_entries) {
+	HashTable* table = (HashTable*)malloc(sizeof(HashTable));
+	check_memory(table);
 
-	iter->ptr = new_ptr;
-	iter->size = new_size;
-	iter->desc = new_desc;
+	table->entries = (List*)calloc(n_entries, sizeof(List));
+	check_memory(table->entries);
 
-	return TRUE;
+	table->n_entries= n_entries;
+	table->length = 0;
 
 ERROR
-	return FALSE;
-}
-
-
-uint32_t memory_manage_memory_blocks() {
-	Node* iter = allocated_memory.first;
-	uint32_t memory_blocks = 0;
-
-	while (iter != NULL) {
-		memory_blocks++;
-		iter = iter->next;
+	if (table != NULL) {
+		free(table);
 	}
-	return memory_blocks;
+	return NULL;
 }
 
+static inline void hash_table_resize(HashTable* table, size_t new_size) {
+	size_t i = 0;
+	List* list = NULL;
+	Node* node = NULL;
+	size_t hash = 0;
+	HashTable* new_table = hash_table_create(new_size);
 
-size_t memory_manage_memory_size() {
-	Node* iter = allocated_memory.first;
-	size_t memory_size = 0;
-
-	while (iter != NULL) {
-		memory_size += iter->size;
-		iter = iter->next;
+	// move the nodes from @table to @new_table
+	for (i = 0; i < table->n_entries; ++i) {
+		list = &(table->entries[i]);
+		
+		// take all elements from the list
+		while ((node = list_remove_first(list)) != NULL) {
+			hash_table_add(new_table, node);
+		}
 	}
-	return memory_size;
+
+	// overwrite table
+	free(table->entries);	// table->entries contains only empty lists
+	table->entries = new_table->entries;
+	table->length = new_table->length;
+	table->n_entries = new_table->n_entries;
+	free(new_table); // no need for this anymore
 }
 
-
-bool memory_manage_is_empty() {
-	// if there is an element in the list then their is memory that is not deallocated
-	if (allocated_memory.first != NULL) return FALSE;
-	return TRUE;
-}
-
-
-void memory_manage_report() {
-	Node* iter = NULL;
-	size_t n_nodes = 0;
-	size_t total_memory = 0;
-
-	log_info("UNFREED MEMORY");
-	for (iter = allocated_memory.first; iter != NULL; iter = iter->next) {
-		printf("Node %llu - desc: %s ptr: %p size: %llu BYTES\n", n_nodes, iter->desc, iter->ptr, iter->size);
-		n_nodes++;
-		total_memory += iter->size;
+static inline void hash_table_add(HashTable* table, Node* node) {
+	// resize when 80% is filled (nr_elements / nr_entries)
+	if ((float)table->length / (float)table->n_entries >= 0.8f) {
+		hash_table_resize(table, next_prime(table->n_entries * 2));
 	}
-	log_info("Summary %llu nodes, %llu BYTES not freed", n_nodes, total_memory);
+	size_t idx = hash_f(table, node->ptr);
+	list_add(&(table->entries[idx]), node);
+	(table->length)++;
+}
+
+static inline Node* hash_table_remove(HashTable* table, void* key) {
+	size_t hash = hash_f(table, key);
+	List* entry = &(table->entries[hash]);
+	Node* node = list_find(entry, key);
+	list_remove(entry, node);
+	(table->length)--;
+	return node;
 }
 
 
+/********************************************************************************
+* Keep a global Hash Table, we only need one for the whose process
+* This will be freed automatically at the end of the program
+********************************************************************************/
+HashTable* memory_table = NULL;
+
+
+/********************************************************************************
+* Module Functionality
+********************************************************************************/
 void* memory_manage_malloc(size_t size, char* desc) {
+	if (memory_table == NULL) memory_table = hash_table_create(TABLE_INITIAL_LENGTH);
+
 	void* ptr = malloc(size);
 	check_memory(ptr);
 
 	Node* node = create_node(ptr, size, desc);
-	add_node(node);
+	hash_table_add(memory_table, node);
 	return ptr;
-
 ERROR
 	return NULL;
 }
 
 
 void* memory_manage_calloc(size_t nitems, size_t size, char* desc) {
+	if (memory_table == NULL) memory_table = hash_table_create(TABLE_INITIAL_LENGTH);
 	void* ptr = calloc(nitems, size);
 	check_memory(ptr);
 
 	Node* node = create_node(ptr, nitems * size, desc);
-	add_node(node);
+	hash_table_add(memory_table, node);
 	return ptr;
 ERROR
 	return NULL;
 }
 
-
 void* memory_manage_realloc(void* ptr, size_t size, char* desc) {
+	check(memory_table != NULL, null_argument("memory_tabel"));
 	// try to realloc
 	void* n_ptr = realloc(ptr, size);
 	check_memory(ptr);
 
-	update_node(ptr, n_ptr, size, desc);
-	return n_ptr;
+	// remove node because its key may change
+	Node* node = hash_table_remove(memory_table, ptr);
+	check(node != NULL, "%p pointer does not have a node", ptr);
 
+	// update node state
+	node->ptr = n_ptr;
+	node->size = size;
+	node->desc = desc;
+
+	hash_table_add(memory_table, node);
+	return n_ptr;
 ERROR
 	// realloc failed return old data
 	return ptr;
 }
 
-
 void memory_manage_free(void* ptr) {
+	check(memory_table != NULL, null_argument("memory_tabel"));
 	// find node and remove it from list
-	Node* node = find_node(ptr);
+	Node* node = hash_table_remove(memory_table, ptr);
 	check(node != NULL, "Node should exist for %p", ptr);
 
-	remove_node(node);
+	free(node->ptr);
 	free(node);
+ERROR
+	return;
+}
 
+size_t memory_manage_memory_blocks() {
+	size_t i = 0;
+	size_t n_blocks = 0;
+	List* list = NULL;
+	Node* node = NULL;
+
+	for (i = 0; i < memory_table->n_entries; ++i) {
+		list = &(memory_table->entries[i]);
+		node = list->first;
+
+		while (node != NULL) {
+			n_blocks++;
+			node = node->next;
+		}
+	}
+	return n_blocks;
+}
+
+size_t memory_manage_memory_size() {
+	size_t i = 0;
+	size_t mem_size = 0;
+	List* list = NULL;
+	Node* node = NULL;
+
+	for (i = 0; i < memory_table->n_entries; ++i) {
+		list = &(memory_table->entries[i]);
+		node = list->first;
+
+		while (node != NULL) {
+			mem_size += node->size;
+			node = node->next;
+		}
+	}
+	return mem_size;
+}
+
+bool memory_manage_is_empty() {
+	if (memory_table->length == 0) return TRUE;
+	return FALSE;
+}
+
+void memory_manage_report() {
+	size_t i = 0;
+	size_t mem_size = 0;
+	size_t n_nodes = 0;
+	List* list = NULL;
+	Node* node = NULL;
+
+	log_info("UNFREED MEMORY");
+	for (i = 0; i < memory_table->n_entries; ++i) {
+		list = &(memory_table->entries[i]);
+		node = list->first;
+
+		while (node != NULL) {
+			printf("Node %llu - desc: %s ptr: %p size: %llu BYTES\n", n_nodes, node->desc, node->ptr, node->size);
+			n_nodes++;
+			mem_size += node->size;
+			node = node->next;
+		}
+	}
+
+	check(n_nodes == memory_table->length, "@n_nodes != @memory_table->length");
+	log_info("Summary %llu nodes, %llu BYTES not freed", n_nodes, mem_size);
 ERROR
 	return;
 }

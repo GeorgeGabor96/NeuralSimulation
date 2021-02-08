@@ -5,7 +5,7 @@
 
 
 // number of memory allocations that are currently not freed
-uint32_t memory_manage_memory_blocks();
+size_t memory_manage_memory_blocks();
 
 // number of bytes currently not freed
 size_t memory_manage_memory_size();
