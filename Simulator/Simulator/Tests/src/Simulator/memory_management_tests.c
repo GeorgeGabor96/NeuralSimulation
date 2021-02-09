@@ -5,22 +5,23 @@ TestStatus memory_management_general_test() {
 	TestStatus status = TEST_FAILED;
 
 	// should not have any memory registered
-	uint32_t memory_blocks = memory_manage_memory_blocks();
-	assert(memory_blocks == 0, "@memory_blocks is %u, not 0", memory_blocks);
+	size_t memory_blocks = memory_manage_memory_blocks();
+	assert(memory_blocks == 0, "@memory_blocks is %llu, not 0", memory_blocks);
 	size_t memory_size = memory_manage_memory_size();
 	assert(memory_size == 0, "@memory_size is %llu, not 0", memory_size);
 	
 	// do 1000 mallocs 
-	uint32_t malloc_allocations = 1000;
+	uint32_t malloc_allocations = 50;
 	size_t memory_block_size = 1000;
 	uint32_t i = 0;
 	void* ptrs[1000] = { 0 };
 	for (i = 0; i < malloc_allocations; ++i) {
 		ptrs[i] = malloc(memory_block_size, "malloc_allocation");
 	}
+
 	// check status of memory
 	memory_blocks = memory_manage_memory_blocks();
-	assert(memory_blocks == malloc_allocations, "@memory_blocks is %u, not %u", memory_blocks, malloc_allocations);
+	assert(memory_blocks == malloc_allocations, "@memory_blocks is %llu, not %u", memory_blocks, malloc_allocations);
 	memory_size = memory_manage_memory_size();
 	assert(memory_size == memory_block_size * malloc_allocations, "@memory_size is %llu, not %llu", memory_size, memory_block_size * malloc_allocations);
 
@@ -30,7 +31,7 @@ TestStatus memory_management_general_test() {
 	}
 
 	memory_blocks = memory_manage_memory_blocks();
-	assert(memory_blocks == 0, "@memory_blocks is %u, not 0", memory_blocks);
+	assert(memory_blocks == 0, "@memory_blocks is %llu, not 0", memory_blocks);
 	memory_size = memory_manage_memory_size();
 	assert(memory_size == 0, "@memory_size is %llu, not 0", memory_size);
 
@@ -42,7 +43,7 @@ TestStatus memory_management_general_test() {
 	}
 	// check status of memory
 	memory_blocks = memory_manage_memory_blocks();
-	assert(memory_blocks == calloc_allocations, "@memory_blocks is %u, not %u", memory_blocks, calloc_allocations);
+	assert(memory_blocks == calloc_allocations, "@memory_blocks is %llu, not %u", memory_blocks, calloc_allocations);
 	memory_size = memory_manage_memory_size();
 	assert(memory_size == memory_block_size * calloc_allocations, "@memory_size is %llu, not %llu", memory_size, memory_block_size * calloc_allocations);
 
@@ -50,11 +51,14 @@ TestStatus memory_management_general_test() {
 	for (i = 0; i < calloc_allocations; i++) {
 		ptrs2[i] = realloc(ptrs2[i], memory_block_size * 2, "realloc_allocation");
 	}
+
 	// check status of memory
 	memory_blocks = memory_manage_memory_blocks();
-	assert(memory_blocks == calloc_allocations, "@memory_blocks is %u, not %u", memory_blocks, calloc_allocations);
+	assert(memory_blocks == calloc_allocations, "@memory_blocks is %llu, not %u", memory_blocks, calloc_allocations);
 	memory_size = memory_manage_memory_size();
 	assert(memory_size == 2 * memory_block_size * calloc_allocations, "@memory_size is %llu, not %llu", memory_size, 2 * memory_block_size * calloc_allocations);
+
+	memory_manage_show_inner_state(FALSE, FALSE);
 
 	// clean memory
 	for (i = 0; i < calloc_allocations; ++i) {
@@ -62,7 +66,7 @@ TestStatus memory_management_general_test() {
 	}
 
 	memory_blocks = memory_manage_memory_blocks();
-	assert(memory_blocks == 0, "@memory_blocks is %u, not 0", memory_blocks);
+	assert(memory_blocks == 0, "@memory_blocks is %llu, not 0", memory_blocks);
 	memory_size = memory_manage_memory_size();
 	assert(memory_size == 0, "@memory_size is %llu, not 0", memory_size);
 
@@ -80,8 +84,8 @@ TestStatus memory_manage_report_test() {
 	void* ptr2 = calloc(3, 300000, "calloc_simple");
 	bool is_empty = memory_manage_is_empty();
 	assert(is_empty == FALSE, "should have memory");
-	uint32_t memory_blocks = memory_manage_memory_blocks();
-	assert(memory_blocks == 2, "@memory_blocks is %u, not 2", memory_blocks);
+	size_t memory_blocks = memory_manage_memory_blocks();
+	assert(memory_blocks == 2, "@memory_blocks is %llu, not 2", memory_blocks);
 	size_t memory_size = memory_manage_memory_size();
 	size_t real_memory_size = 100000 + 3 * 300000;
 	assert(memory_size == real_memory_size, "@memory_size is %llu, not %llu", memory_size, real_memory_size);
@@ -91,7 +95,7 @@ TestStatus memory_manage_report_test() {
 	free(ptr1);
 	free(ptr2);
 	memory_blocks = memory_manage_memory_blocks();
-	assert(memory_blocks == 0, "@memory_blocks is %u, not 0", memory_blocks);
+	assert(memory_blocks == 0, "@memory_blocks is %llu, not 0", memory_blocks);
 	memory_size = memory_manage_memory_size();
 	assert(memory_size == 0, "@memory_size is %llu, not 0", memory_size);
 

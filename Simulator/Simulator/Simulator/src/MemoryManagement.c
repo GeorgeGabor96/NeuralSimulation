@@ -45,7 +45,6 @@ typedef struct List {
 	Node* last;
 } List;
 
-
 static inline void list_add(List* list, Node* node) {
 	if (list->first == NULL) {
 		list->first = node;
@@ -107,33 +106,39 @@ typedef struct HashTable {
 	size_t n_entries;
 	size_t length;
 } HashTable;
-#define TABLE_INITIAL_LENGTH 1000
+#define TABLE_INITIAL_LENGTH 997
 
 static inline HashTable* hash_table_create(size_t n_entries);
 static inline void hash_table_resize(HashTable* table, size_t new_size);
 static inline void hash_table_add(HashTable* table, Node* node);
 static inline Node* hash_table_remove(HashTable* table, void* key);
 
-size_t next_prime(size_t n) {
-	// TO DO
+
+static inline bool is_prime(size_t n) {
+	size_t i = 0;
+	for (i = 2; i < n / 2; ++i) {
+		if (n % i == 0) return FALSE;
+	}
+	return TRUE;
+}
+
+static inline size_t next_prime(size_t n) {
+	if (is_prime(n) == TRUE) return n;
+	size_t radius = 1;
+	size_t number = 0;
+	while (TRUE) {
+		number = n + radius;
+		if (is_prime(number) == TRUE) return number;
+		number = n - radius;
+		if (is_prime(number) == TRUE) return number;
+		radius++;
+	}
 	return n;
 }
 
 // TO DO: test i don't know if it's good
-size_t hash_f(HashTable* table, void* address_value) {
+static inline size_t hash_f(HashTable* table, void* address_value) {
 	return (size_t)address_value % table->n_entries;
-	/*
-	uint8_t* address_p = &address_value;
-	uint8_t c = 0;
-	uint32_t i = 0;
-	size_t h = 0;
-
-	for (i = 0; i < sizeof(size_t); ++i) {
-		c = address_p[i];
-		h *= h ^ c;
-	}
-	return h % memory_table->n_entries;
-	*/
 }
 
 
@@ -147,6 +152,7 @@ static inline HashTable* hash_table_create(size_t n_entries) {
 	table->n_entries= n_entries;
 	table->length = 0;
 
+	return table;
 ERROR
 	if (table != NULL) {
 		free(table);
@@ -167,6 +173,8 @@ static inline void hash_table_resize(HashTable* table, size_t new_size) {
 		
 		// take all elements from the list
 		while ((node = list_remove_first(list)) != NULL) {
+			node->next = NULL;
+			node->prev = NULL;
 			hash_table_add(new_table, node);
 		}
 	}
@@ -249,6 +257,8 @@ void* memory_manage_realloc(void* ptr, size_t size, char* desc) {
 	node->ptr = n_ptr;
 	node->size = size;
 	node->desc = desc;
+	node->prev = NULL;
+	node->next = NULL;
 
 	hash_table_add(memory_table, node);
 	return n_ptr;
@@ -270,6 +280,9 @@ ERROR
 }
 
 size_t memory_manage_memory_blocks() {
+	if (memory_table == NULL) {
+		memory_table = hash_table_create(TABLE_INITIAL_LENGTH);
+	}
 	size_t i = 0;
 	size_t n_blocks = 0;
 	List* list = NULL;
@@ -288,6 +301,7 @@ size_t memory_manage_memory_blocks() {
 }
 
 size_t memory_manage_memory_size() {
+	if (memory_table == NULL) memory_table = hash_table_create(TABLE_INITIAL_LENGTH);
 	size_t i = 0;
 	size_t mem_size = 0;
 	List* list = NULL;
@@ -306,11 +320,13 @@ size_t memory_manage_memory_size() {
 }
 
 bool memory_manage_is_empty() {
+	if (memory_table == NULL) memory_table = hash_table_create(TABLE_INITIAL_LENGTH);
 	if (memory_table->length == 0) return TRUE;
 	return FALSE;
 }
 
 void memory_manage_report() {
+	if (memory_table == NULL) memory_table = hash_table_create(TABLE_INITIAL_LENGTH);
 	size_t i = 0;
 	size_t mem_size = 0;
 	size_t n_nodes = 0;
@@ -334,4 +350,33 @@ void memory_manage_report() {
 	log_info("Summary %llu nodes, %llu BYTES not freed", n_nodes, mem_size);
 ERROR
 	return;
+}
+
+
+void memory_manage_show_inner_state(bool show_entries, bool show_empty) {
+	if (memory_table == NULL) memory_table = hash_table_create(TABLE_INITIAL_LENGTH);
+
+	size_t i = 0;
+	List* list = NULL;
+	Node* node = NULL;
+	size_t n_lists = 0;
+
+	log_info("INNER STATE");
+	for (i = 0; i < memory_table->n_entries; ++i) {
+		
+		list = &(memory_table->entries[i]);
+		node = list->first;
+		
+		if (show_entries == TRUE && (show_empty == TRUE || list->first != NULL)) printf("[%4llu] ", i);
+		if (list->first != NULL) n_lists++;
+
+		if (show_entries == TRUE) {
+			while (node != NULL) {
+				printf("-> %p ", node->ptr);
+				node = node->next;
+			}
+		}
+		if (show_entries == TRUE && (show_empty == TRUE || list->first != NULL)) printf("\n");
+	}
+	printf("TABLE LENGTH: %llu\nTABLE ENTRIES: %llu\nAverage List Length %f\n", memory_table->length, memory_table->n_entries, (float)memory_table->length / n_lists);
 }

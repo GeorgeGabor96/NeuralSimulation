@@ -3,6 +3,8 @@
 
 #include "config.h"
 
+// for debuging to see how the memory structure is filled
+void memory_manage_show_inner_state(bool show_entries, bool show_empty);
 
 // number of memory allocations that are currently not freed
 size_t memory_manage_memory_blocks();
