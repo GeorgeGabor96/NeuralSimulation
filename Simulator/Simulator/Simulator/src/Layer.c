@@ -7,7 +7,7 @@
 *************************************************************/
 bool layer_is_valid(Layer* layer) {
 	check(layer != NULL, null_argument("layer"));
-	check(layer->type == LAYER_FULLY_CONNECTED, "@layer->type is %d", layer->type);
+	check(layer_type_is_valid(layer->type) == TRUE, invalid_argument("layer->type"));
 	check(neuron_class_is_valid(layer->neuron_class) == TRUE, invalid_argument("layer->neuron_class"));
 	check(synapse_class_is_valid(layer->synapse_class) == TRUE, invalid_argument("layer->synapse_class"));
 	check(layer->link != NULL, "NULL value for @layer->link");
@@ -31,39 +31,52 @@ ERROR
 /*************************************************************
 * LAYER FUNCTIONALITY
 *************************************************************/
-Status layer_init(
-		Layer* layer, 
-		LayerType type, 
-		uint32_t n_neurons, 
-		NeuronClass* neuron_class, 
-		SynapseClass* synapse_class,
-		String* name,
-		Array* input_names) {
 
-	uint32_t i = 0;
+// may add multiple layer types in the future
+bool layer_type_is_valid(LayerType type) {
+	check(type == LAYER_FULLY_CONNECTED, "@type is %d", type);
+
+	return TRUE;
+ERROR
+	return FALSE;
+}
+
+
+// NEW LAYER INTERFACE
+Status layer_init(
+		Layer* layer,
+		LayerType type,
+		uint32_t n_neurons,
+		NeuronClass* neuron_class,
+		SynapseClass* synapse_class,
+		const char* name) {
+
 	Status status = FAIL;
+	uint32_t i = 0;
 
 	check(layer != NULL, null_argument("layer"));
-	check(type == LAYER_FULLY_CONNECTED, "@type is %d", type);
+	check(layer_type_is_valid(type) == TRUE, invalid_argument("type"));
 	check(n_neurons > 0, "@n_neurons is 0");
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
 	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
-	check(string_is_valid(name) == TRUE, invalid_argument("name"));
-	check(array_is_valid(input_names) == TRUE, invalid_argument("input_names"));
-
+	check(name != NULL, null_argument("name"));
+	
 	status = array_init(&(layer->neurons), n_neurons, n_neurons, sizeof(Neuron));
 	check(status == SUCCESS, "Couldn't init @layer->neurons");
-
-	layer->type = type;
-	layer->neuron_class = neuron_class;
-	layer->synapse_class = synapse_class;
-	layer->name = name;
-	layer->input_names = input_names;
-
 	for (i = 0; i < n_neurons; ++i) {
 		status = neuron_init(array_get(&(layer->neurons), i), neuron_class);
 		check(status == SUCCESS, "Failed to init neuron %d", i);
 	}
+
+	String* name_s = string_create(name);
+	check(string_is_valid(name_s) == TRUE, invalid_argument("name"));
+
+	layer->type = type;
+	layer->neuron_class = neuron_class;
+	layer->synapse_class = synapse_class;
+	layer->name = name_s;
+	layer->input_names = array_create(1, 0, sizeof(String*));
+	check(array_is_valid(layer->input_names) == TRUE, invalid_argument("layer->input_names"));
 
 	switch (type)
 	{
@@ -77,8 +90,8 @@ Status layer_init(
 	return SUCCESS;
 
 ERROR
-	// reset initiliazed neurons
-	if (i > 0) {
+	// reset neurons, working with unsigned, need underflow
+	if (i < layer->neurons.length) {
 		--i;
 		while (i < layer->neurons.length) {
 			neuron_reset(array_get(&(layer->neurons), i));
@@ -92,27 +105,25 @@ ERROR
 
 Status layer_init_fully_connected(
 		Layer* layer, 
-		uint32_t n_neurons, 
-		NeuronClass* neuron_class, 
-		SynapseClass* synapse_class, 
-		String* name, 
-		Array* input_names) {
-	return layer_init(layer, LAYER_FULLY_CONNECTED, n_neurons, neuron_class, synapse_class, name, input_names);
+		uint32_t n_neurons,
+		NeuronClass* neuron_class,
+		SynapseClass* synapse_class,
+		const char* name) {
+	return layer_init(layer, LAYER_FULLY_CONNECTED, n_neurons, neuron_class, synapse_class, name);
 }
 
 
 Layer* layer_create(
-		LayerType type, 
-		uint32_t n_neurons, 
-		NeuronClass* neuron_class, 
+		LayerType type,
+		uint32_t n_neurons,
+		NeuronClass* neuron_class,
 		SynapseClass* synapse_class,
-		String* name,
-		Array* input_names) {
+		const char* name) {
 	Status status = FAIL;
 	Layer* layer = (Layer*)malloc(sizeof(Layer), "layer_create");
 	check_memory(layer);
 
-	status = layer_init(layer, type, n_neurons, neuron_class, synapse_class, name, input_names);
+	status = layer_init(layer, type, n_neurons, neuron_class, synapse_class, name);
 	check(status == SUCCESS, "Could not initialize @layer");
 
 	return layer;
@@ -124,12 +135,30 @@ ERROR
 
 
 Layer* layer_create_fully_connected(
-		uint32_t n_neurons, 
-		NeuronClass* neuron_class, 
+		uint32_t n_neurons,
+		NeuronClass* neuron_class,
 		SynapseClass* synapse_class,
-		String* name,
-		Array* input_names) {
-	return layer_create(LAYER_FULLY_CONNECTED, n_neurons, neuron_class, synapse_class, name, input_names);
+		const char* name) {
+	return layer_create(LAYER_FULLY_CONNECTED, n_neurons, neuron_class, synapse_class, name);
+}
+
+
+Status layer_add_input_layer(Layer* layer, Layer* input) {
+	return array_append(layer->input_names, &(input->name));
+}
+
+
+Status layer_link_input_layer(Layer* layer, Layer* input) {
+	Status status = layer_add_input_layer(layer, input);
+	check(status == TRUE, "@layer_add_input_layer failed");
+	status = layer->link(layer, input);
+ERROR
+	return status;
+}
+
+
+const char* layer_get_name(Layer* layer) {
+	return string_get_C_string(layer->name);
 }
 
 
@@ -314,4 +343,108 @@ ERROR
 	// PROBABLY not a problem
 
 	return FAIL;
+}
+
+
+
+// old way of doing stuff
+Status layer_init_with_input_names(
+	Layer* layer,
+	LayerType type,
+	uint32_t n_neurons,
+	NeuronClass* neuron_class,
+	SynapseClass* synapse_class,
+	String* name,
+	Array* input_names) {
+
+	uint32_t i = 0;
+	Status status = FAIL;
+
+	check(layer != NULL, null_argument("layer"));
+	check(layer_type_is_valid(type) == TRUE, invalid_argument("type"));
+	check(n_neurons > 0, "@n_neurons is 0");
+	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
+	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
+	check(string_is_valid(name) == TRUE, invalid_argument("name"));
+	check(array_is_valid(input_names) == TRUE, invalid_argument("input_names"));
+
+	status = array_init(&(layer->neurons), n_neurons, n_neurons, sizeof(Neuron));
+	check(status == SUCCESS, "Couldn't init @layer->neurons");
+
+	layer->type = type;
+	layer->neuron_class = neuron_class;
+	layer->synapse_class = synapse_class;
+	layer->name = name;
+	layer->input_names = input_names;
+
+	for (i = 0; i < n_neurons; ++i) {
+		status = neuron_init(array_get(&(layer->neurons), i), neuron_class);
+		check(status == SUCCESS, "Failed to init neuron %d", i);
+	}
+
+	switch (type)
+	{
+	case LAYER_FULLY_CONNECTED:
+		layer->link = layer_link_fc;
+		break;
+	default:
+		break;
+	}
+
+	return SUCCESS;
+
+	ERROR
+		// reset initiliazed neurons
+		if (i > 0) {
+			--i;
+			while (i < layer->neurons.length) {
+				neuron_reset(array_get(&(layer->neurons), i));
+				--i;
+			}
+			array_reset(&(layer->neurons), NULL);
+		}
+	return FAIL;
+}
+
+
+Status layer_init_fully_connected_with_input_names(
+	Layer* layer,
+	uint32_t n_neurons,
+	NeuronClass* neuron_class,
+	SynapseClass* synapse_class,
+	String* name,
+	Array* input_names) {
+	return layer_init_with_input_names(layer, LAYER_FULLY_CONNECTED, n_neurons, neuron_class, synapse_class, name, input_names);
+}
+
+
+Layer* layer_create_with_input_names(
+	LayerType type,
+	uint32_t n_neurons,
+	NeuronClass* neuron_class,
+	SynapseClass* synapse_class,
+	String* name,
+	Array* input_names) {
+	Status status = FAIL;
+	Layer* layer = (Layer*)malloc(sizeof(Layer), "layer_create");
+	check_memory(layer);
+
+	status = layer_init(layer, type, n_neurons, neuron_class, synapse_class, name, input_names);
+	check(status == SUCCESS, "Could not initialize @layer");
+
+	return layer;
+
+	ERROR
+		if (layer != NULL) free(layer);
+	return NULL;
+}
+
+
+Layer* layer_create_fully_connected_with_input_names(
+	uint32_t n_neurons,
+	NeuronClass* neuron_class,
+	SynapseClass* synapse_class,
+	String* name,
+	Array* input_names) {
+	return layer_create_with_input_names(LAYER_FULLY_CONNECTED, n_neurons, neuron_class, synapse_class, name, input_names);
 }

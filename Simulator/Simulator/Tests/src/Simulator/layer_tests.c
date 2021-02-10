@@ -225,7 +225,6 @@ TestStatus layer_fully_connected_test() {
 	Array* layer_middle_input_names = strings_create(layer_middle_inputs, 1);
 	Layer* layer_middle = layer_create_fully_connected(100, n_class, s_class, layer_middle_name, layer_middle_input_names);
 
-
 	assert(layer_is_valid(layer_input) == TRUE, invalid_argument("layer_input"));
 	assert(layer_is_valid(layer_output) == TRUE, invalid_argument("layer_output"));
 
@@ -308,4 +307,19 @@ TestStatus layer_fully_connected_test() {
 error:
 	return status;
 
+}
+
+
+TestStatus layer_fully_new_interface() {
+	TestStatus status = TEST_FAILED;
+
+	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
+	SynapseClass* s_class = synapse_class_create_default();
+
+	Layer* l1 = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, s_class, "layer1");
+	Layer* l2 = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, s_class, "layer2");
+	Layer* l3 = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, s_class, "layer3");
+	layer_add_input_name(l2, l1);
+	layer_add_input_name(l3, l2);
+	layer_add_input_name(l3, l1);
 }

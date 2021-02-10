@@ -71,6 +71,14 @@ ERROR
 }
 
 
+char* string_get_C_string(String* string) {
+	check(string_is_valid(string) == TRUE, invalid_argument("string"));
+	return string->data;
+ERROR
+	return NULL;
+}
+
+
 void strings_destroy(Array* strings_p) {
 	check(array_is_valid(strings_p) == TRUE, invalid_argument("strings_p"));
 	uint32_t i = 0;

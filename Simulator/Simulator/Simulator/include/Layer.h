@@ -53,8 +53,48 @@ struct Layer {
 * 8. @layer->neurons is valid
 */
 bool layer_is_valid(Layer* layer);
+bool layer_type_is_valid(LayerType type);
 
+// NEW CREATION API
 Status layer_init(
+	Layer* layer,
+	LayerType type,
+	uint32_t n_neurons,
+	NeuronClass* neuron_class,
+	SynapseClass* synapse_class,
+	const char* name);
+
+Status layer_init_fully_connected(
+	Layer* layer,
+	uint32_t n_neurons,
+	NeuronClass* neuron_class,
+	SynapseClass* synapse_class,
+	const char* name);
+
+Layer* layer_create(
+	LayerType type,
+	uint32_t n_neurons,
+	NeuronClass* neuron_class,
+	SynapseClass* synapse_class,
+	const char* name);
+
+Layer* layer_create_fully_connected(
+	uint32_t n_neurons,
+	NeuronClass* neuron_class,
+	SynapseClass* synapse_class,
+	const char* name);
+
+// stores that @input is an input layer for @layer, does not call @link
+Status layer_add_input_layer(Layer* layer, Layer* input);
+
+// stores that @input is an input layer for @layer, does call @link
+Status layer_link_input_layer(Layer* layer, Layer* input);
+
+const char* layer_get_name(Layer* layer);
+
+
+// OLD CREATION API
+Status layer_init_with_input_names(
 	Layer* layer,
 	LayerType type,
 	uint32_t n_neurons,
@@ -63,29 +103,31 @@ Status layer_init(
 	String* name,
 	Array* input_names);
 
-Status layer_init_fully_connected(
-	Layer* layer, 
-	uint32_t n_neurons, 
-	NeuronClass* neuron_class, 
-	SynapseClass* synapse_class, 
+Status layer_init_fully_connected_with_input_names(
+	Layer* layer,
+	uint32_t n_neurons,
+	NeuronClass* neuron_class,
+	SynapseClass* synapse_class,
 	String* name,
 	Array* input_names);
 
-Layer* layer_create(
-	LayerType type, 
+Layer* layer_create_with_input_names(
+	LayerType type,
+	uint32_t n_neurons,
+	NeuronClass* neuron_class,
+	SynapseClass* synapse_class,
+	String* name,
+	Array* input_names);
+
+Layer* layer_create_fully_connected_with_input_names(
 	uint32_t n_neurons, 
 	NeuronClass* neuron_class, 
 	SynapseClass* synapse_class,
 	String* name,
 	Array* input_names);
 
-Layer* layer_create_fully_connected(
-	uint32_t n_neurons, 
-	NeuronClass* neuron_class, 
-	SynapseClass* synapse_class,
-	String* name,
-	Array* input_names);
 
+// NORMAL FUNCTIONALITY
 void layer_reset(Layer* layer);
 void layer_destroy(Layer* layer);
 
