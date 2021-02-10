@@ -4,7 +4,6 @@
 #include "../testing.h"
 
 
-#define MEMORY_MANAGE
 #include "MemoryManagement.h"
 
 

@@ -179,9 +179,9 @@ TestStatus neuron_general_use_case_test() {
 	assert(neuron_inject_current(NULL, 1.0f, 10u) == FAIL, "Should fail for invalid @neuron");
 
 	neuron_destroy(neuron);
-	synapse_class_destroy(s_class);
 	synapse_destroy(sy_out_1);
 	synapse_destroy(sy_out_2);
+	synapse_class_destroy(s_class);
 	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
@@ -198,7 +198,7 @@ TestStatus neuron_memory_test() {
 	uint32_t j = 0;
 	uint32_t k = 0;
 	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
-	Neuron* neurons[1000] = { NULL };
+	Neuron* neurons[100] = { NULL };
 	SynapseClass* s_class = synapse_class_create_default();
 	Synapse* synapse = NULL;
 
@@ -207,10 +207,11 @@ TestStatus neuron_memory_test() {
 
 	uint32_t neurons_cnt = sizeof(neurons) / sizeof(Neuron*);
 	for (i = 0; i < neurons_cnt; ++i) neurons[i] = neuron_create(n_class);
+	
+	start = clock();
 
 	for (i = 0; i < neurons_cnt; ++i) {
-		start = clock();
-		uint32_t step_runs = 1000;
+		uint32_t step_runs = 100;
 		Synapse** out_synapses = (Synapse**)calloc(step_runs, sizeof(Synapse*), "test");
 
 		for (j = 0; j < step_runs; ++j) {
@@ -232,19 +233,21 @@ TestStatus neuron_memory_test() {
 
 			assert(neuron_is_valid(neurons[i]) == TRUE, invalid_argument("neurons[i]"));
 		}
-
+		
 		for (j = 0; j < step_runs; ++j) {
 			synapse_destroy(out_synapses[j]);
 		}
 		free(out_synapses);
-
-		end = clock();
-		cpu_time_used = ((double)((size_t)end - start)) / CLOCKS_PER_SEC;
-		//printf("%u %llf\n", i, cpu_time_used);
+		// the synapses are not longer valid, need avoid checking the valididty
+		neurons[i]->out_synapses_refs.length = 0;
 	}
+
 	for (i = 0; i < neurons_cnt; ++i) {
 		neuron_destroy(neurons[i]);
 	}
+	end = clock();
+	cpu_time_used = ((double)((size_t)end - start)) / CLOCKS_PER_SEC;
+	printf("%u %llf\n", i, cpu_time_used);
 	neuron_class_destroy(n_class);
 	synapse_class_destroy(s_class);
 	

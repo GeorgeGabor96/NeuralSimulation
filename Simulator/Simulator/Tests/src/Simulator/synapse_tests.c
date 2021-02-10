@@ -200,7 +200,6 @@ TestStatus synapse_compute_PSC_test() {
 	float synapse_I = 0.0f;
 	Synapse* synapse = synapse_create(&s_class, w);
 	//Queue* spike_times = synapse->spike_times;
-
 	// TEST CONDUCTANCE_SYNAPSE
 	s_class.type = CONDUCTANCE_SYNAPCE;
 	synapse->g = g;
@@ -228,6 +227,7 @@ TestStatus synapse_compute_PSC_test() {
 	s_class.type = 5;
 	assert(synapse_compute_PSC(synapse, u) == 0.0f, "Should return 0.0 for undifined @synapse->s_class->type");
 
+	s_class.type = CONDUCTANCE_SYNAPCE;
 	synapse_destroy(synapse);
 	assert(memory_leak() == FALSE, "Memory leak");
 

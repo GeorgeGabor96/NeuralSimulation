@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #include "testing.h"
-#include "debug.h"
+#include "config.h"
 
 #include "Simulator/memory_management_tests.h"
 
@@ -19,10 +19,11 @@
 
 // TODO: some tests take time, mark them and set a flag to run them or not
 TestInfo tests[] = {
+#ifdef MEMORY_MANAGE
 	// MEMORY MANAGEMENT
 	{ memory_management_general_test, "memory_management_general_test" },
 	{ memory_manage_report_test, "memory_manage_report_test" },
-
+#endif
 	// ARRAY
 	{ array_general_use_case_test, "array_general_use_case_test" },
 	{ array_expand_test, "array_expand_test" },
@@ -54,12 +55,12 @@ TestInfo tests[] = {
 	{ neuron_memory_test, "neuron_memory_test" },
 	
 	// LAYER
-	{ layer_general_use_case_test, "layer_general_use_case_test" },
-	{ layer_memory_test_test, "layer_memory_test_test" },
+	//{ layer_general_use_case_test, "layer_general_use_case_test" },
+	//{ layer_memory_test_test, "layer_memory_test_test" },
 
 	// NETWORK
-	{ network_compile_general_use_case_test, "network_compile_general_use_case_test" },
-	{ network_step_test, "network_step_test" },
+	//{ network_compile_general_use_case_test, "network_compile_general_use_case_test" },
+	//{ network_step_test, "network_step_test" },
 };
 
 

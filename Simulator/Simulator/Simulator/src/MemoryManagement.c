@@ -6,10 +6,9 @@
 #undef free
 
 /********************************************************************************
-* This will keep nodes, where every node has the info about one memory allocation
-* When memory is freed, a node is removed from here
-*
-* NOTE -- Don't care about performance here, used only to find memory leaks
+* This will keep nodes in Hash Table, where the key is the memory adress of the 
+* allocation. Every node has info about one memory allocation and when memory
+* is freed a node is removed from the Hash Table
 ********************************************************************************/
 
 /********************************************************************************
@@ -136,11 +135,9 @@ static inline size_t next_prime(size_t n) {
 	return n;
 }
 
-// TO DO: test i don't know if it's good
 static inline size_t hash_f(HashTable* table, void* address_value) {
 	return (size_t)address_value % table->n_entries;
 }
-
 
 static inline HashTable* hash_table_create(size_t n_entries) {
 	HashTable* table = (HashTable*)malloc(sizeof(HashTable));
