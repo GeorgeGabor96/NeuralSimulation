@@ -97,6 +97,7 @@ typedef Array String;
 #define string_is_valid(s) array_is_valid(s)
 String* string_create(char* c_string_p);
 char* string_get_C_string(String* string);
+String* string_copy(String* string);
 void string_destroy(String* string_p);
 Array* strings_create(char** strings_pp, uint32_t cnt);
 void strings_destroy(Array* strings_p);

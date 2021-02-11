@@ -16,7 +16,7 @@ TestStatus layer_general_use_case_test() {
 	String* string2 = NULL;
 	char* input_names[2] = { "Layer input 1", "Layer input 2" };
 	Array* l_input_names = strings_create(input_names, 2);
-	Layer* layer = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, s_class, l_name, l_input_names);
+	Layer* layer = layer_create_with_input_names(LAYER_FULLY_CONNECTED, 100, n_class, s_class, l_name, l_input_names);
 
 	assert(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	assert(layer->neurons.length == 100, invalid_argument("layer->neurons->length"));
@@ -118,10 +118,10 @@ TestStatus layer_general_use_case_test() {
 	array_destroy(voltages, NULL);
 
 	// corner cases
-	assert(layer_create(LIF_NEURON, 100, NULL, s_class, l_name, l_input_names) == NULL, "Should return NULL for invalid @n_class");
-	assert(layer_create(LIF_NEURON, 100, n_class, NULL, l_name, l_input_names) == NULL, "Should return NULL for invalid @s_class");
-	assert(layer_create(LIF_NEURON, 100, n_class, s_class, NULL, l_input_names) == NULL, "Should return NULL for invalid @name");
-	assert(layer_create(LIF_NEURON, 100, n_class, s_class, l_name, NULL) == NULL, "Should return NULL for invalid @input_names");
+	assert(layer_create_with_input_names(LIF_NEURON, 100, NULL, s_class, l_name, l_input_names) == NULL, "Should return NULL for invalid @n_class");
+	assert(layer_create_with_input_names(LIF_NEURON, 100, n_class, NULL, l_name, l_input_names) == NULL, "Should return NULL for invalid @s_class");
+	assert(layer_create_with_input_names(LIF_NEURON, 100, n_class, s_class, NULL, l_input_names) == NULL, "Should return NULL for invalid @name");
+	assert(layer_create_with_input_names(LIF_NEURON, 100, n_class, s_class, l_name, NULL) == NULL, "Should return NULL for invalid @input_names");
 
 	assert(layer_force_spikes(NULL, spikes, 0u) == FAIL, "Should fail for invalid @layer");
 	assert(layer_force_spikes(layer, NULL, 0u) == FAIL, "Should fail for invalid @spikes");
@@ -165,7 +165,7 @@ TestStatus layer_memory_test_test() {
 	for (i = 0; i < 100; ++i) {
 		l_name = string_create("Layer test");
 		l_input_names = strings_create(input_names, 2);
-		layers[i] = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, s_class, l_name, l_input_names);
+		layers[i] = layer_create_with_input_names(LAYER_FULLY_CONNECTED, 100, n_class, s_class, l_name, l_input_names);
 	}
 
 	spikes = array_create(layers[0]->neurons.length, layers[0]->neurons.length, sizeof(bool));
@@ -213,17 +213,17 @@ TestStatus layer_fully_connected_test() {
 	String* layer_input_name = string_create("layer_input");
 	Array* layer_input_input_names = array_create(1, 0, sizeof(Array*));
 	uint32_t layer_input_length = 10;
-	Layer* layer_input = layer_create_fully_connected(layer_input_length, n_class, s_class, layer_input_name, layer_input_input_names);
+	Layer* layer_input = layer_create_fully_connected_with_input_names(layer_input_length, n_class, s_class, layer_input_name, layer_input_input_names);
 
 	String* layer_output_name = string_create("layer_output");
 	char* layer_output_inputs[1] = { "layer_input" };
 	Array* layer_output_input_names = strings_create(layer_output_inputs, 1);
-	Layer* layer_output = layer_create_fully_connected(100, n_class, s_class, layer_output_name, layer_output_input_names);
+	Layer* layer_output = layer_create_fully_connected_with_input_names(100, n_class, s_class, layer_output_name, layer_output_input_names);
 
 	String* layer_middle_name = string_create("layer_middle");
 	char* layer_middle_inputs[] = { "layer_input" };
 	Array* layer_middle_input_names = strings_create(layer_middle_inputs, 1);
-	Layer* layer_middle = layer_create_fully_connected(100, n_class, s_class, layer_middle_name, layer_middle_input_names);
+	Layer* layer_middle = layer_create_fully_connected_with_input_names(100, n_class, s_class, layer_middle_name, layer_middle_input_names);
 
 	assert(layer_is_valid(layer_input) == TRUE, invalid_argument("layer_input"));
 	assert(layer_is_valid(layer_output) == TRUE, invalid_argument("layer_output"));
@@ -306,7 +306,6 @@ TestStatus layer_fully_connected_test() {
 	status = TEST_SUCCESS;
 error:
 	return status;
-
 }
 
 
@@ -319,7 +318,28 @@ TestStatus layer_fully_new_interface() {
 	Layer* l1 = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, s_class, "layer1");
 	Layer* l2 = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, s_class, "layer2");
 	Layer* l3 = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, s_class, "layer3");
-	layer_add_input_name(l2, l1);
-	layer_add_input_name(l3, l2);
-	layer_add_input_name(l3, l1);
+	layer_link_input_layer(l2, l1);
+	layer_link_input_layer(l3, l2);
+	layer_link_input_layer(l3, l1);
+
+	//layer_step(l1, 0);
+	//layer_step(l2, 0);
+	//layer_step(l3, 0);
+
+	layer_is_valid(l1);
+	layer_is_valid(l2);
+	layer_is_valid(l3);
+
+	layer_destroy(l1);
+	layer_destroy(l2);
+	layer_destroy(l3);
+	neuron_class_destroy(n_class);
+	synapse_class_destroy(s_class);
+
+	assert(memory_leak() == FALSE, "memory_leak");
+
+	status = TEST_SUCCESS;
+
+ERROR
+	return status;
 }

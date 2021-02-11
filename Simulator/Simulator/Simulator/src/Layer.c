@@ -49,7 +49,7 @@ Status layer_init(
 		uint32_t n_neurons,
 		NeuronClass* neuron_class,
 		SynapseClass* synapse_class,
-		const char* name) {
+		char* name) {
 
 	Status status = FAIL;
 	uint32_t i = 0;
@@ -108,7 +108,7 @@ Status layer_init_fully_connected(
 		uint32_t n_neurons,
 		NeuronClass* neuron_class,
 		SynapseClass* synapse_class,
-		const char* name) {
+		char* name) {
 	return layer_init(layer, LAYER_FULLY_CONNECTED, n_neurons, neuron_class, synapse_class, name);
 }
 
@@ -118,7 +118,7 @@ Layer* layer_create(
 		uint32_t n_neurons,
 		NeuronClass* neuron_class,
 		SynapseClass* synapse_class,
-		const char* name) {
+		char* name) {
 	Status status = FAIL;
 	Layer* layer = (Layer*)malloc(sizeof(Layer), "layer_create");
 	check_memory(layer);
@@ -138,19 +138,27 @@ Layer* layer_create_fully_connected(
 		uint32_t n_neurons,
 		NeuronClass* neuron_class,
 		SynapseClass* synapse_class,
-		const char* name) {
+		char* name) {
 	return layer_create(LAYER_FULLY_CONNECTED, n_neurons, neuron_class, synapse_class, name);
 }
 
 
 Status layer_add_input_layer(Layer* layer, Layer* input) {
-	return array_append(layer->input_names, &(input->name));
+	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+	check(layer_is_valid(input) == TRUE, invalid_argument("input"));
+	String* input_name = string_copy(input->name);
+	return array_append(layer->input_names, &input_name);
+ERROR
+	return FAIL;
 }
 
 
 Status layer_link_input_layer(Layer* layer, Layer* input) {
-	Status status = layer_add_input_layer(layer, input);
-	check(status == TRUE, "@layer_add_input_layer failed");
+	Status status = FAIL;
+	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+	check(layer_is_valid(input) == TRUE, invalid_argument("input"));
+	status = layer_add_input_layer(layer, input);
+	check(status == FALSE, "@layer_add_input_layer failed");
 	status = layer->link(layer, input);
 ERROR
 	return status;
@@ -158,7 +166,10 @@ ERROR
 
 
 const char* layer_get_name(Layer* layer) {
+	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	return string_get_C_string(layer->name);
+ERROR
+	return NULL;
 }
 
 
@@ -318,7 +329,7 @@ Status layer_link_fc(Layer* layer, Layer* input_layer) {
 		// which will invalidate the pointers of the neurons in @input_layer
 
 		// DO I really need this resize, can't I make it work without it?
-		array_resize(&(neuron_layer->in_synapses), input_layer->neurons.length);
+		array_resize(&(neuron_layer->in_synapses), neuron_layer->in_synapses.length + input_layer->neurons.length);
 
 		for (j = 0; j < input_layer->neurons.length; ++j) {
 			neuron_input_layer = (Neuron*)array_get(&(input_layer->neurons), j);
@@ -326,7 +337,7 @@ Status layer_link_fc(Layer* layer, Layer* input_layer) {
 
 			synapse = synapse_create(layer->synapse_class, 1.0f);
 			check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
-
+			
 			// copy the synapse into the @neuron_layer and get it back to have the reference for the @neuron_input_layer
 			neuron_add_in_synapse(neuron_layer, synapse, TRUE);
 			synapse = (Synapse*)array_get(&(neuron_layer->in_synapses), neuron_layer->in_synapses.length - 1);
@@ -429,7 +440,7 @@ Layer* layer_create_with_input_names(
 	Layer* layer = (Layer*)malloc(sizeof(Layer), "layer_create");
 	check_memory(layer);
 
-	status = layer_init(layer, type, n_neurons, neuron_class, synapse_class, name, input_names);
+	status = layer_init_with_input_names(layer, type, n_neurons, neuron_class, synapse_class, name, input_names);
 	check(status == SUCCESS, "Could not initialize @layer");
 
 	return layer;

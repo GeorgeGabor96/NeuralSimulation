@@ -31,7 +31,6 @@ Status neuron_is_valid(Neuron* neuron) {
 		check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 	}
 	// check output synapses
-	// TODO: is this neccessary??
 	for (i = 0; i < neuron->out_synapses_refs.length; ++i) {
 		synapse = *((Synapse**)array_get(&(neuron->out_synapses_refs), i));
 		check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));

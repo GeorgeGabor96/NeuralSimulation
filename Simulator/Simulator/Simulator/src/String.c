@@ -8,19 +8,20 @@ static inline uint32_t safe_strlen(char* c_string_p) {
 			break;
 		}
 	}
-	if (i == STRING_LIMIT) {
-		c_string_p[i - 1] = 0;
-	}
-	return i + 1;
+	return i;
 }
 
 
 String* string_create(char* c_string_p) {
 	check(c_string_p != NULL, null_argument("c_string_p"));
 	uint32_t n_chars = safe_strlen(c_string_p);
-	String* string_p = array_create(n_chars, n_chars, sizeof(char));
+	String* string_p = array_create(n_chars + 1, n_chars, sizeof(char));
 	check_memory(string_p);
 	array_copy_data(string_p, c_string_p, 0, n_chars);
+
+	// didn't put end of string
+	char end_s = '\0';
+	array_append(string_p, &end_s);
 
 	return string_p;
 
@@ -76,6 +77,11 @@ char* string_get_C_string(String* string) {
 	return string->data;
 ERROR
 	return NULL;
+}
+
+
+String* string_copy(String* string) {
+	return string_create(string->data);
 }
 
 

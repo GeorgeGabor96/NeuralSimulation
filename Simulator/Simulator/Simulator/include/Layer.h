@@ -62,27 +62,27 @@ Status layer_init(
 	uint32_t n_neurons,
 	NeuronClass* neuron_class,
 	SynapseClass* synapse_class,
-	const char* name);
+	char* name);
 
 Status layer_init_fully_connected(
 	Layer* layer,
 	uint32_t n_neurons,
 	NeuronClass* neuron_class,
 	SynapseClass* synapse_class,
-	const char* name);
+	char* name);
 
 Layer* layer_create(
 	LayerType type,
 	uint32_t n_neurons,
 	NeuronClass* neuron_class,
 	SynapseClass* synapse_class,
-	const char* name);
+	char* name);
 
 Layer* layer_create_fully_connected(
 	uint32_t n_neurons,
 	NeuronClass* neuron_class,
 	SynapseClass* synapse_class,
-	const char* name);
+	char* name);
 
 // stores that @input is an input layer for @layer, does not call @link
 Status layer_add_input_layer(Layer* layer, Layer* input);
@@ -91,6 +91,26 @@ Status layer_add_input_layer(Layer* layer, Layer* input);
 Status layer_link_input_layer(Layer* layer, Layer* input);
 
 const char* layer_get_name(Layer* layer);
+
+// NORMAL FUNCTIONALITY
+void layer_reset(Layer* layer);
+void layer_destroy(Layer* layer);
+
+Status layer_step(Layer* layer, uint32_t time);
+/*
+Use these to set the input of the network
+*/
+Status layer_force_spikes(Layer* layer, ArrayBool* spikes, uint32_t time);
+Status layer_inject_currents(Layer* layer, ArrayFloat* currents, uint32_t time);
+
+/*
+use these to get the output of the network
+*/
+ArrayBool* layer_get_spikes(Layer* layer);
+ArrayFloat* layer_get_voltages(Layer* layer);
+
+// LINK functions
+Status layer_link_fc(Layer* layer, Layer* input_layer);
 
 
 // OLD CREATION API
@@ -125,27 +145,5 @@ Layer* layer_create_fully_connected_with_input_names(
 	SynapseClass* synapse_class,
 	String* name,
 	Array* input_names);
-
-
-// NORMAL FUNCTIONALITY
-void layer_reset(Layer* layer);
-void layer_destroy(Layer* layer);
-
-Status layer_step(Layer* layer, uint32_t time);
-/*
-Use these to set the input of the network
-*/
-Status layer_force_spikes(Layer* layer, ArrayBool* spikes, uint32_t time);
-Status layer_inject_currents(Layer* layer, ArrayFloat* currents, uint32_t time);
-
-
-/*
-use these to get the output of the network
-*/
-ArrayBool* layer_get_spikes(Layer* layer);
-ArrayFloat* layer_get_voltages(Layer* layer);
-
-// LINK functions
-Status layer_link_fc(Layer* layer, Layer* input_layer);
 
 #endif // __LAYER_H__
