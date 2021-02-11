@@ -82,12 +82,12 @@ TestStatus neuron_general_use_case_test() {
 	memcpy(&sy1_copy, sy_in_1, sizeof(Synapse));
 	memcpy(&sy2_copy, sy_in_2, sizeof(Synapse));
 	
-	assert(neuron_add_in_synapse(neuron, sy_in_1, TRUE) == SUCCESS, "Cannot add input synapse @sy_in_1");
-	assert(neuron_add_in_synapse(neuron, sy_in_2, TRUE) == SUCCESS, "Cannot add input synapse @sy_in_2");
-	assert(neuron->in_synapses.length == 2, "@neuron->in_synapses.lenght should be 2 not %u", neuron->in_synapses.length);
-	sy = (Synapse*)array_get(&(neuron->in_synapses), 0);
+	assert(neuron_add_in_synapse(neuron, sy_in_1) == SUCCESS, "Cannot add input synapse @sy_in_1");
+	assert(neuron_add_in_synapse(neuron, sy_in_2) == SUCCESS, "Cannot add input synapse @sy_in_2");
+	assert(neuron->in_synapses_refs.length == 2, "@neuron->in_synapses.lenght should be 2 not %u", neuron->in_synapses_refs.length);
+	sy = *((Synapse**)array_get(&(neuron->in_synapses_refs), 0));
 	assert(memcmp(sy, &sy1_copy, sizeof(Synapse)) == 0, "@sy and @sy1_copy should have the same values");
-	sy = (Synapse*)array_get(&(neuron->in_synapses), 1);
+	sy = *((Synapse**)array_get(&(neuron->in_synapses_refs), 1));
 	assert(memcmp(sy, &sy2_copy, sizeof(Synapse)) == 0, "@sy and @sy2_copy should have the same values");
 
 	/*--------add output synapse--------*/
@@ -95,15 +95,15 @@ TestStatus neuron_general_use_case_test() {
 	Synapse* sy_out_2 = synapse_create(s_class, 3.4f);
 	assert(neuron_add_out_synapse(neuron, sy_out_1) == SUCCESS, "Cannot add output synapse @sy_out_1");
 	assert(neuron_add_out_synapse(neuron, sy_out_2) == SUCCESS, "Cannot add output synapse @sy_out_2");
-	assert(neuron->out_synapses_refs.length == 2, "@neuron->in_synapses->lenght should be 2 not %u", neuron->in_synapses.length);
+	assert(neuron->out_synapses_refs.length == 2, "@neuron->in_synapses->lenght should be 2 not %u", neuron->in_synapses_refs.length);
 	sy = *(Synapse**)array_get(&(neuron->out_synapses_refs), 0);
 	assert(sy == sy_out_1, "@sy should be %p not %p", sy_out_1, sy);
 	sy = *(Synapse**)array_get(&(neuron->out_synapses_refs), 1);
 	assert(sy == sy_out_2, "@sy should be %p not %p", sy_out_2, sy);
 
 	/*--------neuron step--------*/
-	sy_in_1 = (Synapse*)array_get(&(neuron->in_synapses), 0);
-	sy_in_2 = (Synapse*)array_get(&(neuron->in_synapses), 1);
+	sy_in_1 = *((Synapse**)array_get(&(neuron->in_synapses_refs), 0));
+	sy_in_2 = *((Synapse**)array_get(&(neuron->in_synapses_refs), 1));
 
 	// case 1: no spyke due to low conductances
 	sy_in_1->g = 1.0f;
@@ -168,8 +168,8 @@ TestStatus neuron_general_use_case_test() {
 	// corner cases
 	assert(neuron_create(NULL) == NULL, "Should fail for @neuron_class = NULL");
 
-	assert(neuron_add_in_synapse(NULL, sy_in_1, TRUE) == FAIL, "Should fail for invalid @neuron");
-	assert(neuron_add_in_synapse(neuron, NULL, TRUE) == FAIL, "Should fail for invalid @synapse");
+	assert(neuron_add_in_synapse(NULL, sy_in_1) == FAIL, "Should fail for invalid @neuron");
+	assert(neuron_add_in_synapse(neuron, NULL) == FAIL, "Should fail for invalid @synapse");
 
 	assert(neuron_add_out_synapse(NULL, sy_out_1) == FAIL, "Should fail for invalid @neuron");
 	assert(neuron_add_out_synapse(neuron, NULL) == FAIL, "Should fail for invalid @synapse");
@@ -221,7 +221,7 @@ TestStatus neuron_memory_test() {
 
 		for (j = 0; j < step_runs; ++j) {
 			synapse = synapse_create(s_class, 1.0f);
-			neuron_add_in_synapse(neurons[i], synapse, TRUE);
+			neuron_add_in_synapse(neurons[i], synapse);
 			neuron_add_out_synapse(neurons[i], out_synapses[j]);
 
 			neuron_inject_current(neurons[i], 1000.0f, j);

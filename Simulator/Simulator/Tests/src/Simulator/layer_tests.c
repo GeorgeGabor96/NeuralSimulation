@@ -255,9 +255,9 @@ TestStatus layer_fully_connected_test() {
 		Neuron* neuron = (Neuron*)array_get(&(layer_middle->neurons), i);
 		assert(neuron_is_valid(neuron) == TRUE, invalid_argument("neurons"));
 
-		assert(neuron->in_synapses.length == 10, "@neuron->in_synapses.length is %u, not %u", neuron->in_synapses.length, 10);
-		for (j = 0; j < neuron->in_synapses.length; ++j) {
-			Synapse* synapse = (Synapse*)array_get(&(neuron->in_synapses), j);
+		assert(neuron->in_synapses_refs.length == 10, "@neuron->in_synapses.length is %u, not %u", neuron->in_synapses_refs.length, 10);
+		for (j = 0; j < neuron->in_synapses_refs.length; ++j) {
+			Synapse* synapse = *((Synapse**)array_get(&(neuron->in_synapses_refs), j));
 			assert(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 		}
 
@@ -273,9 +273,9 @@ TestStatus layer_fully_connected_test() {
 		Neuron* neuron = (Neuron*)array_get(&(layer_output->neurons), i);
 		assert(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
-		assert(neuron->in_synapses.length == 100, "@neuron->in_synapses.length is %u, not %u", neuron->in_synapses.length, 100);
-		for (j = 0; j < neuron->in_synapses.length; ++j) {
-			Synapse* synapse = (Synapse*)array_get(&(neuron->in_synapses), j);
+		assert(neuron->in_synapses_refs.length == 100, "@neuron->in_synapses.length is %u, not %u", neuron->in_synapses_refs.length, 100);
+		for (j = 0; j < neuron->in_synapses_refs.length; ++j) {
+			Synapse* synapse = *((Synapse**)array_get(&(neuron->in_synapses_refs), j));
 			assert(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 		}
 	}
@@ -311,6 +311,8 @@ error:
 
 TestStatus layer_fully_new_interface() {
 	TestStatus status = TEST_FAILED;
+	clock_t start, end;
+	double cpu_time_used;
 
 	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
 	SynapseClass* s_class = synapse_class_create_default();
@@ -322,13 +324,15 @@ TestStatus layer_fully_new_interface() {
 	layer_link_input_layer(l3, l2);
 	layer_link_input_layer(l3, l1);
 
-	//layer_step(l1, 0);
-	//layer_step(l2, 0);
-	//layer_step(l3, 0);
-
-	layer_is_valid(l1);
-	layer_is_valid(l2);
-	layer_is_valid(l3);
+	start = clock();
+	for (uint32_t i = 0; i < 100; ++i) {
+		layer_step(l1, i);
+		layer_step(l2, i);
+		layer_step(l3, i);
+	}
+	end = clock();
+	cpu_time_used = ((double)((size_t)end - start)) / CLOCKS_PER_SEC;
+	printf("RUNS: %u TIME: %llf\n", 100, cpu_time_used);
 
 	layer_destroy(l1);
 	layer_destroy(l2);
@@ -340,6 +344,6 @@ TestStatus layer_fully_new_interface() {
 
 	status = TEST_SUCCESS;
 
-ERROR
+error:
 	return status;
 }

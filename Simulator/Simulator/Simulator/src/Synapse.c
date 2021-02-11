@@ -98,6 +98,12 @@ ERROR
 }
 
 
+void synapse_destroy_2p(Synapse** synapse) {
+	synapse_destroy(*synapse);
+}
+
+
+
 Synapse* synapse_create(SynapseClass* s_class, float w) {
 	Synapse* synapse = NULL;
 	Status status = FAIL;

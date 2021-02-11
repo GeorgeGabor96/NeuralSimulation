@@ -324,12 +324,6 @@ Status layer_link_fc(Layer* layer, Layer* input_layer) {
 	for (i = 0; i < layer->neurons.length; ++i) {
 		neuron_layer = (Neuron*)array_get(&(layer->neurons), i);
 		check(neuron_is_valid(neuron_layer) == TRUE, invalid_argument("neuron_layer"));
-		// need to allocated the number of input synapses for the @neuron_layer to avoid expanding
-		// @neuron_layer->in_synapses which can cause changing the @neuron_layer->in_synapses.data pointer
-		// which will invalidate the pointers of the neurons in @input_layer
-
-		// DO I really need this resize, can't I make it work without it?
-		array_resize(&(neuron_layer->in_synapses), neuron_layer->in_synapses.length + input_layer->neurons.length);
 
 		for (j = 0; j < input_layer->neurons.length; ++j) {
 			neuron_input_layer = (Neuron*)array_get(&(input_layer->neurons), j);
@@ -339,8 +333,8 @@ Status layer_link_fc(Layer* layer, Layer* input_layer) {
 			check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 			
 			// copy the synapse into the @neuron_layer and get it back to have the reference for the @neuron_input_layer
-			neuron_add_in_synapse(neuron_layer, synapse, TRUE);
-			synapse = (Synapse*)array_get(&(neuron_layer->in_synapses), neuron_layer->in_synapses.length - 1);
+			neuron_add_in_synapse(neuron_layer, synapse);
+			synapse = *((Synapse**)array_get(&(neuron_layer->in_synapses_refs), neuron_layer->in_synapses_refs.length - 1));
 			check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 			neuron_add_out_synapse(neuron_input_layer, synapse);
 		}

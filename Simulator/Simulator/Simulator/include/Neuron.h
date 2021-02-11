@@ -51,7 +51,7 @@ Status neuron_class_set_LIF_parameters(NeuronClass* neuron_class, float u_th, fl
 
 typedef struct Neuron {
 	NeuronClass* n_class;
-	Array in_synapses;		// input synapses are kept in the neuron
+	Array in_synapses_refs;	  // references to input synapses
 	Array out_synapses_refs;  // references to output synapses
 	float u;
 	bool spike;
@@ -74,14 +74,11 @@ void neuron_reset(Neuron* neuron);
 Neuron* neuron_create(NeuronClass* neuron_class);
 void neuron_destroy(Neuron* neuron);
 
-/*
-* THIS will copy the content of @synapse and free it if should_free is TRUE
-* Synapses are kept and freed by the neuron for which they are input
-*/
-Status neuron_add_in_synapse(Neuron* neuron, Synapse* synapse, Status should_free);
+// The input synapses are only kept as references, but the neuron is responsible for freeing them
+Status neuron_add_in_synapse(Neuron* neuron, Synapse* synapse);
 
 // The ouput synapses are only kept as references
-Status neuron_add_out_synapse(Neuron* neuron, Synapse* out_synapse);
+Status neuron_add_out_synapse(Neuron* neuron, Synapse* synapse);
 
 /*
 This will collect the PSC from the input synpases, update the neuron state,

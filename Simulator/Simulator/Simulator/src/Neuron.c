@@ -20,14 +20,15 @@ ERROR
 Status neuron_is_valid(Neuron* neuron) {
 	check(neuron != NULL, null_argument("neuron"));
 	check(neuron_class_is_valid(neuron->n_class) == TRUE, invalid_argument("neuron->n_class"));
-	check(array_is_valid(&(neuron->in_synapses)) == TRUE, invalid_argument("neuron->in_synapses"));
-	check(array_is_valid(&(neuron->out_synapses_refs)) == TRUE, invalid_argument("neuron_>out_synapses"));
+	check(array_is_valid(&(neuron->in_synapses_refs)) == TRUE, invalid_argument("neuron->in_synapses_refs"));
+	check(array_is_valid(&(neuron->out_synapses_refs)) == TRUE, invalid_argument("neuron_>out_synapses_refs"));
 
-	// check input synapses
+	// check the synapses, which are kept as references, so the @array_get return **
 	uint32_t i = 0;
 	Synapse* synapse = NULL;
-	for (i = 0; i < neuron->in_synapses.length; ++i) {
-		synapse = (Synapse*)array_get(&(neuron->in_synapses), i);
+	// check input synapses
+	for (i = 0; i < neuron->in_synapses_refs.length; ++i) {
+		synapse = *((Synapse**)array_get(&(neuron->in_synapses_refs), i));
 		check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 	}
 	// check output synapses
@@ -85,8 +86,8 @@ static inline float neuron_compute_psc(Neuron* neuron, uint32_t simulation_time)
 	uint32_t i = 0ui32;
 	Synapse* synapse = NULL;
 
-	for (i = 0u; i < neuron->in_synapses.length; i++) {
-		synapse = (Synapse*)array_get(&(neuron->in_synapses), i);
+	for (i = 0u; i < neuron->in_synapses_refs.length; i++) {
+		synapse = *((Synapse**)array_get(&(neuron->in_synapses_refs), i));
 		PSC += synapse_compute_PSC(synapse, neuron->u);
 		synapse_step(synapse, simulation_time);
 	}
@@ -162,7 +163,7 @@ Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
 	check(neuron != NULL, null_argument("neuron"));
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
 
-	status = array_init(&(neuron->in_synapses), NEURON_INITIAL_SYNAPSE_LENGTH, 0, sizeof(Synapse));
+	status = array_init(&(neuron->in_synapses_refs), NEURON_INITIAL_SYNAPSE_LENGTH, 0, sizeof(Synapse*));
 	check(status == SUCCESS, "Couldn't init @neuron->in_synapses");
 
 	status = array_init(&(neuron->out_synapses_refs), NEURON_INITIAL_SYNAPSE_LENGTH, 0, sizeof(Synapse*));
@@ -176,7 +177,7 @@ Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
 ERROR
 	// @neuron->in_synapses FAIL
 	if (neuron != NULL) {
-		if (array_is_valid(&(neuron->in_synapses)) == TRUE) array_reset(&(neuron->in_synapses), NULL);
+		if (array_is_valid(&(neuron->in_synapses_refs)) == TRUE) array_reset(&(neuron->in_synapses_refs), NULL);
 		if (array_is_valid(&(neuron->out_synapses_refs)) == TRUE) array_reset(&(neuron->out_synapses_refs), NULL);
 	}
 	return FAIL;
@@ -186,7 +187,7 @@ ERROR
 void neuron_reset(Neuron* neuron) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
-	array_reset(&(neuron->in_synapses), synapse_reset);
+	array_reset(&(neuron->in_synapses_refs), synapse_destroy_2p);
 	array_reset(&(neuron->out_synapses_refs), NULL);
 	neuron->n_class = NULL;
 
@@ -225,15 +226,13 @@ ERROR
 }
 
 
-Status neuron_add_in_synapse(Neuron* neuron, Synapse* synapse, Status should_free) {
+Status neuron_add_in_synapse(Neuron* neuron, Synapse* synapse) {
 	Status status = FAIL;
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 
-	// NOTE: @neuron keeps internally its INPUT synapses, so copy its content and free it
-	status = array_append(&(neuron->in_synapses), synapse);
+	status = array_append(&(neuron->in_synapses_refs), &synapse);
 	check(status == SUCCESS, "Could not add new INPUT synapse");
-	if (should_free == TRUE) free(synapse);
 
 ERROR
 	return status;
@@ -245,7 +244,6 @@ Status neuron_add_out_synapse(Neuron* neuron, Synapse* synapse) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 
-	// NOTE: @neuron keeps references to its OUTPUT synapses, so keeps a reference to it
 	status = array_append(&(neuron->out_synapses_refs), &synapse);
 	check(status == SUCCESS, "Could not add new OUTPUT synapse");
 

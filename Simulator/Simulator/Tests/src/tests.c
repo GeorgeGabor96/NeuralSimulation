@@ -55,9 +55,9 @@ TestInfo tests[] = {
 	{ neuron_memory_test, "neuron_memory_test" },
 	
 	// LAYER
-	//{ layer_general_use_case_test, "layer_general_use_case_test" },
-	//{ layer_memory_test_test, "layer_memory_test_test" },
-	//{ layer_fully_connected_test, "layer_fully_connected_test" },
+	{ layer_general_use_case_test, "layer_general_use_case_test" },
+	{ layer_memory_test_test, "layer_memory_test_test" },
+	{ layer_fully_connected_test, "layer_fully_connected_test" },
 	{ layer_fully_new_interface, "layer_fully_new_interface" },
 	// NETWORK
 	//{ network_compile_general_use_case_test, "network_compile_general_use_case_test" },

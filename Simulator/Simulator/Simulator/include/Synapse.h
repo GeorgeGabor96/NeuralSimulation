@@ -75,6 +75,7 @@ Status synapse_init(Synapse* synapse, SynapseClass* s_class, float w);
 void synapse_reset(Synapse* synapse);
 Synapse* synapse_create(SynapseClass* s_class, float w);
 void synapse_destroy(Synapse* synapse);
+void synapse_destroy_2p(Synapse** synapse);
 
 /*
 Preconditions: @spike_time > queue_head(synapse->spike_times) - should never receive a spike older that I already have
