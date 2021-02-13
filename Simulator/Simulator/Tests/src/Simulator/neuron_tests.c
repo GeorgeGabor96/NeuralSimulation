@@ -135,7 +135,7 @@ TestStatus neuron_general_use_case_test() {
 	// case 3: force a spike
 	sy_in_1->g = 0.0f;
 	sy_in_2->g = 0.0f;
-	neuron_force_spike(neuron, 2u);
+	neuron_step_force_spike(neuron, 2u);
 	assert(neuron->spike == TRUE, "Should spyke");
 	assert(neuron->u == neuron->n_class->u_rest, "Should have reseted the voltage");
 	assert(sy_out_1->spike_times.array.length == 1, "Should have added spyke on the output synapse 1");
@@ -148,13 +148,13 @@ TestStatus neuron_general_use_case_test() {
 	assert(time == 2u, "The spyke time should be 2 not %u", time);
 
 	// case 4: inject current -> no spyke
-	neuron_inject_current(neuron, 3.0f, 3u);
+	neuron_step_inject_current(neuron, 3.0f, 3u);
 	assert(neuron->spike == FALSE, "Should not spyke");
 	assert(sy_out_1->spike_times.array.length == 0, "Shouldn't have added spyke on the output synapse 1");
 	assert(sy_out_2->spike_times.array.length == 0, "Shouldn't have added spyke on tht output synapse 2");
 
 	// case 5: inject current -> spyke
-	neuron_inject_current(neuron, 100.0f, 4u);
+	neuron_step_inject_current(neuron, 100.0f, 4u);
 	assert(neuron->spike == TRUE, "Should spyke");
 	assert(neuron->u == neuron->n_class->u_rest, "Should have reseted the voltage");
 	assert(sy_out_1->spike_times.array.length == 1, "Should have added spyke on the output synapse 1");
@@ -175,8 +175,8 @@ TestStatus neuron_general_use_case_test() {
 	assert(neuron_add_out_synapse(neuron, NULL) == FAIL, "Should fail for invalid @synapse");
 
 	assert(neuron_step(NULL, 0u), "Should fail for invalid @neuron");
-	assert(neuron_force_spike(NULL, 10u) == FAIL, "Should fail for invalid @neuron");
-	assert(neuron_inject_current(NULL, 1.0f, 10u) == FAIL, "Should fail for invalid @neuron");
+	assert(neuron_step_force_spike(NULL, 10u) == FAIL, "Should fail for invalid @neuron");
+	assert(neuron_step_inject_current(NULL, 1.0f, 10u) == FAIL, "Should fail for invalid @neuron");
 
 	neuron_destroy(neuron);
 	synapse_destroy(sy_out_1);
@@ -224,7 +224,7 @@ TestStatus neuron_memory_test() {
 			neuron_add_in_synapse(neurons[i], synapse);
 			neuron_add_out_synapse(neurons[i], out_synapses[j]);
 
-			neuron_inject_current(neurons[i], 1000.0f, j);
+			neuron_step_inject_current(neurons[i], 1000.0f, j);
 			neuron_step(neurons[i], j);
 			// check you have spykes on output synapses
 			for (k = 0; k <= j; ++k) {

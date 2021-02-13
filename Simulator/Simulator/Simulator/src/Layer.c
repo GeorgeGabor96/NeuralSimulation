@@ -219,7 +219,7 @@ ERROR
 }
 
 
-Status layer_force_spikes(Layer* layer, ArrayBool* spikes, uint32_t time) {
+Status layer_step_force_spikes(Layer* layer, ArrayBool* spikes, uint32_t time) {
 	check(layer_is_valid(layer), invalid_argument("layer"));
 	check(array_is_valid(spikes), invalid_argument("spikes"));
 	check(layer->neurons.length == spikes->length, "@layer->neurons.length is %u and @spikes->length is %u at time %u", layer->neurons.length, spikes->length, time);
@@ -233,7 +233,7 @@ Status layer_force_spikes(Layer* layer, ArrayBool* spikes, uint32_t time) {
 		if (spike == TRUE) {
 			neuron = (Neuron*)array_get(&(layer->neurons), i);
 			check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
-			neuron_force_spike(neuron, time);
+			neuron_step_force_spike(neuron, time);
 		}
 	}
 
@@ -243,7 +243,7 @@ ERROR
 }
 
 
-Status layer_inject_currents(Layer* layer, ArrayFloat* currents, uint32_t time) {
+Status layer_step_inject_currents(Layer* layer, ArrayFloat* currents, uint32_t time) {
 	check(layer_is_valid(layer), invalid_argument("layer"));
 	check(array_is_valid(currents), invalid_argument("currents"));
 	check(layer->neurons.length == currents->length, "@layer->neurons.length is %u and @currents->length is %u at time %u", layer->neurons.length, currents->length, time);
@@ -256,7 +256,7 @@ Status layer_inject_currents(Layer* layer, ArrayFloat* currents, uint32_t time) 
 		current = *((float*)array_get(currents, i));
 		neuron = (Neuron*)array_get(&(layer->neurons), i);
 		check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
-		neuron_inject_current(neuron, current, time);
+		neuron_step_inject_current(neuron, current, time);
 	}
 
 	return SUCCESS;

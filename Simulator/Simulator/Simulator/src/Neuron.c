@@ -269,7 +269,7 @@ ERROR
 }
 
 
-Status neuron_force_spike(Neuron* neuron, uint32_t simulation_time) {
+Status neuron_step_force_spike(Neuron* neuron, uint32_t simulation_time) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
 	neuron->spike = TRUE;
@@ -282,7 +282,7 @@ ERROR
 }
 
 
-Status neuron_inject_current(Neuron* neuron, float PSC, uint32_t simulation_time) {
+Status neuron_step_inject_current(Neuron* neuron, float PSC, uint32_t simulation_time) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
 	neuron->spike = neuron_update(neuron, PSC);

@@ -10,11 +10,13 @@ bool network_is_valid(Network* network) {
 	check(array_is_valid(&(network->layers)) == TRUE, invalid_argument("network->layers"));
 	check(array_is_valid(&(network->input_layers)) == TRUE, invalid_argument("network->input_layers"));
 	check(array_is_valid(&(network->output_layers)) == TRUE, invalid_argument("network->output_layers"));
+	check(array_is_valid(&(network->input_names)) == TRUE, invalid_argument("network->input_names"));
+	check(array_is_valid(&(network->output_names)) == TRUE, invalid_argument("network->output_names"));
 
 	uint32_t i = 0;
 	uint32_t j = 0;
 	Layer* layer = NULL;
-	Layer* layer_2 = NULL;
+	Layer* layer_p = NULL;
 	bool ok = FALSE;
 
 	for (i = 0; i < network->layers.length; ++i) {
@@ -28,8 +30,8 @@ bool network_is_valid(Network* network) {
 			// the address of an input layer should be found in @network->layers
 			ok = FALSE;
 			for (j = 0; j < network->layers.length; ++j) {
-				layer_2 = (Layer*)array_get(&(network->layers), j);
-				if (layer == layer_2) {
+				layer_p = (Layer*)array_get(&(network->layers), j);
+				if (layer == layer_p) {
 					ok = TRUE;
 					break;
 				}
@@ -42,8 +44,8 @@ bool network_is_valid(Network* network) {
 			// the address of an input layer should be found in @network->layers
 			ok = FALSE;
 			for (j = 0; j < network->layers.length; ++j) {
-				layer_2 = (Layer*)array_get(&(network->layers), j);
-				if (layer == layer_2) {
+				layer_p = (Layer*)array_get(&(network->layers), j);
+				if (layer == layer_p) {
 					ok = TRUE;
 					break;
 				}
@@ -86,6 +88,8 @@ ERROR
 		if (network->layers.data != NULL) array_reset(&(network->layers), NULL);
 		if (network->output_layers.data != NULL) array_destroy(&(network->output_layers), NULL);
 		if (network->input_layers.data != NULL) array_destroy(&(network->input_layers), NULL);
+		if (network->input_names.data != NULL) array_destroy(&(network->input_names), NULL);
+		if (network->output_names.data != NULL) array_destroy(&(network->output_names), NULL);
 		free(network);
 	}
 	return NULL;
@@ -101,7 +105,7 @@ void network_destroy(Network* network) {
 	array_reset(&(network->layers), layer_reset);
 	array_reset(&(network->input_layers), NULL);
 	array_reset(&(network->output_layers), NULL);
-	array_reset(&(network->input_names), NULL); // TODO, here I remove the names???
+	array_reset(&(network->input_names), NULL);
 	array_reset(&(network->output_names), NULL);
 	free(network);
 
@@ -137,7 +141,6 @@ Status network_add_layer(Network* network, Layer* layer, bool should_free, bool 
 		status = array_append(&(network->output_names), &(network_layer->name));
 		check(status == SUCCESS, "Could not add output_layer");
 	}
-
 	return SUCCESS;
 
 ERROR
@@ -157,8 +160,7 @@ ERROR
 	return NULL;
 }
 
-
-Layer* network_get_layer_by_name(Network* network, String* name) {
+Layer* network_get_layer_by_string(Network* network, String* name) {
 	check(network_is_valid(network) == TRUE, invalid_argument("network"));
 	check(string_is_valid(name) == TRUE, invalid_argument("name"));
 	uint32_t i = 0;
@@ -171,13 +173,20 @@ Layer* network_get_layer_by_name(Network* network, String* name) {
 			return layer;
 		}
 	}
-
 ERROR
 	return NULL;
 }
 
 
-uint32_t network_get_layer_idx_by_name(Network* network, String* name) {
+Layer* network_get_layer_by_name(Network* network, char* name) {
+	String* string = string_create(name);
+	Layer* layer = network_get_layer_by_string(network, string);
+	string_destroy(string);
+	return layer;
+}
+
+
+uint32_t network_get_layer_idx_by_string(Network* network, String* name) {
 	check(network_is_valid(network) == TRUE, invalid_argument("network"));
 	check(string_is_valid(name) == TRUE, invalid_argument("name"));
 	uint32_t i = 0;
@@ -193,6 +202,15 @@ uint32_t network_get_layer_idx_by_name(Network* network, String* name) {
 
 ERROR
 	return UINT32_MAX;
+}
+
+
+
+uint32_t network_get_layer_idx_by_name(Network* network, char* name) {
+	String* string = string_create(name);
+	uint32_t idx = network_get_layer_idx_by_string(network, string);
+	string_destroy(string);
+	return idx;
 }
 
 
@@ -224,7 +242,7 @@ Status network_compile(Network* network) {
 		for (j = 0; j < layer->input_names->length; ++j) {
 			layer_name = *((String**)array_get(layer->input_names, j));
 			check(string_is_valid(layer_name) == TRUE, invalid_argument("layer_name"));
-			input_layer = network_get_layer_by_name(network, layer_name);
+			input_layer = network_get_layer_by_string(network, layer_name);
 			check(layer_is_valid(input_layer) == TRUE, invalid_argument("input_layer"));
 		}
 	}
@@ -259,7 +277,7 @@ loop1:
 
 		for (j = 0; j < layer->input_names->length; ++j) {
 			layer_name = *((String**)array_get(layer->input_names, j));
-			input_layer = network_get_layer_by_name(network, layer_name);
+			input_layer = network_get_layer_by_string(network, layer_name);
 			status = layer->link(layer, input_layer);
 			check(status == SUCCESS, "Could not link layers");
 		}
@@ -268,14 +286,14 @@ loop1:
 	// save references of input layers in @network->input_layers
 	for (i = 0; i < network->input_names.length; ++i) {
 		layer_name = *((String**)array_get(&(network->input_names), i));
-		layer = network_get_layer_by_name(network, layer_name);
+		layer = network_get_layer_by_string(network, layer_name);
 		array_append(&(network->input_layers), &layer);
 	}
 
 	// save references of output layers in @network->output_layers
 	for (i = 0; i < network->output_names.length; ++i) {
 		layer_name = *((String**)array_get(&(network->output_names), i));
-		layer = network_get_layer_by_name(network, layer_name);
+		layer = network_get_layer_by_string(network, layer_name);
 		array_append(&(network->output_layers), &layer);
 	}
 
@@ -292,7 +310,7 @@ ERROR
 void network_step(Network* network, NetworkInputs* inputs, uint32_t time) {
 	check(network_is_valid(network) == TRUE, invalid_argument("network"));
 	check(array_is_valid(inputs) == TRUE, invalid_argument("inputs"));
-	check(inputs->length == network->input_layers.length, "@inputs->length %u should equal @network->input_layers.lenght %u", inputs->length, network->input_layers.length);
+	check(inputs->length == network->input_layers.length, "@inputs->length %u should equal @network->input_layers.length %u", inputs->length, network->input_layers.length);
 	check(network->compiled == TRUE, invalid_argument("network->compiled"));
 
 	uint32_t i = 0;
@@ -308,10 +326,10 @@ void network_step(Network* network, NetworkInputs* inputs, uint32_t time) {
 
 		check(input->values->length == layer->neurons.length, "for input %u - input lenght %u while layer length %u", i, input->values->length, layer->neurons.length);
 		if (input->type == SPIKES) {
-			layer_force_spikes(layer, input->values, time);
+			layer_step_force_spikes(layer, input->values, time);
 		}
 		else if (input->type == CURRENT) {
-			layer_inject_currents(layer, input->values, time);
+			layer_step_inject_currents(layer, input->values, time);
 		}
 		else {
 			log_error("Undefined NETWORK input type %d", input->type);
@@ -332,6 +350,9 @@ ERROR
 
 
 NetworkOutputs* network_get_outputs(Network* network, NetworkValueType type) {
+	check(network_is_valid(network) == TRUE, invalid_argument("network"));
+	check(type == SPIKES || type == VOLTAGE, invalid_argument("type"));
+
 	NetworkOutputs* outputs = array_create(network->output_layers.length, network->output_layers.length, sizeof(NetworkValues));
 	check(array_is_valid(outputs) == TRUE, invalid_argument("outputs"));
 
@@ -364,6 +385,70 @@ ERROR
 }
 
 
+Array* network_get_output_spikes(Network* network) {
+	check(network_is_valid(network) == TRUE, invalid_argument("network"));
+	Array* outputs = array_create(network->output_layers.length, 0, sizeof(ArrayBool));
+	check(array_is_valid(outputs) == TRUE, invalid_argument("outputs"));
+
+	uint32_t i = 0;
+	Layer* output_layer = NULL;
+	Array* spikes = NULL;
+
+	for (i = 0; i < network->output_layers.length; ++i) {
+		output_layer = *((Layer**)array_get(&(network->output_layers), i));
+		check(layer_is_valid(output_layer) == TRUE, invalid_argument("output_layer"));
+
+		spikes = layer_get_spikes(output_layer);
+		array_append(outputs, spikes);
+		free(spikes);
+	}
+	return outputs;
+ERROR
+	return NULL;
+}
+
+Array* network_get_output_voltages(Network* network) {
+	check(network_is_valid(network) == TRUE, invalid_argument("network"));
+	Array* outputs = array_create(network->output_layers.length, 0, sizeof(Array));
+	check(array_is_valid(outputs) == TRUE, invalid_argument("outputs"));
+
+	uint32_t i = 0;
+	Layer* output_layer = NULL;
+	Array* voltages = NULL;
+
+	for (i = 0; i < network->output_layers.length; ++i) {
+		output_layer = *((Layer**)array_get(&(network->output_layers), i));
+		check(layer_is_valid(output_layer) == TRUE, invalid_argument("output_layer"));
+
+		voltages = layer_get_voltages(output_layer);
+		array_append(outputs, voltages);
+	}
+	return outputs;
+ERROR
+	return NULL;
+}
+
+Array* network_get_layer_spikes(Network* network, uint32_t i) {
+	check(network_is_valid(network) == TRUE, invalid_argument("network"));
+	Layer* layer = network_get_layer_by_idx(network, i);
+	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+
+	return layer_get_spikes(layer);
+ERROR
+	return NULL;
+}
+
+Array* network_get_layer_voltages(Network* network, uint32_t i) {
+	check(network_is_valid(network) == TRUE, invalid_argument("network"));
+	Layer* layer = network_get_layer_by_idx(network, i);
+	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+
+	return layer_get_voltages(layer);
+ERROR
+	return NULL;
+}
+
+
 void network_values_show(Array* values) {
 	uint32_t i = 0;
 	NetworkValues* net_values = NULL;
@@ -374,8 +459,7 @@ void network_values_show(Array* values) {
 		net_values = (NetworkValues*)array_get(values, i);
 		printf("\n[%d]-Type: %d\n", i, net_values->type);
 		if (net_values->type == SPIKES) {
-			// to do
-			array_show(net_values->values, NULL);
+			array_show(net_values->values, show_bool);
 		}
 		else if (net_values->type == VOLTAGE) {
 			array_show(net_values->values, show_float);

@@ -100,8 +100,8 @@ Status layer_step(Layer* layer, uint32_t time);
 /*
 Use these to set the input of the network
 */
-Status layer_force_spikes(Layer* layer, ArrayBool* spikes, uint32_t time);
-Status layer_inject_currents(Layer* layer, ArrayFloat* currents, uint32_t time);
+Status layer_step_force_spikes(Layer* layer, ArrayBool* spikes, uint32_t time);
+Status layer_step_inject_currents(Layer* layer, ArrayFloat* currents, uint32_t time);
 
 /*
 use these to get the output of the network
