@@ -3,13 +3,6 @@
 #include "Synapse.h"
 #include "MemoryManagement.h"
 
-const char* synapse_type_C_string(SynapseType type) {
-	const char* name = NULL;
-	if (type == CONDUCTANCE_SYNAPSE) name = "CONDUCTANCE_SYNAPSE";
-	else if (type == VOLTAGE_DEPENDENT_SYNAPSE) name = "VOLTAGE_DEPENDENT_SYNAPSE";
-	else name = "SYNAPSE_UNKNOWN";
-	return name;
-}
 
 /*************************************************************
 * CHECKS FUNCTIONS
@@ -35,6 +28,18 @@ Status synapse_is_valid(Synapse* synapse) {
 
 ERROR
 	return FALSE;
+}
+
+
+/*************************************************************
+* Synapse Type Functionality
+*************************************************************/
+const char* synapse_type_C_string(SynapseType type) {
+	const char* name = NULL;
+	if (type == CONDUCTANCE_SYNAPSE) name = "CONDUCTANCE_SYNAPSE";
+	else if (type == VOLTAGE_DEPENDENT_SYNAPSE) name = "VOLTAGE_DEPENDENT_SYNAPSE";
+	else name = "SYNAPSE_UNKNOWN";
+	return name;
 }
 
 

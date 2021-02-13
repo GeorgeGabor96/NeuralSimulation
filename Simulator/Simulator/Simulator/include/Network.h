@@ -86,7 +86,6 @@ Array* network_get_output_spikes(Network* network);
 Array* network_get_output_voltages(Network* network);
 Array* network_get_layer_spikes(Network* network, uint32_t i);
 Array* network_get_layer_voltages(Network* network, uint32_t i);
-//void network_show(Network* network);
 
 
 #endif // __NETWORK_H__

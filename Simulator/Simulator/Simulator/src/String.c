@@ -1,6 +1,9 @@
 #include "Containers.h"
 
 
+/*************************************************************
+* Check Functions
+*************************************************************/
 bool string_is_valid(String* string) {
 	check(array_is_valid(string) == TRUE, invalid_argument("string"));
 	check(string->element_size == 1, "@string->element_size != 1");
@@ -9,6 +12,10 @@ ERROR
 	return FALSE;
 }
 
+
+/*************************************************************
+* Helper Functions
+*************************************************************/
 static inline uint32_t safe_strlen(char* c_string_p) {
 	uint32_t i = 0;
 	for (i = 0; i < STRING_LIMIT; ++i) {
@@ -20,6 +27,9 @@ static inline uint32_t safe_strlen(char* c_string_p) {
 }
 
 
+/*************************************************************
+* String Functionality
+*************************************************************/
 String* string_create(char* c_string_p) {
 	check(c_string_p != NULL, null_argument("c_string_p"));
 	uint32_t n_chars = safe_strlen(c_string_p);

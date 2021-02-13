@@ -2,14 +2,6 @@
 #include "MemoryManagement.h"
 
 
-const char* layer_type_C_string(LayerType type) {
-	const char* name = NULL;
-	if (type == LAYER_INVALID) name = "LAYER_INVALID";
-	else if (type == LAYER_FULLY_CONNECTED) name = "LAYER_FULLY_CONNECTED";
-	else name = "LAYER_UNKNOWN";
-	return name;
-}
-
 /*************************************************************
 * CHECKS FUNCTIONS
 *************************************************************/
@@ -33,6 +25,18 @@ bool layer_is_valid(Layer* layer) {
 
 ERROR
 	return FALSE;
+}
+
+
+/*************************************************************
+* LAYER TYPE FUNCTIONALITY
+*************************************************************/
+const char* layer_type_C_string(LayerType type) {
+	const char* name = NULL;
+	if (type == LAYER_INVALID) name = "LAYER_INVALID";
+	else if (type == LAYER_FULLY_CONNECTED) name = "LAYER_FULLY_CONNECTED";
+	else name = "LAYER_UNKNOWN";
+	return name;
 }
 
 
