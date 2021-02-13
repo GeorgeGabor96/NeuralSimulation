@@ -2,6 +2,15 @@
 #include "MemoryManagement.h"
 
 
+const char* neuron_type_C_string(type) {
+	const char* name = NULL;
+	if (type == LIF_NEURON) name = "LIF_NEURON";
+	else name = "NEURON_UNKNOWN";
+	return name;
+}
+
+
+
 /*************************************************************
 * CHECKS FUNCTIONS
 *************************************************************/

@@ -72,6 +72,8 @@ uint32_t network_get_layer_idx_by_name(Network* network, char* name);
 * Then it will connect every layer with its inputs
 */
 Status network_compile(Network* network);
+void network_summary(Network* network);
+
 
 // forward of the network for an input
 // NOTE the inputs vector should have the same length as the number of input layers and the same number of values

@@ -169,7 +169,7 @@ Layer* network_get_layer_by_string(Network* network, String* name) {
 	for (i = 0; i < network->layers.length; ++i) {
 		layer = (Layer*)array_get(&(network->layers), i);
 		check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
-		if (string_compare(layer->name, name) == 0) {
+		if (string_equal(layer->name, name) == TRUE) {
 			return layer;
 		}
 	}
@@ -195,7 +195,7 @@ uint32_t network_get_layer_idx_by_string(Network* network, String* name) {
 	for (i = 0; i < network->layers.length; ++i) {
 		layer = (Layer*)array_get(&(network->layers), i);
 		check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
-		if (string_compare(layer->name, name) == 0) {
+		if (string_equal(layer->name, name) == TRUE) {
 			return i;
 		}
 	}
@@ -261,7 +261,7 @@ loop1:
 				layer_k = (Layer*)array_get(&(network->layers), k);
 
 				// check if layer k is input for layer i, where i < k
-				if (string_compare(layer_k->name, input_name) == 0) {
+				if (string_equal(layer_k->name, input_name) == TRUE) {
 					array_swap(&(network->layers), i, k);
 					// start over from the same index layer
 					goto loop1; // know is bad practice, but its easy
@@ -302,6 +302,48 @@ loop1:
 
 ERROR
 	return status;
+}
+
+
+void network_summary(Network* network) {
+	check(network_is_valid(network) == TRUE, invalid_argument("network"));
+	uint32_t i = 0;
+	String* name = NULL;
+	Layer* layer = NULL;
+	size_t n_weights = 0;
+
+	printf("-----------------NETWORK SUMMARY----------------\n");
+	printf("[LAYERS]\n");
+	for (i = 0; i < network->layers.length; i++) {
+		layer = (Layer*)array_get(&(network->layers), i);
+		printf("------------------------------------------------\n");
+		layer_summary(layer);
+		n_weights += layer_get_weights_number(layer);
+	}
+	printf("------------------------------------------------\n");
+
+	printf("Compiled: ");
+	if (network->compiled == TRUE) printf("TRUE\n");
+	else printf("FALSE\n");
+
+	printf("Number of layers: %u\n", network->layers.length);
+	printf("Input layers:");
+	for (i = 0; i < network->input_names.length; i++) {
+		name = *((String**)array_get(&(network->input_names), i));
+		printf(" %s", string_get_C_string(name));
+	}
+	printf("\n");
+	printf("Output layers:");
+	for (i = 0; i < network->output_names.length; i++) {
+		name = *((String**)array_get(&(network->output_names), i));
+		printf(" %s", string_get_C_string(name));
+	}
+	printf("\n");
+	printf("Number of parameters: %llu\n", n_weights);
+	printf("------------------------------------------------\n");
+
+ERROR
+	return;
 }
 
 

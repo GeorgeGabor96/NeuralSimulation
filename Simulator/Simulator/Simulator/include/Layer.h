@@ -18,6 +18,7 @@ typedef Status(*Layer_link)(Layer* layer, Layer* input_layer);
 // Need a type of the layer, this will define how synapses are connected between neurons
 typedef enum { LAYER_INVALID = 0, LAYER_FULLY_CONNECTED = 1 } LayerType;
 
+const char* layer_type_C_string(LayerType type);
 
 // Possible optimmization of memory: DO I NEED A NEURON TO HOLD INFORMATION ABOUT ITS CLASS?, In sensul ca am neuroni pe layer de acelasi tip, nu pot tine asta in layer?? direct
 
@@ -108,6 +109,9 @@ use these to get the output of the network
 */
 ArrayBool* layer_get_spikes(Layer* layer);
 ArrayFloat* layer_get_voltages(Layer* layer);
+
+void layer_summary(Layer* layer);
+size_t layer_get_weights_number(Layer* layer);
 
 // LINK functions
 Status layer_link_fc(Layer* layer, Layer* input_layer);

@@ -11,7 +11,7 @@ TestStatus synapse_class_create_destroy_test() {
 	float rev_potential = 0.0f;
 	float tau_ms = -1.0f / (float)log(0.5);
 	uint32_t delay = 1;
-	SynapseType s_type = CONDUCTANCE_SYNAPCE;
+	SynapseType s_type = CONDUCTANCE_SYNAPSE;
 	float simuation_time_ms = 1.0f;
 	float tau_exp = 0.5f;
 
@@ -74,7 +74,7 @@ TestStatus synapse_create_destroy_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
 	SynapseClass s_class;
-	synapse_class_set_default_values(CONDUCTANCE_SYNAPCE, &s_class);
+	synapse_class_set_default_values(CONDUCTANCE_SYNAPSE, &s_class);
 	float w = 1.0f;
 	Synapse* synapse = NULL;
 
@@ -106,7 +106,7 @@ error:
 TestStatus synapse_memory_test() {
 	TestStatus status = TEST_FAILED;
 	SynapseClass s_class;
-	synapse_class_set_default_values(CONDUCTANCE_SYNAPCE, &s_class);
+	synapse_class_set_default_values(CONDUCTANCE_SYNAPSE, &s_class);
 	Synapse* synapses[1000] = { NULL };
 	uint32_t i = 0;
 	uint32_t j = 0;
@@ -144,7 +144,7 @@ TestStatus synapse_add_spike_time_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
 	SynapseClass s_class;
-	s_class.type = CONDUCTANCE_SYNAPCE;
+	s_class.type = CONDUCTANCE_SYNAPSE;
 	s_class.delay = 0u;
 	float w = 1.0f;
 	Synapse* synapse = synapse_create(&s_class, w);
@@ -191,7 +191,7 @@ TestStatus synapse_compute_PSC_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
 	SynapseClass s_class;
-	s_class.type = CONDUCTANCE_SYNAPCE;
+	s_class.type = CONDUCTANCE_SYNAPSE;
 	s_class.E = 0.0f;
 	float w = 1.5f;
 	float u = 2.3f;
@@ -201,7 +201,7 @@ TestStatus synapse_compute_PSC_test() {
 	Synapse* synapse = synapse_create(&s_class, w);
 	//Queue* spike_times = synapse->spike_times;
 	// TEST CONDUCTANCE_SYNAPSE
-	s_class.type = CONDUCTANCE_SYNAPCE;
+	s_class.type = CONDUCTANCE_SYNAPSE;
 	synapse->g = g;
 	I = w * g;
 	synapse_I = synapse_compute_PSC(synapse, u);
@@ -227,7 +227,7 @@ TestStatus synapse_compute_PSC_test() {
 	s_class.type = 5;
 	assert(synapse_compute_PSC(synapse, u) == 0.0f, "Should return 0.0 for undifined @synapse->s_class->type");
 
-	s_class.type = CONDUCTANCE_SYNAPCE;
+	s_class.type = CONDUCTANCE_SYNAPSE;
 	synapse_destroy(synapse);
 	assert(memory_leak() == FALSE, "Memory leak");
 
@@ -242,7 +242,7 @@ TestStatus synapse_step_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
 	SynapseClass s_class;
-	s_class.type = CONDUCTANCE_SYNAPCE;
+	s_class.type = CONDUCTANCE_SYNAPSE;
 	s_class.delay = 1u;
 	s_class.tau_exp = 0.5f;
 

@@ -12,7 +12,8 @@
 * SynapseClass Functionality
 *************************************************************/
 
-typedef enum { CONDUCTANCE_SYNAPCE = 0, VOLTAGE_DEPENDENT_SYNAPSE = 1 } SynapseType;
+typedef enum { CONDUCTANCE_SYNAPSE = 0, VOLTAGE_DEPENDENT_SYNAPSE = 1 } SynapseType;
+const char* synapse_type_C_string(SynapseType type);
 
 
 typedef struct SynapseClass {
@@ -27,7 +28,7 @@ typedef struct SynapseClass {
 #define SYNAPSE_REV_POTENTIAL_DF 0.0f
 #define SYNAPSE_TAU_MS_DF -1.0f / (float)log(0.5f)
 #define SYNAPSE_DELAY_DF 1
-#define SYNAPSE_TYPE_DF CONDUCTANCE_SYNAPCE
+#define SYNAPSE_TYPE_DF CONDUCTANCE_SYNAPSE
 #define SYNAPSE_SIMULATION_TIME_MS_DF 1.0f
 
 /*

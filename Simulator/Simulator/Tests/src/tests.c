@@ -20,6 +20,7 @@
 // TODO: some tests take time, mark them and set a flag to run them or not
 TestInfo tests[] = {
 	// NETWORK
+	{ network_summary_test, "network_summary_test" },
 	{ network_compile_general_use_case_test, "network_compile_general_use_case_test" },
 	{ network_step_test, "network_step_test" },
 

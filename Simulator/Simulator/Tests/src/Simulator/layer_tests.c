@@ -25,11 +25,11 @@ TestStatus layer_general_use_case_test() {
 		assert(neuron_is_valid(neuron) == TRUE, "neuron %u is invalid", i);
 	}
 	assert(layer->link == layer_link_fc, invalid_argument("layer->link"));
-	assert(string_compare(l_name, layer->name) == 0, "Should be equal");
+	assert(string_equal(l_name, layer->name) == TRUE, "Should be equal");
 	for (i = 0; i < l_input_names->length; ++i) {
 		string1 = *((String**)array_get(l_input_names, i));
 		string2 = *((String**)array_get(layer->input_names, i));
-		assert(string_compare(string1, string2) == 0, "Should be equal");
+		assert(string_equal(string1, string2) == TRUE, "Should be equal");
 	}
 
 	// test case 1: force spike on every neuron, make a step, and verify that no neuron has spiked

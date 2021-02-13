@@ -3,7 +3,13 @@
 #include "Synapse.h"
 #include "MemoryManagement.h"
 
-
+const char* synapse_type_C_string(SynapseType type) {
+	const char* name = NULL;
+	if (type == CONDUCTANCE_SYNAPSE) name = "CONDUCTANCE_SYNAPSE";
+	else if (type == VOLTAGE_DEPENDENT_SYNAPSE) name = "VOLTAGE_DEPENDENT_SYNAPSE";
+	else name = "SYNAPSE_UNKNOWN";
+	return name;
+}
 
 /*************************************************************
 * CHECKS FUNCTIONS
@@ -11,7 +17,7 @@
 Status synapse_class_is_valid(SynapseClass* synapse_class) {
 	check(synapse_class != NULL, null_argument("synapse_class"));
 	// NOTE: If you add more types this check needs to be updated
-	check(synapse_class->type == CONDUCTANCE_SYNAPCE || synapse_class->type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("synapse_class->type"));
+	check(synapse_class->type == CONDUCTANCE_SYNAPSE || synapse_class->type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("synapse_class->type"));
 
 	return TRUE;
 
@@ -38,7 +44,7 @@ ERROR
 SynapseClass* synapse_class_create(float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms) {
 	check(tau_ms > 0.0, "@tau_ms should be > 0");
 	check(simulation_step_ms > 0.0, "@simulation_step_ms should be > 0");
-	check(type == CONDUCTANCE_SYNAPCE || type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("type"));
+	check(type == CONDUCTANCE_SYNAPSE || type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("type"));
 
 	SynapseClass* synapse_class = (SynapseClass*)malloc(sizeof(SynapseClass), "synapse_class_create");
 	check_memory(synapse_class);
@@ -158,7 +164,7 @@ float synapse_compute_PSC(Synapse* synapse, float u) {
 
 	switch (synapse->s_class->type)
 	{
-	case CONDUCTANCE_SYNAPCE:
+	case CONDUCTANCE_SYNAPSE:
 		I = synapse->w * synapse->g;
 		break;
 

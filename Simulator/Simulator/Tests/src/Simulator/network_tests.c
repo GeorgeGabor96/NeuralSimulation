@@ -218,3 +218,48 @@ error:
 
 	return status;
 }
+
+
+TestStatus network_summary_test() {
+	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
+	SynapseClass* s_class = synapse_class_create_default();
+
+	Layer* l_input_1 = layer_create_fully_connected(10, n_class, s_class, "l_input_1");
+	Layer* l_input_2 = layer_create_fully_connected(100, n_class, s_class, "l_input_2");
+	Layer* l_inner_1 = layer_create_fully_connected(100, n_class, s_class, "l_inner_1");
+	Layer* l_inner_2 = layer_create_fully_connected(100, n_class, s_class, "l_inner_2");
+	Layer* l_output_1 = layer_create_fully_connected(100, n_class, s_class, "l_output_1");
+	Layer* l_output_2 = layer_create_fully_connected(10, n_class, s_class, "l_output_2");
+	layer_add_input_layer(l_inner_1, l_input_1);
+	layer_add_input_layer(l_inner_1, l_input_2);
+	
+	layer_add_input_layer(l_inner_2, l_input_1);
+	layer_add_input_layer(l_inner_2, l_input_2);
+	layer_add_input_layer(l_inner_2, l_inner_1);
+
+	layer_add_input_layer(l_output_1, l_inner_2);
+	
+	layer_add_input_layer(l_output_2, l_inner_1);
+	layer_add_input_layer(l_output_2, l_inner_2);
+
+	Network* network = network_create();
+	network_add_layer(network, l_input_1, TRUE, TRUE, FALSE);
+	network_add_layer(network, l_input_2, TRUE, TRUE, FALSE);
+	network_add_layer(network, l_inner_1, TRUE, FALSE, FALSE);
+	network_add_layer(network, l_inner_2, TRUE, FALSE, FALSE);
+	network_add_layer(network, l_output_1, TRUE, FALSE, TRUE);
+	network_add_layer(network, l_output_2, TRUE, FALSE, TRUE);
+
+	network_summary(network);
+	network_compile(network);
+	network_summary(network);
+
+	neuron_class_destroy(n_class);
+	synapse_class_destroy(s_class);
+	network_destroy(network);
+	assert(memory_leak() == FALSE, "Memory leak");
+
+	return TEST_SUCCESS;
+ERROR
+	return TEST_FAILED;
+}
