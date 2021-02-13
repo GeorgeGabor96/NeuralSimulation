@@ -1,6 +1,21 @@
 #include "Containers.h"
 
 
+/*************************************************************
+* Check Functions
+*************************************************************/
+bool string_is_valid(String* string) {
+	check(array_is_valid(string) == TRUE, invalid_argument("string"));
+	check(string->element_size == 1, "@string->element_size != 1");
+	return TRUE;
+ERROR
+	return FALSE;
+}
+
+
+/*************************************************************
+* Helper Functions
+*************************************************************/
 static inline uint32_t safe_strlen(char* c_string_p) {
 	uint32_t i = 0;
 	for (i = 0; i < STRING_LIMIT; ++i) {
@@ -12,6 +27,9 @@ static inline uint32_t safe_strlen(char* c_string_p) {
 }
 
 
+/*************************************************************
+* String Functionality
+*************************************************************/
 String* string_create(char* c_string_p) {
 	check(c_string_p != NULL, null_argument("c_string_p"));
 	uint32_t n_chars = safe_strlen(c_string_p);
@@ -102,14 +120,12 @@ ERROR
 }
 
 
-int string_compare(String* string1_p, String* string2_p) {
-	check(array_is_valid(string1_p), invalid_argument("string1_p"));
-	check(array_is_valid(string2_p), invalid_argument("string2_p"));
-	check(string1_p->length == string2_p->length, "@string1_p->length != @string2_p->length");
-	check(string1_p->max_length == string2_p->max_length, "@string1_p->max_length != @string2_p->max_length");
-	check(string1_p->element_size == string2_p->element_size, "@string1_p->element_size != @string2_p->element_size");
-
-	return memcmp(string1_p->data, string2_p->data, string1_p->element_size * string1_p->length);
+bool string_equal(String* string1_p, String* string2_p) {
+	check(string_is_valid(string1_p), invalid_argument("string1_p"));
+	check(string_is_valid(string2_p), invalid_argument("string2_p"));
+	
+	if (string1_p->length != string2_p->length) return FALSE;
+	if (memcmp(string1_p->data, string2_p->data, string1_p->element_size * string1_p->length) == 0) return TRUE;
 ERROR
-	return -1;
+	return FALSE;
 }

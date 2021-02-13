@@ -9,113 +9,117 @@ TestStatus network_compile_general_use_case_test() {
 
 	Layer* layer = NULL;
 	uint32_t layer_idx = 0;
-	
+	String* string = NULL;
+
 	// create a few layers
 	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
 	SynapseClass* s_class = synapse_class_create_default();
 
-	// layer 1
-	String* name1 = string_create("layer1");
-	Array* input_names1 = array_create(1, 0, sizeof(Array*));
-	Layer* layer1 = layer_create_fully_connected(10, n_class, s_class, name1, input_names1);
-
-	// layer 2
-	String* name2 = string_create("layer2");
-	char* inputs_2[1] = { "layer1" };
-	Array* input_names2 = strings_create(inputs_2, 1);
-	Layer* layer2 = layer_create_fully_connected(100, n_class, s_class, name2, input_names2);
-
-	// layer 3
-	String* name3 = string_create("layer3");
-	char* inputs_3[1] = { "layer2" };
-	Array* input_names3 = strings_create(inputs_3, 1);
-	Layer* layer3 = layer_create_fully_connected(1, n_class, s_class, name3, input_names3);
+	char* name1 = "layer_1";
+	char* name2 = "layer_2";
+	char* name3 = "layer_3";
+	Layer* l1 = layer_create_fully_connected(10, n_class, s_class, name1);
+	Layer* l2 = layer_create_fully_connected(100, n_class, s_class, name2);
+	Layer* l3 = layer_create_fully_connected(1, n_class, s_class, name3);
+	layer_add_input_layer(l2, l1);
+	layer_add_input_layer(l3, l1);
+	layer_add_input_layer(l3, l2);
 
 	/*----------create_network----------*/
 	Network* network = network_create();
 	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
 	
 	/*----------network_add_layer----------*/
-	s_status = network_add_layer(network, layer3, TRUE, FALSE, TRUE);
-	assert(s_status == SUCCESS, "Couldn't add layer3");
+	s_status = network_add_layer(network, l3, TRUE, FALSE, TRUE);
+	assert(s_status == SUCCESS, "Couldn't add @l3");
 	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
 	assert(network->layers.length == 1, "@network->layers.length is %u, not 1", network->layers.length);
-	assert(network->input_layers.length == 0, "@network->input_layers.length is %u, not 0", network->input_layers.length);
-	assert(network->output_layers.length == 1, "@network->output_layers.length is %u, not 1", network->output_layers.length);
+	assert(network->input_names.length == 0, "@network->input_names.length is %u, not 0", network->input_names.length);
+	assert(network->output_names.length == 1, "@network->output_names.length is %u, not 1", network->output_names.length);
 
-	s_status = network_add_layer(network, layer2, TRUE, FALSE, FALSE);
-	assert(s_status == SUCCESS, "Couldn't add layer2");
+	s_status = network_add_layer(network, l2, TRUE, FALSE, FALSE);
+	assert(s_status == SUCCESS, "Couldn't add @l2");
 	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
 	assert(network->layers.length == 2, "@network->layers.length is %u, not 2", network->layers.length);
-	assert(network->input_layers.length == 0, "@network->input_layers.length is %u, not 0", network->input_layers.length);
-	assert(network->output_layers.length == 1, "@network->output_layers.length is %u, not 1", network->output_layers.length);
+	assert(network->input_names.length == 0, "@network->input_names.length is %u, not 0", network->input_names.length);
+	assert(network->output_names.length == 1, "@network->output_names.length is %u, not 1", network->output_names.length);
 
-	s_status = network_add_layer(network, layer1, TRUE, TRUE, FALSE);
-	assert(s_status == SUCCESS, "Couldn't add layer1");
+	s_status = network_add_layer(network, l1, TRUE, TRUE, FALSE);
+	assert(s_status == SUCCESS, "Couldn't add l1");
 	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
 	assert(network->layers.length == 3, "@network->layers.length is %u, not 3", network->layers.length);
-	assert(network->input_layers.length == 1, "@network->input_layers.length is %u, not 1", network->input_layers.length);
-	assert(network->output_layers.length == 1, "@network->output_layers.length is %u, not 1", network->output_layers.length);
+	assert(network->input_names.length == 1, "@network->input_names.length is %u, not 1", network->input_names.length);
+	assert(network->output_names.length == 1, "@network->output_names.length is %u, not 1", network->output_names.length);
 	
 	/*----------network_get_layer_by_idx----------*/
-	layer3 = network_get_layer_by_idx(network, 0);
-	assert(layer_is_valid(layer3) == TRUE, invalid_argument("layer3"));
-	assert(string_compare(layer3->name, name3) == 0, invalid_argument("layer3->name"));
-	assert(layer3->neurons.length == 1, invalid_argument("layer3->neurons.length"));
-	assert(layer3->is_input == FALSE, "@layer3->is_input is TRUE");
+	l3 = network_get_layer_by_idx(network, 0);
+	assert(layer_is_valid(l3) == TRUE, invalid_argument("l3"));
+	assert(strcmp(layer_get_name(l3), name3) == 0, invalid_argument("l3->name"));
+	assert(l3->neurons.length == 1, invalid_argument("l3->neurons.length"));
+	assert(l3->is_input == FALSE, "@l3->is_input is TRUE");
 	
-	layer2 = network_get_layer_by_idx(network, 1);
-	assert(layer_is_valid(layer2) == TRUE, invalid_argument("layer2"));
-	assert(string_compare(layer2->name, name2) == 0, invalid_argument("layer2->name"));
-	assert(layer2->neurons.length == 100, invalid_argument("layer2->neurons.length"));
-	assert(layer2->is_input == FALSE, "@layer2->is_input is TRUE");
+	l2 = network_get_layer_by_idx(network, 1);
+	assert(layer_is_valid(l2) == TRUE, invalid_argument("l2"));
+	assert(strcmp(layer_get_name(l2), name2) == 0, invalid_argument("l2->name"));
+	assert(l2->neurons.length == 100, invalid_argument("l2->neurons.length"));
+	assert(l2->is_input == FALSE, "@l2->is_input is TRUE");
 
-	layer1 = network_get_layer_by_idx(network, 2);
-	assert(layer_is_valid(layer1) == TRUE, invalid_argument("layer1"));
-	assert(string_compare(layer1->name, name1) == 0, invalid_argument("layer1->name"));
-	assert(layer1->neurons.length == 10, invalid_argument("layer1->neurons.length"));
-	assert(layer1->is_input == TRUE, "@layer3->is_input is FALSE");
-
-	// check network input layers
-	layer = *((Layer**)array_get(&(network->input_layers), 0));
-	assert(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
-	assert(string_compare(layer->name, name1) == 0, invalid_argument("layer->name"));
-	assert(layer->neurons.length == 10, invalid_argument("layer->neurons.length"));
-	
-	// check network output layers
-	layer = *((Layer**)array_get(&(network->output_layers), 0));
-	assert(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
-	assert(string_compare(layer->name, name3) == 0, invalid_argument("layer->name"));
-	assert(layer->neurons.length == 1, invalid_argument("layer->neurons->length"));
+	l1 = network_get_layer_by_idx(network, 2);
+	assert(layer_is_valid(l1) == TRUE, invalid_argument("l1"));
+	assert(strcmp(layer_get_name(l1), name1) == 0, invalid_argument("l1->name"));
+	assert(l1->neurons.length == 10, invalid_argument("l1->neurons.length"));
+	assert(l1->is_input == TRUE, "@1->is_input is FALSE");
 
 	/*----------network_get_layer_by_name----------*/
-	Array* name = string_create("layer2");
-	layer2 = network_get_layer_by_name(network, name);
-	string_destroy(name);
-	assert(layer_is_valid(layer2) == TRUE, invalid_argument("layer2"));
-	assert(string_compare(layer2->name, name2) == 0, invalid_argument("layer2->name"));
-	assert(layer2->neurons.length == 100, invalid_argument("layer2->neurons->length"));
+	layer = network_get_layer_by_name(network, name2);
+	assert(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+	assert(strcmp(layer_get_name(layer), name2) == 0, invalid_argument("layer->name"));
+	assert(layer->neurons.length == 100, invalid_argument("layer->neurons->length"));
+
+	// check network input names
+	string = *((String**)array_get(&(network->input_names), 0));
+	assert(string_is_valid(string) == TRUE, invalid_argument("string"));
+	assert(strcmp(string_get_C_string(string), name1) == 0, invalid_argument("string"));
+
+	// check network output names
+	string = *((String**)array_get(&(network->output_names), 0));
+	assert(string_is_valid(string) == TRUE, invalid_argument("string"));
+	assert(strcmp(string_get_C_string(string), name3) == 0, invalid_argument("string"));
 
 	/*----------network_compile----------*/
 	s_status = network_compile(network);
 	assert(s_status == SUCCESS, "could not compile @network");
 	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
+	assert(network->input_layers.length == 1, "@network->input_layers.length is %u, not 1", network->input_layers.length);
+	assert(network->output_layers.length == 1, "@network->output_layers.length is %u, not 1", network->output_layers.length);
 	assert(network->compiled == TRUE, invalid_argument("network->compiled"));
+
+	// check network input layers
+	layer = *((Layer**)array_get(&(network->input_layers), 0));
+	assert(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+	assert(strcmp(layer_get_name(layer), name1) == 0, invalid_argument("layer->name"));
+	assert(layer->neurons.length == 10, invalid_argument("layer->neurons.length"));
+
+	// check network output layers
+	layer = *((Layer**)array_get(&(network->output_layers), 0));
+	assert(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+	assert(strcmp(layer_get_name(layer), name3) == 0, invalid_argument("layer->name"));
+	assert(layer->neurons.length == 1, invalid_argument("layer->neurons->length"));
 
 	// test the reordering, it should be layer1->layer2->layer3
 	layer = (Layer*)network_get_layer_by_idx(network, 0);
 	assert(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
-	assert(string_compare(layer->name, name1) == 0, invalid_argument("layer"));
+	assert(strcmp(layer_get_name(layer), name1) == 0, invalid_argument("layer"));
 	assert(layer->neurons.length == 10, "@layer->neurons.length is %u, not 10", layer->neurons.length);
 
 	layer = (Layer*)network_get_layer_by_idx(network, 1);
 	assert(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
-	assert(string_compare(layer->name, name2) == 0, invalid_argument("layer"));
+	assert(strcmp(layer_get_name(layer), name2) == 0, invalid_argument("layer"));
 	assert(layer->neurons.length == 100, "@layer->neurons.length is %u, not 100", layer->neurons.length);
 
 	layer = (Layer*)network_get_layer_by_idx(network, 2);
 	assert(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
-	assert(string_compare(layer->name, name3) == 0, invalid_argument("layer"));
+	assert(strcmp(layer_get_name(layer), name3) == 0, invalid_argument("layer"));
 	assert(layer->neurons.length == 1, "@layer->neurons.length is %u, not 1", layer->neurons.length);
 
 	/*----------network_get_layer_idx_by_name----------*/
@@ -135,11 +139,11 @@ TestStatus network_compile_general_use_case_test() {
 	assert(network_get_layer_by_idx(NULL, 0) == NULL, "Should return NULL for invalid @network");
 	assert(network_get_layer_by_idx(network, 100) == NULL, "Should return NULL for invalid @layer_idx");
 
-	assert(network_get_layer_by_name(NULL, name) == NULL, "Should return NULL for invalid @network");
+	assert(network_get_layer_by_name(NULL, name1) == NULL, "Should return NULL for invalid @network");
 	assert(network_get_layer_by_name(network, NULL) == NULL, "Should return NULL for invalid @name");
 
-	assert(network_get_layer_idx_by_name(NULL, name) == UINT32_MAX, "Should return NULL for invalid @network");
-	assert(network_get_layer_idx_by_name(network, NULL) == UINT32_MAX, "Should return NULL for invalid @name");
+	assert(network_get_layer_idx_by_name(NULL, name1) == UINT32_MAX, "Should return UINT32_MAX for invalid @network");
+	assert(network_get_layer_idx_by_name(network, NULL) == UINT32_MAX, "Should return UINT32_MAX for invalid @name");
 
 	network_destroy(NULL);
 
@@ -165,24 +169,15 @@ TestStatus network_step_test() {
 	SynapseClass* s_class = synapse_class_create_default();
 
 	// build layers
-	String* name1 = string_create("layer1");
-	Array* input_names1 = array_create(1, 0, sizeof(Array*));
 	uint32_t input_neuron_length = 5;
-	Layer* layer1 = layer_create_fully_connected(input_neuron_length, n_class, s_class, name1, input_names1);
-
-	String* name2 = string_create("layer2");
-	char* inputs_2[] = { "layer1" };
-	Array* input_names2 = strings_create(inputs_2, 1);
-	Layer* layer2 = layer_create_fully_connected(100, n_class, s_class, name2, input_names2);
-
-	String* name3 = string_create("layer3");
-	char* inputs_3[] = { "layer2" };
-	Array* input_names3 = strings_create(inputs_3, 1);
-	Layer* layer3 = layer_create_fully_connected(10, n_class, s_class, name3, input_names3);
+	Layer* layer1 = layer_create_fully_connected(input_neuron_length, n_class, s_class, "layer1");
+	Layer* layer2 = layer_create_fully_connected(100, n_class, s_class, "layer2");
+	Layer* layer3 = layer_create_fully_connected(10, n_class, s_class, "layer3");
+	layer_add_input_layer(layer2, layer1);
+	layer_add_input_layer(layer3, layer2);
 
 	// add layers into a network
 	Network* network = network_create();
-
 	network_add_layer(network, layer1, TRUE, TRUE, FALSE);
 	network_add_layer(network, layer2, TRUE, FALSE, FALSE);
 	network_add_layer(network, layer3, TRUE, FALSE, TRUE);
@@ -202,13 +197,13 @@ TestStatus network_step_test() {
 	for (i = 0; i < 100; ++i) {
 		network_step(network, inputs, i);
 		log_info("Loop %u", i);
-		NetworkOutputs* outputs = network_get_outputs(network, SPIKES);
-		for (uint32_t j = 0; j < outputs->length; ++j) {
-			NetworkValues* values = (NetworkValues*)array_get(outputs, j);
-			array_show(values->values, show_bool);
-			array_destroy(values->values, NULL);
+		Array* output_spikes = network_get_output_spikes(network);
+		for (uint32_t j = 0; j < output_spikes->length; ++j) {
+			ArrayBool* spikes = (ArrayBool*)array_get(output_spikes, j);
+			array_show(spikes, show_bool);
+			array_reset(spikes, NULL);
 		}
-		array_destroy(outputs, NULL);
+		array_destroy(output_spikes, NULL);
 	}
 	array_destroy(currents.values, NULL);
 	array_destroy(inputs, NULL);
@@ -222,4 +217,49 @@ TestStatus network_step_test() {
 error:
 
 	return status;
+}
+
+
+TestStatus network_summary_test() {
+	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
+	SynapseClass* s_class = synapse_class_create_default();
+
+	Layer* l_input_1 = layer_create_fully_connected(10, n_class, s_class, "l_input_1");
+	Layer* l_input_2 = layer_create_fully_connected(100, n_class, s_class, "l_input_2");
+	Layer* l_inner_1 = layer_create_fully_connected(100, n_class, s_class, "l_inner_1");
+	Layer* l_inner_2 = layer_create_fully_connected(100, n_class, s_class, "l_inner_2");
+	Layer* l_output_1 = layer_create_fully_connected(100, n_class, s_class, "l_output_1");
+	Layer* l_output_2 = layer_create_fully_connected(10, n_class, s_class, "l_output_2");
+	layer_add_input_layer(l_inner_1, l_input_1);
+	layer_add_input_layer(l_inner_1, l_input_2);
+	
+	layer_add_input_layer(l_inner_2, l_input_1);
+	layer_add_input_layer(l_inner_2, l_input_2);
+	layer_add_input_layer(l_inner_2, l_inner_1);
+
+	layer_add_input_layer(l_output_1, l_inner_2);
+	
+	layer_add_input_layer(l_output_2, l_inner_1);
+	layer_add_input_layer(l_output_2, l_inner_2);
+
+	Network* network = network_create();
+	network_add_layer(network, l_input_1, TRUE, TRUE, FALSE);
+	network_add_layer(network, l_input_2, TRUE, TRUE, FALSE);
+	network_add_layer(network, l_inner_1, TRUE, FALSE, FALSE);
+	network_add_layer(network, l_inner_2, TRUE, FALSE, FALSE);
+	network_add_layer(network, l_output_1, TRUE, FALSE, TRUE);
+	network_add_layer(network, l_output_2, TRUE, FALSE, TRUE);
+
+	network_summary(network);
+	network_compile(network);
+	network_summary(network);
+
+	neuron_class_destroy(n_class);
+	synapse_class_destroy(s_class);
+	network_destroy(network);
+	assert(memory_leak() == FALSE, "Memory leak");
+
+	return TEST_SUCCESS;
+ERROR
+	return TEST_FAILED;
 }

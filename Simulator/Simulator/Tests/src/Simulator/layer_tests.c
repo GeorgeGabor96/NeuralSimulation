@@ -25,11 +25,11 @@ TestStatus layer_general_use_case_test() {
 		assert(neuron_is_valid(neuron) == TRUE, "neuron %u is invalid", i);
 	}
 	assert(layer->link == layer_link_fc, invalid_argument("layer->link"));
-	assert(string_compare(l_name, layer->name) == 0, "Should be equal");
+	assert(string_equal(l_name, layer->name) == TRUE, "Should be equal");
 	for (i = 0; i < l_input_names->length; ++i) {
 		string1 = *((String**)array_get(l_input_names, i));
 		string2 = *((String**)array_get(layer->input_names, i));
-		assert(string_compare(string1, string2) == 0, "Should be equal");
+		assert(string_equal(string1, string2) == TRUE, "Should be equal");
 	}
 
 	// test case 1: force spike on every neuron, make a step, and verify that no neuron has spiked
@@ -39,7 +39,7 @@ TestStatus layer_general_use_case_test() {
 		spike = TRUE;
 		array_set(spikes, i, &spike);
 	}
-	s = layer_force_spikes(layer, spikes, 0);
+	s = layer_step_force_spikes(layer, spikes, 0);
 	assert(s == SUCCESS, "Couldn't force spikes");
 	array_destroy(spikes, NULL);
 
@@ -67,7 +67,7 @@ TestStatus layer_general_use_case_test() {
 		current = 1.0f;
 		array_set(currents, i, &current);
 	}
-	s = layer_inject_currents(layer, currents, 2);
+	s = layer_step_inject_currents(layer, currents, 2);
 	assert(s == SUCCESS, "Couldn't inject currents");
 	array_destroy(currents, NULL);
 	for (i = 0; i < layer->neurons.length; ++i) {
@@ -93,7 +93,7 @@ TestStatus layer_general_use_case_test() {
 		current = 100.0f;
 		array_set(currents, i, &current);
 	}
-	s = layer_inject_currents(layer, currents, 4);
+	s = layer_step_inject_currents(layer, currents, 4);
 	assert(s == SUCCESS, "Couldn't inject currents");
 	array_destroy(currents, NULL);
 	for (i = 0; i < layer->neurons.length; ++i) {
@@ -123,8 +123,8 @@ TestStatus layer_general_use_case_test() {
 	assert(layer_create_with_input_names(LIF_NEURON, 100, n_class, s_class, NULL, l_input_names) == NULL, "Should return NULL for invalid @name");
 	assert(layer_create_with_input_names(LIF_NEURON, 100, n_class, s_class, l_name, NULL) == NULL, "Should return NULL for invalid @input_names");
 
-	assert(layer_force_spikes(NULL, spikes, 0u) == FAIL, "Should fail for invalid @layer");
-	assert(layer_force_spikes(layer, NULL, 0u) == FAIL, "Should fail for invalid @spikes");
+	assert(layer_step_force_spikes(NULL, spikes, 0u) == FAIL, "Should fail for invalid @layer");
+	assert(layer_step_force_spikes(layer, NULL, 0u) == FAIL, "Should fail for invalid @spikes");
 
 	assert(layer_step(NULL, 0u) == FAIL, "Should fail for invalid @layer");
 
@@ -173,7 +173,7 @@ TestStatus layer_memory_test_test() {
 	for (i = 0; i < 100; ++i) array_set(spikes, i, &spike);
 	for (i = 0; i < 100; ++i) {
 		for (j = 0; j < 100; ++j) {
-			layer_force_spikes(layers[i], spikes, j);
+			layer_step_force_spikes(layers[i], spikes, j);
 			layer_step(layers[i], j);
 			voltages = layer_get_voltages(layers[i]);
 			array_destroy(voltages, NULL);
@@ -184,7 +184,7 @@ TestStatus layer_memory_test_test() {
 	currents = array_create(layers[0]->neurons.length, layers[0]->neurons.length, sizeof(float));
 	for (i = 0; i < 100; ++i) {
 		for (j = 0; j < 100; ++j) {
-			layer_inject_currents(layers[i], currents, j);
+			layer_step_inject_currents(layers[i], currents, j);
 			layer_step(layers[i], j);
 			voltages = layer_get_voltages(layers[i]);
 			array_destroy(voltages, NULL);
@@ -290,7 +290,7 @@ TestStatus layer_fully_connected_test() {
 		layer_step(layer_middle, i);
 		layer_step(layer_output, i);
 
-		layer_inject_currents(layer_input, currents, i);
+		layer_step_inject_currents(layer_input, currents, i);
 
 		array_destroy(currents, NULL);
 	}

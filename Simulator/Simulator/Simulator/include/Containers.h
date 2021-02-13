@@ -94,14 +94,14 @@ void* stack_top(Stack* stack_p);
 // string have at most 256 chars currently
 #define STRING_LIMIT 256
 typedef Array String;
-#define string_is_valid(s) array_is_valid(s)
+bool string_is_valid(String* string);
 String* string_create(char* c_string_p);
 char* string_get_C_string(String* string);
 String* string_copy(String* string);
 void string_destroy(String* string_p);
 Array* strings_create(char** strings_pp, uint32_t cnt);
 void strings_destroy(Array* strings_p);
-int string_compare(String* string1_p, String* string2_p);
+bool string_equal(String* string1_p, String* string2_p);
 
 
 /*************************************************************

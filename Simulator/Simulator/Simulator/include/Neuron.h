@@ -12,6 +12,8 @@
 *************************************************************/
 
 typedef enum { LIF_NEURON = 0 } NeuronType;
+const char* neuron_type_C_string(type);
+
 
 typedef struct NeuronClass {
 	NeuronType type;
@@ -89,14 +91,14 @@ Status neuron_step(Neuron* neuron, uint32_t simulation_time);
 /*
 * Similar to @neuron_step, but it only propagates a spike through the output synapses
 */
-Status neuron_force_spike(Neuron* neuron, uint32_t simulation_time);
+Status neuron_step_force_spike(Neuron* neuron, uint32_t simulation_time);
 
 
 /*
 * Similar to @neuron_step, but usses received PSC instead of collecting it from the 
 * input synapses
 */
-Status neuron_inject_current(Neuron* neuron, float PSC, uint32_t simulation_time);
+Status neuron_step_inject_current(Neuron* neuron, float PSC, uint32_t simulation_time);
 
 
 #endif // __NEURON_H__

@@ -45,6 +45,17 @@ ERROR
 
 
 /*************************************************************
+* Neuron Type Functionality
+*************************************************************/
+const char* neuron_type_C_string(type) {
+	const char* name = NULL;
+	if (type == LIF_NEURON) name = "LIF_NEURON";
+	else name = "NEURON_UNKNOWN";
+	return name;
+}
+
+
+/*************************************************************
 * UPDATE functions for neurons
 *************************************************************/
 static inline bool neuron_update(Neuron* neuron, float PSC) {
@@ -269,7 +280,7 @@ ERROR
 }
 
 
-Status neuron_force_spike(Neuron* neuron, uint32_t simulation_time) {
+Status neuron_step_force_spike(Neuron* neuron, uint32_t simulation_time) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
 	neuron->spike = TRUE;
@@ -282,7 +293,7 @@ ERROR
 }
 
 
-Status neuron_inject_current(Neuron* neuron, float PSC, uint32_t simulation_time) {
+Status neuron_step_inject_current(Neuron* neuron, float PSC, uint32_t simulation_time) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
 	neuron->spike = neuron_update(neuron, PSC);

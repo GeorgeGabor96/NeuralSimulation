@@ -198,9 +198,12 @@ static inline Node* hash_table_remove(HashTable* table, void* key) {
 	size_t hash = hash_f(table, key);
 	List* entry = &(table->entries[hash]);
 	Node* node = list_find(entry, key);
+	check(node != NULL, "NO node with key %p", key);
 	list_remove(entry, node);
 	(table->length)--;
 	return node;
+ERROR
+	return NULL;
 }
 
 
