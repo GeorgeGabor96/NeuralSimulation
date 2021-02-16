@@ -7,7 +7,7 @@ unsigned char *DoubleArrayToByteArray(double *data, size_t length){
 	out = (unsigned char*)malloc(sizeof(unsigned char)*length);
 
 	for(i = 0; i < length; i++){
-		out[i] = data[i];
+		out[i] = (unsigned char)data[i];
 	}
 
 	return out;

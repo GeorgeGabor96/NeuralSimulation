@@ -124,8 +124,8 @@ double InterceptFromCoordinates(double x1, double y1, double x2, double y2){
 RGBA **Get8HighContrastColors(size_t *returnArrayLength){
   RGBA **colors;
   size_t colorsLength;
-  colors = (RGBA**)malloc(sizeof(RGBA) * 8.0);
-  colorsLength = 8.0;
+  colors = (RGBA**)malloc(sizeof(RGBA) * 8);
+  colorsLength = 8;
   colors[0] = CreateRGBColor(3.0/256.0, 146.0/256.0, 206.0/256.0);
   colors[1] = CreateRGBColor(253.0/256.0, 83.0/256.0, 8.0/256.0);
   colors[2] = CreateRGBColor(102.0/256.0, 176.0/256.0, 50.0/256.0);
@@ -148,8 +148,8 @@ RGBABitmapImageReference *CreateRGBABitmapImageReference(){
 
   reference = (RGBABitmapImageReference *)malloc(sizeof(RGBABitmapImageReference));
   reference->image = (RGBABitmapImage *)malloc(sizeof(RGBABitmapImage));
-  reference->image->x = (RGBABitmap**)malloc(sizeof(RGBABitmap) * 0.0);
-  reference->image->xLength = 0.0;
+  reference->image->x = (RGBABitmap**)malloc(sizeof(RGBABitmap) * 0);
+  reference->image->xLength = 0;
 
   return reference;
 }
@@ -378,12 +378,12 @@ double *ComputeGridLinePositions(size_t *returnArrayLength, double cMin, double 
     mode = 2.0;
   }
 
-  positions = (double*)malloc(sizeof(double) * (pNum));
-  positionsLength = pNum;
-  labels->stringArray = (StringReference**)malloc(sizeof(StringReference) * pNum);
-  labels->stringArrayLength = pNum;
-  priorities->numberArray = (double*)malloc(sizeof(double) * (pNum));
-  priorities->numberArrayLength = pNum;
+  positions = (double*)malloc(sizeof(double) * (size_t)(pNum));
+  positionsLength = (size_t)pNum;
+  labels->stringArray = (StringReference**)malloc(sizeof(StringReference) * (size_t)pNum);
+  labels->stringArrayLength = (size_t)pNum;
+  priorities->numberArray = (double*)malloc(sizeof(double) * (size_t)(pNum));
+  priorities->numberArrayLength = (size_t)pNum;
 
   for(i = 0.0; i < pNum; i = i + 1.0){
     num = pMin + pInterval*i;
@@ -547,8 +547,8 @@ ScatterPlotSettings *GetDefaultScatterPlotSettings(){
   settings->xLabelLength = wcslen(settings->xLabel);
   settings->yLabel = L"";
   settings->yLabelLength = wcslen(settings->yLabel);
-  settings->scatterPlotSeries = (ScatterPlotSeries**)malloc(sizeof(ScatterPlotSeries) * 0.0);
-  settings->scatterPlotSeriesLength = 0.0;
+  settings->scatterPlotSeries = (ScatterPlotSeries**)malloc(sizeof(ScatterPlotSeries) * 0);
+  settings->scatterPlotSeriesLength = 0;
   settings->showGrid = true;
   settings->gridColor = GetGray(0.1);
   settings->xAxisAuto = true;
@@ -571,10 +571,10 @@ ScatterPlotSeries *GetDefaultScatterPlotSeriesSettings(){
   series->lineType = L"solid";
   series->lineTypeLength = wcslen(series->lineType);
   series->lineThickness = 1.0;
-  series->xs = (double*)malloc(sizeof(double) * (0.0));
-  series->xsLength = 0.0;
-  series->ys = (double*)malloc(sizeof(double) * (0.0));
-  series->ysLength = 0.0;
+  series->xs = (double*)malloc(sizeof(double) * (0));
+  series->xsLength = 0;
+  series->ys = (double*)malloc(sizeof(double) * (0));
+  series->ysLength = 0;
   series->color = GetBlack();
 
   return series;
@@ -586,8 +586,8 @@ void DrawScatterPlot(RGBABitmapImageReference *canvasReference, double width, do
 
   settings->width = width;
   settings->height = height;
-  settings->scatterPlotSeries = (ScatterPlotSeries**)malloc(sizeof(ScatterPlotSeries) * 1.0);
-  settings->scatterPlotSeriesLength = 1.0;
+  settings->scatterPlotSeries = (ScatterPlotSeries**)malloc(sizeof(ScatterPlotSeries) * 1);
+  settings->scatterPlotSeriesLength = 1;
   settings->scatterPlotSeries[0] = GetDefaultScatterPlotSeriesSettings();
   free(settings->scatterPlotSeries[0]->xs);
   settings->scatterPlotSeries[0]->xs = xs;
@@ -1104,8 +1104,8 @@ BarPlotSettings *GetDefaultBarPlotSettings(){
   settings->titleLength = wcslen(settings->title);
   settings->yLabel = L"";
   settings->yLabelLength = wcslen(settings->yLabel);
-  settings->barPlotSeries = (BarPlotSeries**)malloc(sizeof(BarPlotSeries) * 0.0);
-  settings->barPlotSeriesLength = 0.0;
+  settings->barPlotSeries = (BarPlotSeries**)malloc(sizeof(BarPlotSeries) * 0);
+  settings->barPlotSeriesLength = 0;
   settings->showGrid = true;
   settings->gridColor = GetGray(0.1);
   settings->autoColor = true;
@@ -1114,8 +1114,8 @@ BarPlotSettings *GetDefaultBarPlotSettings(){
   settings->groupSeparation = 0.0;
   settings->barSeparation = 0.0;
   settings->autoLabels = true;
-  settings->xLabels = (StringReference**)malloc(sizeof(StringReference) * 0.0);
-  settings->xLabelsLength = 0.0;
+  settings->xLabels = (StringReference**)malloc(sizeof(StringReference) * 0);
+  settings->xLabelsLength = 0;
   /*settings.autoLabels = false;
         settings.xLabels = new StringReference [5];
         settings.xLabels[0] = CreateStringReference("may 20".toCharArray());
@@ -1132,8 +1132,8 @@ BarPlotSeries *GetDefaultBarPlotSeriesSettings(){
 
   series = (BarPlotSeries *)malloc(sizeof(BarPlotSeries));
 
-  series->ys = (double*)malloc(sizeof(double) * (0.0));
-  series->ysLength = 0.0;
+  series->ys = (double*)malloc(sizeof(double) * (0));
+  series->ysLength = 0;
   series->color = GetBlack();
 
   return series;
@@ -1144,8 +1144,8 @@ RGBABitmapImage *DrawBarPlot(double width, double height, double *ys, size_t ysL
 
   settings = GetDefaultBarPlotSettings();
 
-  settings->barPlotSeries = (BarPlotSeries**)malloc(sizeof(BarPlotSeries) * 1.0);
-  settings->barPlotSeriesLength = 1.0;
+  settings->barPlotSeries = (BarPlotSeries**)malloc(sizeof(BarPlotSeries) * 1);
+  settings->barPlotSeriesLength = 1;
   settings->barPlotSeries[0] = GetDefaultBarPlotSeriesSettings();
   free(settings->barPlotSeries[0]->ys);
   settings->barPlotSeries[0]->ys = ys;
@@ -1270,8 +1270,8 @@ _Bool DrawBarPlotFromSettings(RGBABitmapImageReference *canvasReference, BarPlot
       if( !settings->grayscaleAutoColor ){
         colors = Get8HighContrastColors(&colorsLength);
       }else{
-        colors = (RGBA**)malloc(sizeof(RGBA) * ss);
-        colorsLength = ss;
+        colors = (RGBA**)malloc(sizeof(RGBA) * (size_t)ss);
+        colorsLength = (size_t)ss;
         if(ss > 1.0){
           for(i = 0.0; i < ss; i = i + 1.0){
             colors[(int)(i)] = GetGray(0.7 - (i/ss)*0.7);
@@ -1281,8 +1281,8 @@ _Bool DrawBarPlotFromSettings(RGBABitmapImageReference *canvasReference, BarPlot
         }
       }
     }else{
-      colors = (RGBA**)malloc(sizeof(RGBA) * 0.0);
-      colorsLength = 0.0;
+      colors = (RGBA**)malloc(sizeof(RGBA) * 0);
+      colorsLength = 0;
     }
 
     /* distances */
@@ -1381,7 +1381,7 @@ _Bool DrawBarPlotFromSettings(RGBABitmapImageReference *canvasReference, BarPlot
 _Bool BarPlotSettingsIsValid(BarPlotSettings *settings){
   _Bool success, lengthSet;
   BarPlotSeries *series;
-  double i, width, height, length;
+  double i, length;
 
   success = true;
 
@@ -1513,15 +1513,15 @@ double test(){
   gridlines = ComputeGridLinePositions(&gridlinesLength,  -z/2.0, z/2.0, labels, labelPriorities);
   AssertEquals(gridlinesLength, 21.0, failures);
 
-  xs = (double*)malloc(sizeof(double) * (5.0));
-  xsLength = 5.0;
+  xs = (double*)malloc(sizeof(double) * (5));
+  xsLength = 5;
   xs[0] =  -2.0;
   xs[1] =  -1.0;
   xs[2] = 0.0;
   xs[3] = 1.0;
   xs[4] = 2.0;
-  ys = (double*)malloc(sizeof(double) * (5.0));
-  ysLength = 5.0;
+  ys = (double*)malloc(sizeof(double) * (5));
+  ysLength = 5;
   ys[0] = 2.0;
   ys[1] =  -1.0;
   ys[2] =  -2.0;
@@ -1544,15 +1544,15 @@ void TestMapping(NumberReference *failures){
 
   series = GetDefaultScatterPlotSeriesSettings();
 
-  series->xs = (double*)malloc(sizeof(double) * (5.0));
-  series->xsLength = 5.0;
+  series->xs = (double*)malloc(sizeof(double) * (5));
+  series->xsLength = 5;
   series->xs[0] = -2.0;
   series->xs[1] = -1.0;
   series->xs[2] = 0.0;
   series->xs[3] = 1.0;
   series->xs[4] = 2.0;
-  series->ys = (double*)malloc(sizeof(double) * (5.0));
-  series->ysLength = 5.0;
+  series->ys = (double*)malloc(sizeof(double) * (5));
+  series->ysLength = 5;
   series->ys[0] = -2.0;
   series->ys[1] = -1.0;
   series->ys[2] = -2.0;
@@ -1575,8 +1575,8 @@ void TestMapping(NumberReference *failures){
   settings->xLabelLength = wcslen(settings->xLabel);
   settings->yLabel = L"Y axis";
   settings->yLabelLength = wcslen(settings->yLabel);
-  settings->scatterPlotSeries = (ScatterPlotSeries**)malloc(sizeof(ScatterPlotSeries) * 1.0);
-  settings->scatterPlotSeriesLength = 1.0;
+  settings->scatterPlotSeries = (ScatterPlotSeries**)malloc(sizeof(ScatterPlotSeries) * 1);
+  settings->scatterPlotSeriesLength = 1;
   settings->scatterPlotSeries[0] = series;
 
   imageReference = CreateRGBABitmapImageReference();
@@ -1605,14 +1605,14 @@ void TestMapping2(NumberReference *failures){
   yMin = 0.0;
   yMax = 1.0;
 
-  xs = (double*)malloc(sizeof(double) * (points));
-  xsLength = points;
-  ys = (double*)malloc(sizeof(double) * (points));
-  ysLength = points;
-  xs2 = (double*)malloc(sizeof(double) * (points));
-  xs2Length = points;
-  ys2 = (double*)malloc(sizeof(double) * (points));
-  ys2Length = points;
+  xs = (double*)malloc(sizeof(double) * (size_t)(points));
+  xsLength = (size_t)points;
+  ys = (double*)malloc(sizeof(double) * (size_t)(points));
+  ysLength = (size_t)points;
+  xs2 = (double*)malloc(sizeof(double) * (size_t)(points));
+  xs2Length = (size_t)points;
+  ys2 = (double*)malloc(sizeof(double) * (size_t)(points));
+  ys2Length = (size_t)points;
 
   for(i = 0.0; i < points; i = i + 1.0){
     x = xMin + (xMax - xMin)/(points - 1.0)*i;
@@ -1630,8 +1630,8 @@ void TestMapping2(NumberReference *failures){
 
   settings = GetDefaultScatterPlotSettings();
 
-  settings->scatterPlotSeries = (ScatterPlotSeries**)malloc(sizeof(ScatterPlotSeries) * 2.0);
-  settings->scatterPlotSeriesLength = 2.0;
+  settings->scatterPlotSeries = (ScatterPlotSeries**)malloc(sizeof(ScatterPlotSeries) * 2);
+  settings->scatterPlotSeriesLength = 2;
   settings->scatterPlotSeries[0] = (ScatterPlotSeries *)malloc(sizeof(ScatterPlotSeries));
   settings->scatterPlotSeries[0]->xs = xs;
   settings->scatterPlotSeries[0]->xsLength = xsLength;
@@ -1735,12 +1735,12 @@ RGBABitmapImage *CreateImage(double w, double h, RGBA *color){
   double i, j;
 
   image = (RGBABitmapImage *)malloc(sizeof(RGBABitmapImage));
-  image->x = (RGBABitmap**)malloc(sizeof(RGBABitmap) * w);
-  image->xLength = w;
+  image->x = (RGBABitmap**)malloc(sizeof(RGBABitmap) * (size_t)w);
+  image->xLength = (size_t)w;
   for(i = 0.0; i < w; i = i + 1.0){
     image->x[(int)(i)] = (RGBABitmap *)malloc(sizeof(RGBABitmap));
-    image->x[(int)(i)]->y = (RGBA**)malloc(sizeof(RGBA) * h);
-    image->x[(int)(i)]->yLength = h;
+    image->x[(int)(i)]->y = (RGBA**)malloc(sizeof(RGBA) * (size_t)h);
+    image->x[(int)(i)]->yLength = (size_t)h;
     for(j = 0.0; j < h; j = j + 1.0){
       image->x[(int)(i)]->y[(int)(j)] = (RGBA *)malloc(sizeof(RGBA));
       SetPixel(image, i, j, color);
@@ -2398,8 +2398,8 @@ _Bool *GetLinePattern5(size_t *returnArrayLength){
   _Bool *pattern;
   size_t patternLength;
 
-  pattern = (_Bool*)malloc(sizeof(_Bool) * (19.0));
-  patternLength = 19.0;
+  pattern = (_Bool*)malloc(sizeof(_Bool) * (19));
+  patternLength = 19;
 
   pattern[0] = true;
   pattern[1] = true;
@@ -2428,8 +2428,8 @@ _Bool *GetLinePattern4(size_t *returnArrayLength){
   _Bool *pattern;
   size_t patternLength;
 
-  pattern = (_Bool*)malloc(sizeof(_Bool) * (13.0));
-  patternLength = 13.0;
+  pattern = (_Bool*)malloc(sizeof(_Bool) * (13));
+  patternLength = 13;
 
   pattern[0] = true;
   pattern[1] = true;
@@ -2452,8 +2452,8 @@ _Bool *GetLinePattern3(size_t *returnArrayLength){
   _Bool *pattern;
   size_t patternLength;
 
-  pattern = (_Bool*)malloc(sizeof(_Bool) * (13.0));
-  patternLength = 13.0;
+  pattern = (_Bool*)malloc(sizeof(_Bool) * (13));
+  patternLength = 13;
 
   pattern[0] = true;
   pattern[1] = true;
@@ -2476,8 +2476,8 @@ _Bool *GetLinePattern2(size_t *returnArrayLength){
   _Bool *pattern;
   size_t patternLength;
 
-  pattern = (_Bool*)malloc(sizeof(_Bool) * (4.0));
-  patternLength = 4.0;
+  pattern = (_Bool*)malloc(sizeof(_Bool) * (4));
+  patternLength = 4;
 
   pattern[0] = true;
   pattern[1] = true;
@@ -2491,8 +2491,8 @@ _Bool *GetLinePattern1(size_t *returnArrayLength){
   _Bool *pattern;
   size_t patternLength;
 
-  pattern = (_Bool*)malloc(sizeof(_Bool) * (8.0));
-  patternLength = 8.0;
+  pattern = (_Bool*)malloc(sizeof(_Bool) * (8));
+  patternLength = 8;
 
   pattern[0] = true;
   pattern[1] = true;
@@ -2594,8 +2594,8 @@ wchar_t *CreateStringScientificNotationDecimalFromNumber(size_t *returnArrayLeng
 
   mantissaReference = (StringReference *)malloc(sizeof(StringReference));
   exponentReference = (StringReference *)malloc(sizeof(StringReference));
-  result = (wchar_t*)malloc(sizeof(wchar_t) * (0.0));
-  resultLength = 0.0;
+  result = (wchar_t*)malloc(sizeof(wchar_t) * (0));
+  resultLength = 0;
   done = false;
   exponent = 0.0;
 
@@ -2686,8 +2686,8 @@ _Bool CreateStringFromNumberWithCheck(double decimal, double base, StringReferen
     if(IsInteger(base)){
       success = true;
 
-      string = (wchar_t*)malloc(sizeof(wchar_t) * (0.0));
-      stringLength = 0.0;
+      string = (wchar_t*)malloc(sizeof(wchar_t) * (0));
+      stringLength = 0;
 
       maximumDigits = GetMaximumDigitsForBase(base);
 
@@ -2925,8 +2925,8 @@ _Bool ExtractPartsFromNumberStringFromSign(wchar_t *n, size_t nLength, double ba
   }
 
   if(count >= 1.0){
-    beforePoint->numberArray = (double*)malloc(sizeof(double) * (count));
-    beforePoint->numberArrayLength = count;
+    beforePoint->numberArray = (double*)malloc(sizeof(double) * (size_t)(count));
+    beforePoint->numberArrayLength = (size_t)count;
 
     for(j = 0.0; j < count; j = j + 1.0){
       beforePoint->numberArray[(int)(j)] = GetNumberFromNumberCharacterForBase(n[(int)(i + j)], base);
@@ -2937,10 +2937,10 @@ _Bool ExtractPartsFromNumberStringFromSign(wchar_t *n, size_t nLength, double ba
     if(i < nLength){
       success = ExtractPartsFromNumberStringFromPointOrExponent(n, nLength, base, i, afterPoint, exponentIsPositive, exponent, errorMessages);
     }else{
-      afterPoint->numberArray = (double*)malloc(sizeof(double) * (0.0));
-      afterPoint->numberArrayLength = 0.0;
-      exponent->numberArray = (double*)malloc(sizeof(double) * (0.0));
-      exponent->numberArrayLength = 0.0;
+      afterPoint->numberArray = (double*)malloc(sizeof(double) * (0));
+      afterPoint->numberArrayLength = 0;
+      exponent->numberArray = (double*)malloc(sizeof(double) * (0));
+      exponent->numberArrayLength = 0;
       success = true;
     }
   }else{
@@ -2970,8 +2970,8 @@ _Bool ExtractPartsFromNumberStringFromPointOrExponent(wchar_t *n, size_t nLength
       }
 
       if(count >= 1.0){
-        afterPoint->numberArray = (double*)malloc(sizeof(double) * (count));
-        afterPoint->numberArrayLength = count;
+        afterPoint->numberArray = (double*)malloc(sizeof(double) * (size_t)(count));
+        afterPoint->numberArrayLength = (size_t)count;
 
         for(j = 0.0; j < count; j = j + 1.0){
           afterPoint->numberArray[(int)(j)] = GetNumberFromNumberCharacterForBase(n[(int)(i + j)], base);
@@ -2982,8 +2982,8 @@ _Bool ExtractPartsFromNumberStringFromPointOrExponent(wchar_t *n, size_t nLength
         if(i < nLength){
           success = ExtractPartsFromNumberStringFromExponent(n, nLength, base, i, exponentIsPositive, exponent, errorMessages);
         }else{
-          exponent->numberArray = (double*)malloc(sizeof(double) * (0.0));
-          exponent->numberArrayLength = 0.0;
+          exponent->numberArray = (double*)malloc(sizeof(double) * (0));
+          exponent->numberArrayLength = 0;
           success = true;
         }
       }else{
@@ -2999,8 +2999,8 @@ _Bool ExtractPartsFromNumberStringFromPointOrExponent(wchar_t *n, size_t nLength
   }else if(base <= 14.0 && (n[(int)(i)] == 'e' || n[(int)(i)] == 'E')){
     if(i < nLength){
       success = ExtractPartsFromNumberStringFromExponent(n, nLength, base, i, exponentIsPositive, exponent, errorMessages);
-      afterPoint->numberArray = (double*)malloc(sizeof(double) * (0.0));
-      afterPoint->numberArrayLength = 0.0;
+      afterPoint->numberArray = (double*)malloc(sizeof(double) * (0));
+      afterPoint->numberArrayLength = 0;
     }else{
       success = false;
       errorMessages->string = L"There must be at least one digit after the exponent.";
@@ -3042,8 +3042,8 @@ _Bool ExtractPartsFromNumberStringFromExponent(wchar_t *n, size_t nLength, doubl
         }
 
         if(count >= 1.0){
-          exponent->numberArray = (double*)malloc(sizeof(double) * (count));
-          exponent->numberArrayLength = count;
+          exponent->numberArray = (double*)malloc(sizeof(double) * (size_t)(count));
+          exponent->numberArrayLength = (size_t)count;
 
           for(j = 0.0; j < count; j = j + 1.0){
             exponent->numberArray[(int)(j)] = GetNumberFromNumberCharacterForBase(n[(int)(i + j)], base);
@@ -3402,8 +3402,8 @@ double LanczosApproximation(double z){
   size_t pLength;
   double i, y, t, x;
 
-  p = (double*)malloc(sizeof(double) * (8.0));
-  pLength = 8.0;
+  p = (double*)malloc(sizeof(double) * (8));
+  pLength = 8;
   p[0] = 676.5203681218851;
   p[1] =  -1259.1392167224028;
   p[2] = 771.32342877765313;
@@ -3553,8 +3553,8 @@ double AkiyamaTanigawaAlgorithm(double n){
   double *A;
   size_t ALength;
 
-  A = (double*)malloc(sizeof(double) * (n + 1.0));
-  ALength = n + 1.0;
+  A = (double*)malloc(sizeof(double) * ((size_t)n + 1));
+  ALength = (size_t)n + 1;
 
   for(m = 0.0; m <= n; m = m + 1.0){
     A[(int)(m)] = 1.0/(m + 1.0);
@@ -3592,7 +3592,7 @@ wchar_t *aNumberArrayToString(size_t *returnArrayLength, double *array, size_t a
   stringLength = arrayLength;
 
   for(i = 0.0; i < arrayLength; i = i + 1.0){
-    string[(int)(i)] = array[(int)(i)];
+    string[(int)(i)] = (wchar_t)array[(int)(i)];
   }
   *returnArrayLength = stringLength;
   return string;
@@ -3773,8 +3773,8 @@ _Bool aCopyNumberArrayRange(double *a, size_t aLength, double from, double to, N
 
   if(from >= 0.0 && from <= aLength && to >= 0.0 && to <= aLength && from <= to){
     length = to - from;
-    n = (double*)malloc(sizeof(double) * (length));
-    nLength = length;
+    n = (double*)malloc(sizeof(double) * (size_t)(length));
+    nLength = (size_t)length;
 
     for(i = 0.0; i < length; i = i + 1.0){
       n[(int)(i)] = a[(int)(from + i)];
@@ -3797,8 +3797,8 @@ _Bool aCopyBooleanArrayRange(_Bool *a, size_t aLength, double from, double to, B
 
   if(from >= 0.0 && from <= aLength && to >= 0.0 && to <= aLength && from <= to){
     length = to - from;
-    n = (_Bool*)malloc(sizeof(_Bool) * (length));
-    nLength = length;
+    n = (_Bool*)malloc(sizeof(_Bool) * (size_t)(length));
+    nLength = (size_t)length;
 
     for(i = 0.0; i < length; i = i + 1.0){
       n[(int)(i)] = a[(int)(from + i)];
@@ -3821,8 +3821,8 @@ _Bool aCopyStringRange(wchar_t *a, size_t aLength, double from, double to, Strin
 
   if(from >= 0.0 && from <= aLength && to >= 0.0 && to <= aLength && from <= to){
     length = to - from;
-    n = (wchar_t*)malloc(sizeof(wchar_t) * (length));
-    nLength = length;
+    n = (wchar_t*)malloc(sizeof(wchar_t) * (size_t)(length));
+    nLength = (size_t)length;
 
     for(i = 0.0; i < length; i = i + 1.0){
       n[(int)(i)] = a[(int)(from + i)];
@@ -3844,8 +3844,8 @@ double *aCreateNumberArray(size_t *returnArrayLength, double length, double valu
   double *array;
   size_t arrayLength;
 
-  array = (double*)malloc(sizeof(double) * (length));
-  arrayLength = length;
+  array = (double*)malloc(sizeof(double) * (size_t)(length));
+  arrayLength = (size_t)length;
   aFillNumberArray(array, arrayLength, value);
 
   *returnArrayLength = arrayLength;
@@ -3855,8 +3855,8 @@ _Bool *aCreateBooleanArray(size_t *returnArrayLength, double length, _Bool value
   _Bool *array;
   size_t arrayLength;
 
-  array = (_Bool*)malloc(sizeof(_Bool) * (length));
-  arrayLength = length;
+  array = (_Bool*)malloc(sizeof(_Bool) * (size_t)(length));
+  arrayLength = (size_t)length;
   aFillBooleanArray(array, arrayLength, value);
 
   *returnArrayLength = arrayLength;
@@ -3866,8 +3866,8 @@ wchar_t *aCreateString(size_t *returnArrayLength, double length, wchar_t value){
   wchar_t *array;
   size_t arrayLength;
 
-  array = (wchar_t*)malloc(sizeof(wchar_t) * (length));
-  arrayLength = length;
+  array = (wchar_t*)malloc(sizeof(wchar_t) * (size_t)(length));
+  arrayLength = (size_t)length;
   aFillString(array, arrayLength, value);
 
   *returnArrayLength = arrayLength;
@@ -3916,8 +3916,8 @@ BooleanArrayReference *CreateBooleanArrayReferenceLengthValue(double length, _Bo
   double i;
 
   ref = (BooleanArrayReference *)malloc(sizeof(BooleanArrayReference));
-  ref->booleanArray = (_Bool*)malloc(sizeof(_Bool) * (length));
-  ref->booleanArrayLength = length;
+  ref->booleanArray = (_Bool*)malloc(sizeof(_Bool) * (size_t)(length));
+  ref->booleanArrayLength = (size_t)length;
 
   for(i = 0.0; i < length; i = i + 1.0){
     ref->booleanArray[(int)(i)] = value;
@@ -3959,8 +3959,8 @@ NumberArrayReference *CreateNumberArrayReferenceLengthValue(double length, doubl
   double i;
 
   ref = (NumberArrayReference *)malloc(sizeof(NumberArrayReference));
-  ref->numberArray = (double*)malloc(sizeof(double) * (length));
-  ref->numberArrayLength = length;
+  ref->numberArray = (double*)malloc(sizeof(double) * (size_t)(length));
+  ref->numberArrayLength = (size_t)length;
 
   for(i = 0.0; i < length; i = i + 1.0){
     ref->numberArray[(int)(i)] = value;
@@ -3986,8 +3986,8 @@ StringReference *CreateStringReferenceLengthValue(double length, wchar_t value){
   double i;
 
   ref = (StringReference *)malloc(sizeof(StringReference));
-  ref->string = (wchar_t*)malloc(sizeof(wchar_t) * (length));
-  ref->stringLength = length;
+  ref->string = (wchar_t*)malloc(sizeof(wchar_t) * (size_t)(length));
+  ref->stringLength = (size_t)length;
 
   for(i = 0.0; i < length; i = i + 1.0){
     ref->string[(int)(i)] = value;
@@ -4013,8 +4013,8 @@ StringArrayReference *CreateStringArrayReferenceLengthValue(double length, wchar
   double i;
 
   ref = (StringArrayReference *)malloc(sizeof(StringArrayReference));
-  ref->stringArray = (StringReference**)malloc(sizeof(StringReference) * length);
-  ref->stringArrayLength = length;
+  ref->stringArray = (StringReference**)malloc(sizeof(StringReference) * (size_t)length);
+  ref->stringArrayLength = (size_t)length;
 
   for(i = 0.0; i < length; i = i + 1.0){
     ref->stringArray[(int)(i)] = CreateStringReference(value, valueLength);
@@ -4032,8 +4032,8 @@ void FreeStringArrayReference(StringArrayReference *stringArrayReference){
   free(stringArrayReference);
 }
 wchar_t *DigitDataBase16(size_t *returnArrayLength){
-  *returnArrayLength = wcslen(L"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe891412108153069c4ffffffffffffffffffffffffffffffffffffffff9409000000000000000049e7ffffffffffffffffffffffffffffffffff61000000000000000000000017ddffffffffffffffffffffffffffffff840000000573d3f5e5a62b00000028f0ffffffffffffffffffffffffffda04000008bcfffffffffff44200000073ffffffffffffffffffffffffff5700000088ffffffffffffffe812000008e3ffffffffffffffffffffffea02000015f9ffffffffffffffff8100000080ffffffffffffffffffffff9c00000072ffffffffffffffffffe40100002fffffffffffffffffffffff51000000b8ffffffffffffffffffff2a000000e2ffffffffffffffffffff21000001f0ffffffffffffffffffff65000000b3fffffffffffffffffff602000018ffffffffffffffffffffff8b0000008affffffffffffffffffd200000036ffffffffffffffffffffffa900000063ffffffffffffffffffc00000004effffffffffffffffffffffc100000052ffffffffffffffffffb500000057ffffffffffffffffffffffc900000046ffffffffffffffffffa90000005fffffffffffffffffffffffd20000003affffffffffffffffffa900000060ffffffffffffffffffffffd30000003affffffffffffffffffb400000057ffffffffffffffffffffffca00000046ffffffffffffffffffc00000004effffffffffffffffffffffc100000052ffffffffffffffffffd100000037ffffffffffffffffffffffa900000063fffffffffffffffffff602000019ffffffffffffffffffffff8b00000089ffffffffffffffffffff21000001f1ffffffffffffffffffff66000000b3ffffffffffffffffffff50000000b8ffffffffffffffffffff2a000000e1ffffffffffffffffffff9c00000073ffffffffffffffffffe40100002fffffffffffffffffffffffea02000015f9ffffffffffffffff8200000080ffffffffffffffffffffffff5700000088ffffffffffffffe812000008e2ffffffffffffffffffffffffda04000008bcfffffffffff44300000073ffffffffffffffffffffffffffff830000000674d3f6e6a72b00000028f0ffffffffffffffffffffffffffffff60000000000000000000000016ddfffffffffffffffffffffffffffffffffe9309000000000000000048e6ffffffffffffffffffffffffffffffffffffffe88f3f1f07132e68c3fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9d7b28e69441f02000000afffffffffffffffffffffffffffffffffffff6300000000000000000000afffffffffffffffffffffffffffffffffffff6300000000000000000000afffffffffffffffffffffffffffffffffffff6a274c7095b9de64000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000affffffffffffffffffffffffffffffffffffff7000000000000000000000000000000003bfffffffffffffffffffffffff7000000000000000000000000000000003bfffffffffffffffffffffffff7000000000000000000000000000000003bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd48b56271005142a5ea0f6ffffffffffffffffffffffffffffffffdb7c20000000000000000000001392feffffffffffffffffffffffffffff1f00000000000000000000000000004cf9ffffffffffffffffffffffffff1f0000003784c7e7f9e8b1480000000056ffffffffffffffffffffffffff1f015accffffffffffffffff9701000000b0ffffffffffffffffffffffff58caffffffffffffffffffffff770000003cfffffffffffffffffffffffffffffffffffffffffffffffffff107000002edffffffffffffffffffffffffffffffffffffffffffffffffff3a000000ccffffffffffffffffffffffffffffffffffffffffffffffffff4c000000baffffffffffffffffffffffffffffffffffffffffffffffffff32000000cbffffffffffffffffffffffffffffffffffffffffffffffffec05000002edffffffffffffffffffffffffffffffffffffffffffffffff8d00000039ffffffffffffffffffffffffffffffffffffffffffffffffeb140000009affffffffffffffffffffffffffffffffffffffffffffffff520000002afbffffffffffffffffffffffffffffffffffffffffffffff8c00000003c7ffffffffffffffffffffffffffffffffffffffffffffffb30300000085ffffffffffffffffffffffffffffffffffffffffffffffc50a0000005dfeffffffffffffffffffffffffffffffffffffffffffffd2110000004efbffffffffffffffffffffffffffffffffffffffffffffdb1800000042f8ffffffffffffffffffffffffffffffffffffffffffffe21f00000039f3ffffffffffffffffffffffffffffffffffffffffffffe92600000030efffffffffffffffffffffffffffffffffffffffffffffee2e00000029eafffffffffffffffffffffffffffffffffffffffffffff33700000022e5fffffffffffffffffffffffffffffffffffffffffffff7410000001cdffffffffffffffffffffffffffffffffffffffffffffffb4c00000017d9fffffffffffffffffffffffffffffffffffffffffffffd5900000012d2ffffffffffffffffffffffffffffffffffffffffffffff680000000ecbffffffffffffffffffffffffffffffffffffffffffffffef0000000000000000000000000000000000008bffffffffffffffffffffef0000000000000000000000000000000000008bffffffffffffffffffffef0000000000000000000000000000000000008bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe2af8058392817060a1a3f74c8ffffffffffffffffffffffffffffffffeb0000000000000000000000000036cfffffffffffffffffffffffffffffeb000000000000000000000000000004a7ffffffffffffffffffffffffffeb00000f5a9dd0edfbf0ca841900000003c2ffffffffffffffffffffffffec3da8f9fffffffffffffffff0410000002bffffffffffffffffffffffffffffffffffffffffffffffffffee12000000cbffffffffffffffffffffffffffffffffffffffffffffffffff6900000090ffffffffffffffffffffffffffffffffffffffffffffffffff9600000078ffffffffffffffffffffffffffffffffffffffffffffffffff9a0000007effffffffffffffffffffffffffffffffffffffffffffffffff73000000a5fffffffffffffffffffffffffffffffffffffffffffffffff51b000009edfffffffffffffffffffffffffffffffffffffffffffffff7540000007efffffffffffffffffffffffffffffffffffffffffff3d3912400000055fcffffffffffffffffffffffffffffffffff1700000000000000001692feffffffffffffffffffffffffffffffffffff17000000000000002db8feffffffffffffffffffffffffffffffffffffff170000000000000000002bc3fffffffffffffffffffffffffffffffffffffffffffdf0cf922e00000003a5fffffffffffffffffffffffffffffffffffffffffffffffffd8700000007d1ffffffffffffffffffffffffffffffffffffffffffffffffff780000004ffffffffffffffffffffffffffffffffffffffffffffffffffff308000006f6ffffffffffffffffffffffffffffffffffffffffffffffffff3c000000d0ffffffffffffffffffffffffffffffffffffffffffffffffff4d000000c6ffffffffffffffffffffffffffffffffffffffffffffffffff35000000ddffffffffffffffffffffffffffffffffffffffffffffffffea0300000bf9ffffffffffffffffffffffffffffffffffffffffffffffff6200000054ffffffffffffffffffffff47bafefffffffffffffffffff56b00000002cbffffffffffffffffffffff0b001e71a9d7edfbf6e4ba771a000000007cffffffffffffffffffffffff0b0000000000000000000000000000017dffffffffffffffffffffffffff0b000000000000000000000000003cc8ffffffffffffffffffffffffffffe9b989593827160608162a5689dbffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbd0100000000f3fffffffffffffffffffffffffffffffffffffffffffff3200000000000f3ffffffffffffffffffffffffffffffffffffffffffff69000000000000f3ffffffffffffffffffffffffffffffffffffffffffbf01000b0e000000f3fffffffffffffffffffffffffffffffffffffffff42100008e1f000000f3ffffffffffffffffffffffffffffffffffffffff6a000035fc1f000000f3ffffffffffffffffffffffffffffffffffffffc0010004d1ff1f000000f3fffffffffffffffffffffffffffffffffffff42200007affff1f000000f3ffffffffffffffffffffffffffffffffffff6c000026f7ffff1f000000f3ffffffffffffffffffffffffffffffffffc1010001c1ffffff1f000000f3fffffffffffffffffffffffffffffffff523000066ffffffff1f000000f3ffffffffffffffffffffffffffffffff6d000019f0ffffffff1f000000f3ffffffffffffffffffffffffffffffc2010000aeffffffffff1f000000f3fffffffffffffffffffffffffffff524000052ffffffffffff1f000000f3ffffffffffffffffffffffffffff6e00000fe6ffffffffffff1f000000f3ffffffffffffffffffffffffffc30200009affffffffffffff1f000000f3fffffffffffffffffffffffff62400003ffeffffffffffffff1f000000f3ffffffffffffffffffffffff70000008daffffffffffffffff1f000000f3fffffffffffffffffffffff602000086ffffffffffffffffff1f000000f3fffffffffffffffffffffff3000000000000000000000000000000000000000000cbfffffffffffffff3000000000000000000000000000000000000000000cbfffffffffffffff3000000000000000000000000000000000000000000cbffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000000000000000000000000002fffffffffffffffffffffffffffff4f00000000000000000000000000002fffffffffffffffffffffffffffff4f00000000000000000000000000002fffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f000008672f120514275997efffffffffffffffffffffffffffffffffff4f00000000000000000000000b73f6ffffffffffffffffffffffffffffff4f000000000000000000000000002bdeffffffffffffffffffffffffffff60538cbad2e7faf0d599370000000025ebffffffffffffffffffffffffffffffffffffffffffffffffa0090000005bffffffffffffffffffffffffffffffffffffffffffffffffffb100000001d2ffffffffffffffffffffffffffffffffffffffffffffffffff560000007effffffffffffffffffffffffffffffffffffffffffffffffffb80000003dffffffffffffffffffffffffffffffffffffffffffffffffffec00000022fffffffffffffffffffffffffffffffffffffffffffffffffffd00000011ffffffffffffffffffffffffffffffffffffffffffffffffffec00000022ffffffffffffffffffffffffffffffffffffffffffffffffffb80000003cffffffffffffffffffffffffffffffffffffffffffffffffff580000007dffffffffffffffffffffffffffffffffffffffffffffffffb301000000cfffffffffffffffffffffff4cb1fdffffffffffffffffffa40a00000058ffffffffffffffffffffffff17001a6ea9d7eefbf2d69b380000000024e8ffffffffffffffffffffffff1700000000000000000000000000002de0ffffffffffffffffffffffffff17000000000000000000000000127ef9ffffffffffffffffffffffffffffebba8a59372615050a1a3569a6f7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffca753915050d233866a3e0ffffffffffffffffffffffffffffffffffd13f0000000000000000000000f7ffffffffffffffffffffffffffffff9d07000000000000000000000000f7ffffffffffffffffffffffffffff9700000000469fdbf3f5da9e490100f7ffffffffffffffffffffffffffca0300000eb3ffffffffffffffffd84df8fffffffffffffffffffffffffa2d000007c8ffffffffffffffffffffffffffffffffffffffffffffffff9100000081ffffffffffffffffffffffffffffffffffffffffffffffffff28000010f6ffffffffffffffffffffffffffffffffffffffffffffffffc20000006affffffffffffffffffffffffffffffffffffffffffffffffff79000000b2ffffffffffffffffffffffffffffffffffffffffffffffffff43000000ebffeb903d1a0616306fc0ffffffffffffffffffffffffffffff0f000015ffa211000000000000000041dcfffffffffffffffffffffffff30000003087000000000000000000000013c6ffffffffffffffffffffffe30000000f00000055beeef7d8881000000017e6ffffffffffffffffffffd30000000000019dffffffffffffe12200000056ffffffffffffffffffffd100000000006effffffffffffffffce04000002dbffffffffffffffffffdd0000000006eaffffffffffffffffff550000008bffffffffffffffffffe90000000043ffffffffffffffffffffa90000004dfffffffffffffffffff80200000074ffffffffffffffffffffdb0000002cffffffffffffffffffff2200000088ffffffffffffffffffffef00000019ffffffffffffffffffff4d00000088ffffffffffffffffffffee0000001affffffffffffffffffff7e00000074ffffffffffffffffffffdb0000002dffffffffffffffffffffcd00000042ffffffffffffffffffffa900000052ffffffffffffffffffffff21000005e9ffffffffffffffffff5400000093ffffffffffffffffffffff8f0000006dffffffffffffffffcd04000007e6fffffffffffffffffffffff9220000019effffffffffffe1230000006cffffffffffffffffffffffffffc00600000056beeff8d888110000002af3ffffffffffffffffffffffffffffa603000000000000000000000026ddffffffffffffffffffffffffffffffffc8280000000000000000025deffffffffffffffffffffffffffffffffffffffab25a2a1106193b7ed7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff47000000000000000000000000000000000000f7ffffffffffffffffffff47000000000000000000000000000000000003faffffffffffffffffffff4700000000000000000000000000000000004afffffffffffffffffffffffffffffffffffffffffffffffffc1a000000adffffffffffffffffffffffffffffffffffffffffffffffffb300000015faffffffffffffffffffffffffffffffffffffffffffffffff5100000073ffffffffffffffffffffffffffffffffffffffffffffffffea05000000d6ffffffffffffffffffffffffffffffffffffffffffffffff8d00000039ffffffffffffffffffffffffffffffffffffffffffffffffff2c0000009dffffffffffffffffffffffffffffffffffffffffffffffffc90000000cf3ffffffffffffffffffffffffffffffffffffffffffffffff6700000063fffffffffffffffffffffffffffffffffffffffffffffffff60f000000c6ffffffffffffffffffffffffffffffffffffffffffffffffa300000029ffffffffffffffffffffffffffffffffffffffffffffffffff410000008cffffffffffffffffffffffffffffffffffffffffffffffffdf01000005e9ffffffffffffffffffffffffffffffffffffffffffffffff7d00000052fffffffffffffffffffffffffffffffffffffffffffffffffd1e000000b5ffffffffffffffffffffffffffffffffffffffffffffffffb90000001bfcffffffffffffffffffffffffffffffffffffffffffffffff570000007bffffffffffffffffffffffffffffffffffffffffffffffffee07000001ddffffffffffffffffffffffffffffffffffffffffffffffff9300000042ffffffffffffffffffffffffffffffffffffffffffffffffff31000000a5ffffffffffffffffffffffffffffffffffffffffffffffffd000000010f7ffffffffffffffffffffffffffffffffffffffffffffffff6d0000006bfffffffffffffffffffffffffffffffffffffffffffffffff913000000ceffffffffffffffffffffffffffffffffffffffffffffffffa900000031ffffffffffffffffffffffffffffffffffffffffffffffffff4700000094ffffffffffffffffffffffffffffffffffffffffffffffffe302000008eeffffffffffffffffffffffffffffffffffffffffffffffff840000005afffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9a8602c13050c1d4882dfffffffffffffffffffffffffffffffffffffa918000000000000000000025eeeffffffffffffffffffffffffffffff780000000000000000000000000023e5ffffffffffffffffffffffffff9f0000000037a8e4faf1c66d0500000033fdfffffffffffffffffffffff81600000065fdffffffffffffc40a0000009fffffffffffffffffffffffb600000021faffffffffffffffff8d00000047ffffffffffffffffffffff820000007bffffffffffffffffffeb01000014ffffffffffffffffffffff6d000000a2ffffffffffffffffffff15000001fdffffffffffffffffffff76000000a2ffffffffffffffffffff14000007ffffffffffffffffffffffa10000007bffffffffffffffffffec01000033ffffffffffffffffffffffec08000022fbffffffffffffffff8e00000087ffffffffffffffffffffffff7d00000068fdffffffffffffc70b00001ef2fffffffffffffffffffffffffb5500000039aae5fbf2c87006000013d0fffffffffffffffffffffffffffffe93160000000000000000000153e3ffffffffffffffffffffffffffffffffffbd2e000000000000000780f0ffffffffffffffffffffffffffffffffce3500000000000000000000000e87fcffffffffffffffffffffffffffb3060000004fb2e6faf0cd82150000004ffaffffffffffffffffffffffda0b000004a9ffffffffffffffe93600000076ffffffffffffffffffffff5600000084ffffffffffffffffffe80e000005e2fffffffffffffffffff606000008f4ffffffffffffffffffff6f0000008dffffffffffffffffffcb00000039ffffffffffffffffffffffac0000005cffffffffffffffffffbc0000004affffffffffffffffffffffbe0000004dffffffffffffffffffcc00000039ffffffffffffffffffffffac0000005effffffffffffffffffea00000008f4ffffffffffffffffffff6e0000007cffffffffffffffffffff2f00000085ffffffffffffffffffe70d000000c1ffffffffffffffffffff9300000004a9ffffffffffffffe83400000028fcfffffffffffffffffffffa2d0000000050b2e7fbf2cd821400000002b8ffffffffffffffffffffffffe523000000000000000000000000000299fffffffffffffffffffffffffffff16605000000000000000000002cc5ffffffffffffffffffffffffffffffffffe88e542512040b1b3d72c1fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8a259251008203f8be2ffffffffffffffffffffffffffffffffffffffa91d0000000000000000047ffaffffffffffffffffffffffffffffffff7b00000000000000000000000040f8ffffffffffffffffffffffffffff94000000004db9ecf7da8b1300000057ffffffffffffffffffffffffffdc050000008fffffffffffffe527000000acffffffffffffffffffffffff630000005fffffffffffffffffd406000025fbfffffffffffffffffffffb0c000002e0ffffffffffffffffff5f000000b2ffffffffffffffffffffc600000036ffffffffffffffffffffb50000005fffffffffffffffffffffa000000068ffffffffffffffffffffe700000011feffffffffffffffffff8d0000007cfffffffffffffffffffffb00000000dfffffffffffffffffff8c0000007cfffffffffffffffffffffb00000000b4ffffffffffffffffff9e00000069ffffffffffffffffffffe7000000008dffffffffffffffffffbe00000038ffffffffffffffffffffb6000000007bfffffffffffffffffff606000003e2ffffffffffffffffff62000000006fffffffffffffffffffff4f00000064ffffffffffffffffd8080000000062ffffffffffffffffffffc50000000096ffffffffffffe82b000000000064ffffffffffffffffffffff6c0000000051bbeff8dc8e1500001000000074fffffffffffffffffffffff94f0000000000000000000000288c00000084fffffffffffffffffffffffffd810b000000000000000052ea830000009fffffffffffffffffffffffffffffea8d471d090d2864c1ffff5b000000d4ffffffffffffffffffffffffffffffffffffffffffffffffff2100000dfdffffffffffffffffffffffffffffffffffffffffffffffffd900000052ffffffffffffffffffffffffffffffffffffffffffffffffff75000000b8ffffffffffffffffffffffffffffffffffffffffffffffffe30d000023fefffffffffffffffffffffffffffffffffffffffffffffff945000000b7ffffffffffffffffffffffffff7fa2fdffffffffffffffe8480000005effffffffffffffffffffffffffff63002080c4ecfae7c0740e00000034f4ffffffffffffffffffffffffffff6300000000000000000000000043f0ffffffffffffffffffffffffffffff6300000000000000000000118efdfffffffffffffffffffffffffffffffff4bb7f462b15040b25569ff4ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-  return L"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe891412108153069c4ffffffffffffffffffffffffffffffffffffffff9409000000000000000049e7ffffffffffffffffffffffffffffffffff61000000000000000000000017ddffffffffffffffffffffffffffffff840000000573d3f5e5a62b00000028f0ffffffffffffffffffffffffffda04000008bcfffffffffff44200000073ffffffffffffffffffffffffff5700000088ffffffffffffffe812000008e3ffffffffffffffffffffffea02000015f9ffffffffffffffff8100000080ffffffffffffffffffffff9c00000072ffffffffffffffffffe40100002fffffffffffffffffffffff51000000b8ffffffffffffffffffff2a000000e2ffffffffffffffffffff21000001f0ffffffffffffffffffff65000000b3fffffffffffffffffff602000018ffffffffffffffffffffff8b0000008affffffffffffffffffd200000036ffffffffffffffffffffffa900000063ffffffffffffffffffc00000004effffffffffffffffffffffc100000052ffffffffffffffffffb500000057ffffffffffffffffffffffc900000046ffffffffffffffffffa90000005fffffffffffffffffffffffd20000003affffffffffffffffffa900000060ffffffffffffffffffffffd30000003affffffffffffffffffb400000057ffffffffffffffffffffffca00000046ffffffffffffffffffc00000004effffffffffffffffffffffc100000052ffffffffffffffffffd100000037ffffffffffffffffffffffa900000063fffffffffffffffffff602000019ffffffffffffffffffffff8b00000089ffffffffffffffffffff21000001f1ffffffffffffffffffff66000000b3ffffffffffffffffffff50000000b8ffffffffffffffffffff2a000000e1ffffffffffffffffffff9c00000073ffffffffffffffffffe40100002fffffffffffffffffffffffea02000015f9ffffffffffffffff8200000080ffffffffffffffffffffffff5700000088ffffffffffffffe812000008e2ffffffffffffffffffffffffda04000008bcfffffffffff44300000073ffffffffffffffffffffffffffff830000000674d3f6e6a72b00000028f0ffffffffffffffffffffffffffffff60000000000000000000000016ddfffffffffffffffffffffffffffffffffe9309000000000000000048e6ffffffffffffffffffffffffffffffffffffffe88f3f1f07132e68c3fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9d7b28e69441f02000000afffffffffffffffffffffffffffffffffffff6300000000000000000000afffffffffffffffffffffffffffffffffffff6300000000000000000000afffffffffffffffffffffffffffffffffffff6a274c7095b9de64000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000affffffffffffffffffffffffffffffffffffff7000000000000000000000000000000003bfffffffffffffffffffffffff7000000000000000000000000000000003bfffffffffffffffffffffffff7000000000000000000000000000000003bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd48b56271005142a5ea0f6ffffffffffffffffffffffffffffffffdb7c20000000000000000000001392feffffffffffffffffffffffffffff1f00000000000000000000000000004cf9ffffffffffffffffffffffffff1f0000003784c7e7f9e8b1480000000056ffffffffffffffffffffffffff1f015accffffffffffffffff9701000000b0ffffffffffffffffffffffff58caffffffffffffffffffffff770000003cfffffffffffffffffffffffffffffffffffffffffffffffffff107000002edffffffffffffffffffffffffffffffffffffffffffffffffff3a000000ccffffffffffffffffffffffffffffffffffffffffffffffffff4c000000baffffffffffffffffffffffffffffffffffffffffffffffffff32000000cbffffffffffffffffffffffffffffffffffffffffffffffffec05000002edffffffffffffffffffffffffffffffffffffffffffffffff8d00000039ffffffffffffffffffffffffffffffffffffffffffffffffeb140000009affffffffffffffffffffffffffffffffffffffffffffffff520000002afbffffffffffffffffffffffffffffffffffffffffffffff8c00000003c7ffffffffffffffffffffffffffffffffffffffffffffffb30300000085ffffffffffffffffffffffffffffffffffffffffffffffc50a0000005dfeffffffffffffffffffffffffffffffffffffffffffffd2110000004efbffffffffffffffffffffffffffffffffffffffffffffdb1800000042f8ffffffffffffffffffffffffffffffffffffffffffffe21f00000039f3ffffffffffffffffffffffffffffffffffffffffffffe92600000030efffffffffffffffffffffffffffffffffffffffffffffee2e00000029eafffffffffffffffffffffffffffffffffffffffffffff33700000022e5fffffffffffffffffffffffffffffffffffffffffffff7410000001cdffffffffffffffffffffffffffffffffffffffffffffffb4c00000017d9fffffffffffffffffffffffffffffffffffffffffffffd5900000012d2ffffffffffffffffffffffffffffffffffffffffffffff680000000ecbffffffffffffffffffffffffffffffffffffffffffffffef0000000000000000000000000000000000008bffffffffffffffffffffef0000000000000000000000000000000000008bffffffffffffffffffffef0000000000000000000000000000000000008bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe2af8058392817060a1a3f74c8ffffffffffffffffffffffffffffffffeb0000000000000000000000000036cfffffffffffffffffffffffffffffeb000000000000000000000000000004a7ffffffffffffffffffffffffffeb00000f5a9dd0edfbf0ca841900000003c2ffffffffffffffffffffffffec3da8f9fffffffffffffffff0410000002bffffffffffffffffffffffffffffffffffffffffffffffffffee12000000cbffffffffffffffffffffffffffffffffffffffffffffffffff6900000090ffffffffffffffffffffffffffffffffffffffffffffffffff9600000078ffffffffffffffffffffffffffffffffffffffffffffffffff9a0000007effffffffffffffffffffffffffffffffffffffffffffffffff73000000a5fffffffffffffffffffffffffffffffffffffffffffffffff51b000009edfffffffffffffffffffffffffffffffffffffffffffffff7540000007efffffffffffffffffffffffffffffffffffffffffff3d3912400000055fcffffffffffffffffffffffffffffffffff1700000000000000001692feffffffffffffffffffffffffffffffffffff17000000000000002db8feffffffffffffffffffffffffffffffffffffff170000000000000000002bc3fffffffffffffffffffffffffffffffffffffffffffdf0cf922e00000003a5fffffffffffffffffffffffffffffffffffffffffffffffffd8700000007d1ffffffffffffffffffffffffffffffffffffffffffffffffff780000004ffffffffffffffffffffffffffffffffffffffffffffffffffff308000006f6ffffffffffffffffffffffffffffffffffffffffffffffffff3c000000d0ffffffffffffffffffffffffffffffffffffffffffffffffff4d000000c6ffffffffffffffffffffffffffffffffffffffffffffffffff35000000ddffffffffffffffffffffffffffffffffffffffffffffffffea0300000bf9ffffffffffffffffffffffffffffffffffffffffffffffff6200000054ffffffffffffffffffffff47bafefffffffffffffffffff56b00000002cbffffffffffffffffffffff0b001e71a9d7edfbf6e4ba771a000000007cffffffffffffffffffffffff0b0000000000000000000000000000017dffffffffffffffffffffffffff0b000000000000000000000000003cc8ffffffffffffffffffffffffffffe9b989593827160608162a5689dbffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbd0100000000f3fffffffffffffffffffffffffffffffffffffffffffff3200000000000f3ffffffffffffffffffffffffffffffffffffffffffff69000000000000f3ffffffffffffffffffffffffffffffffffffffffffbf01000b0e000000f3fffffffffffffffffffffffffffffffffffffffff42100008e1f000000f3ffffffffffffffffffffffffffffffffffffffff6a000035fc1f000000f3ffffffffffffffffffffffffffffffffffffffc0010004d1ff1f000000f3fffffffffffffffffffffffffffffffffffff42200007affff1f000000f3ffffffffffffffffffffffffffffffffffff6c000026f7ffff1f000000f3ffffffffffffffffffffffffffffffffffc1010001c1ffffff1f000000f3fffffffffffffffffffffffffffffffff523000066ffffffff1f000000f3ffffffffffffffffffffffffffffffff6d000019f0ffffffff1f000000f3ffffffffffffffffffffffffffffffc2010000aeffffffffff1f000000f3fffffffffffffffffffffffffffff524000052ffffffffffff1f000000f3ffffffffffffffffffffffffffff6e00000fe6ffffffffffff1f000000f3ffffffffffffffffffffffffffc30200009affffffffffffff1f000000f3fffffffffffffffffffffffff62400003ffeffffffffffffff1f000000f3ffffffffffffffffffffffff70000008daffffffffffffffff1f000000f3fffffffffffffffffffffff602000086ffffffffffffffffff1f000000f3fffffffffffffffffffffff3000000000000000000000000000000000000000000cbfffffffffffffff3000000000000000000000000000000000000000000cbfffffffffffffff3000000000000000000000000000000000000000000cbffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000000000000000000000000002fffffffffffffffffffffffffffff4f00000000000000000000000000002fffffffffffffffffffffffffffff4f00000000000000000000000000002fffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f000008672f120514275997efffffffffffffffffffffffffffffffffff4f00000000000000000000000b73f6ffffffffffffffffffffffffffffff4f000000000000000000000000002bdeffffffffffffffffffffffffffff60538cbad2e7faf0d599370000000025ebffffffffffffffffffffffffffffffffffffffffffffffffa0090000005bffffffffffffffffffffffffffffffffffffffffffffffffffb100000001d2ffffffffffffffffffffffffffffffffffffffffffffffffff560000007effffffffffffffffffffffffffffffffffffffffffffffffffb80000003dffffffffffffffffffffffffffffffffffffffffffffffffffec00000022fffffffffffffffffffffffffffffffffffffffffffffffffffd00000011ffffffffffffffffffffffffffffffffffffffffffffffffffec00000022ffffffffffffffffffffffffffffffffffffffffffffffffffb80000003cffffffffffffffffffffffffffffffffffffffffffffffffff580000007dffffffffffffffffffffffffffffffffffffffffffffffffb301000000cfffffffffffffffffffffff4cb1fdffffffffffffffffffa40a00000058ffffffffffffffffffffffff17001a6ea9d7eefbf2d69b380000000024e8ffffffffffffffffffffffff1700000000000000000000000000002de0ffffffffffffffffffffffffff17000000000000000000000000127ef9ffffffffffffffffffffffffffffebba8a59372615050a1a3569a6f7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffca753915050d233866a3e0ffffffffffffffffffffffffffffffffffd13f0000000000000000000000f7ffffffffffffffffffffffffffffff9d07000000000000000000000000f7ffffffffffffffffffffffffffff9700000000469fdbf3f5da9e490100f7ffffffffffffffffffffffffffca0300000eb3ffffffffffffffffd84df8fffffffffffffffffffffffffa2d000007c8ffffffffffffffffffffffffffffffffffffffffffffffff9100000081ffffffffffffffffffffffffffffffffffffffffffffffffff28000010f6ffffffffffffffffffffffffffffffffffffffffffffffffc20000006affffffffffffffffffffffffffffffffffffffffffffffffff79000000b2ffffffffffffffffffffffffffffffffffffffffffffffffff43000000ebffeb903d1a0616306fc0ffffffffffffffffffffffffffffff0f000015ffa211000000000000000041dcfffffffffffffffffffffffff30000003087000000000000000000000013c6ffffffffffffffffffffffe30000000f00000055beeef7d8881000000017e6ffffffffffffffffffffd30000000000019dffffffffffffe12200000056ffffffffffffffffffffd100000000006effffffffffffffffce04000002dbffffffffffffffffffdd0000000006eaffffffffffffffffff550000008bffffffffffffffffffe90000000043ffffffffffffffffffffa90000004dfffffffffffffffffff80200000074ffffffffffffffffffffdb0000002cffffffffffffffffffff2200000088ffffffffffffffffffffef00000019ffffffffffffffffffff4d00000088ffffffffffffffffffffee0000001affffffffffffffffffff7e00000074ffffffffffffffffffffdb0000002dffffffffffffffffffffcd00000042ffffffffffffffffffffa900000052ffffffffffffffffffffff21000005e9ffffffffffffffffff5400000093ffffffffffffffffffffff8f0000006dffffffffffffffffcd04000007e6fffffffffffffffffffffff9220000019effffffffffffe1230000006cffffffffffffffffffffffffffc00600000056beeff8d888110000002af3ffffffffffffffffffffffffffffa603000000000000000000000026ddffffffffffffffffffffffffffffffffc8280000000000000000025deffffffffffffffffffffffffffffffffffffffab25a2a1106193b7ed7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff47000000000000000000000000000000000000f7ffffffffffffffffffff47000000000000000000000000000000000003faffffffffffffffffffff4700000000000000000000000000000000004afffffffffffffffffffffffffffffffffffffffffffffffffc1a000000adffffffffffffffffffffffffffffffffffffffffffffffffb300000015faffffffffffffffffffffffffffffffffffffffffffffffff5100000073ffffffffffffffffffffffffffffffffffffffffffffffffea05000000d6ffffffffffffffffffffffffffffffffffffffffffffffff8d00000039ffffffffffffffffffffffffffffffffffffffffffffffffff2c0000009dffffffffffffffffffffffffffffffffffffffffffffffffc90000000cf3ffffffffffffffffffffffffffffffffffffffffffffffff6700000063fffffffffffffffffffffffffffffffffffffffffffffffff60f000000c6ffffffffffffffffffffffffffffffffffffffffffffffffa300000029ffffffffffffffffffffffffffffffffffffffffffffffffff410000008cffffffffffffffffffffffffffffffffffffffffffffffffdf01000005e9ffffffffffffffffffffffffffffffffffffffffffffffff7d00000052fffffffffffffffffffffffffffffffffffffffffffffffffd1e000000b5ffffffffffffffffffffffffffffffffffffffffffffffffb90000001bfcffffffffffffffffffffffffffffffffffffffffffffffff570000007bffffffffffffffffffffffffffffffffffffffffffffffffee07000001ddffffffffffffffffffffffffffffffffffffffffffffffff9300000042ffffffffffffffffffffffffffffffffffffffffffffffffff31000000a5ffffffffffffffffffffffffffffffffffffffffffffffffd000000010f7ffffffffffffffffffffffffffffffffffffffffffffffff6d0000006bfffffffffffffffffffffffffffffffffffffffffffffffff913000000ceffffffffffffffffffffffffffffffffffffffffffffffffa900000031ffffffffffffffffffffffffffffffffffffffffffffffffff4700000094ffffffffffffffffffffffffffffffffffffffffffffffffe302000008eeffffffffffffffffffffffffffffffffffffffffffffffff840000005afffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9a8602c13050c1d4882dfffffffffffffffffffffffffffffffffffffa918000000000000000000025eeeffffffffffffffffffffffffffffff780000000000000000000000000023e5ffffffffffffffffffffffffff9f0000000037a8e4faf1c66d0500000033fdfffffffffffffffffffffff81600000065fdffffffffffffc40a0000009fffffffffffffffffffffffb600000021faffffffffffffffff8d00000047ffffffffffffffffffffff820000007bffffffffffffffffffeb01000014ffffffffffffffffffffff6d000000a2ffffffffffffffffffff15000001fdffffffffffffffffffff76000000a2ffffffffffffffffffff14000007ffffffffffffffffffffffa10000007bffffffffffffffffffec01000033ffffffffffffffffffffffec08000022fbffffffffffffffff8e00000087ffffffffffffffffffffffff7d00000068fdffffffffffffc70b00001ef2fffffffffffffffffffffffffb5500000039aae5fbf2c87006000013d0fffffffffffffffffffffffffffffe93160000000000000000000153e3ffffffffffffffffffffffffffffffffffbd2e000000000000000780f0ffffffffffffffffffffffffffffffffce3500000000000000000000000e87fcffffffffffffffffffffffffffb3060000004fb2e6faf0cd82150000004ffaffffffffffffffffffffffda0b000004a9ffffffffffffffe93600000076ffffffffffffffffffffff5600000084ffffffffffffffffffe80e000005e2fffffffffffffffffff606000008f4ffffffffffffffffffff6f0000008dffffffffffffffffffcb00000039ffffffffffffffffffffffac0000005cffffffffffffffffffbc0000004affffffffffffffffffffffbe0000004dffffffffffffffffffcc00000039ffffffffffffffffffffffac0000005effffffffffffffffffea00000008f4ffffffffffffffffffff6e0000007cffffffffffffffffffff2f00000085ffffffffffffffffffe70d000000c1ffffffffffffffffffff9300000004a9ffffffffffffffe83400000028fcfffffffffffffffffffffa2d0000000050b2e7fbf2cd821400000002b8ffffffffffffffffffffffffe523000000000000000000000000000299fffffffffffffffffffffffffffff16605000000000000000000002cc5ffffffffffffffffffffffffffffffffffe88e542512040b1b3d72c1fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8a259251008203f8be2ffffffffffffffffffffffffffffffffffffffa91d0000000000000000047ffaffffffffffffffffffffffffffffffff7b00000000000000000000000040f8ffffffffffffffffffffffffffff94000000004db9ecf7da8b1300000057ffffffffffffffffffffffffffdc050000008fffffffffffffe527000000acffffffffffffffffffffffff630000005fffffffffffffffffd406000025fbfffffffffffffffffffffb0c000002e0ffffffffffffffffff5f000000b2ffffffffffffffffffffc600000036ffffffffffffffffffffb50000005fffffffffffffffffffffa000000068ffffffffffffffffffffe700000011feffffffffffffffffff8d0000007cfffffffffffffffffffffb00000000dfffffffffffffffffff8c0000007cfffffffffffffffffffffb00000000b4ffffffffffffffffff9e00000069ffffffffffffffffffffe7000000008dffffffffffffffffffbe00000038ffffffffffffffffffffb6000000007bfffffffffffffffffff606000003e2ffffffffffffffffff62000000006fffffffffffffffffffff4f00000064ffffffffffffffffd8080000000062ffffffffffffffffffffc50000000096ffffffffffffe82b000000000064ffffffffffffffffffffff6c0000000051bbeff8dc8e1500001000000074fffffffffffffffffffffff94f0000000000000000000000288c00000084fffffffffffffffffffffffffd810b000000000000000052ea830000009fffffffffffffffffffffffffffffea8d471d090d2864c1ffff5b000000d4ffffffffffffffffffffffffffffffffffffffffffffffffff2100000dfdffffffffffffffffffffffffffffffffffffffffffffffffd900000052ffffffffffffffffffffffffffffffffffffffffffffffffff75000000b8ffffffffffffffffffffffffffffffffffffffffffffffffe30d000023fefffffffffffffffffffffffffffffffffffffffffffffff945000000b7ffffffffffffffffffffffffff7fa2fdffffffffffffffe8480000005effffffffffffffffffffffffffff63002080c4ecfae7c0740e00000034f4ffffffffffffffffffffffffffff6300000000000000000000000043f0ffffffffffffffffffffffffffffff6300000000000000000000118efdfffffffffffffffffffffffffffffffff4bb7f462b15040b25569ff4ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
+    *returnArrayLength = wcslen(L"ffffffffffffffffffffffffffff");// ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe891412108153069c4ffffffffffffffffffffffffffffffffffffffff9409000000000000000049e7ffffffffffffffffffffffffffffffffff61000000000000000000000017ddffffffffffffffffffffffffffffff840000000573d3f5e5a62b00000028f0ffffffffffffffffffffffffffda04000008bcfffffffffff44200000073ffffffffffffffffffffffffff5700000088ffffffffffffffe812000008e3ffffffffffffffffffffffea02000015f9ffffffffffffffff8100000080ffffffffffffffffffffff9c00000072ffffffffffffffffffe40100002fffffffffffffffffffffff51000000b8ffffffffffffffffffff2a000000e2ffffffffffffffffffff21000001f0ffffffffffffffffffff65000000b3fffffffffffffffffff602000018ffffffffffffffffffffff8b0000008affffffffffffffffffd200000036ffffffffffffffffffffffa900000063ffffffffffffffffffc00000004effffffffffffffffffffffc100000052ffffffffffffffffffb500000057ffffffffffffffffffffffc900000046ffffffffffffffffffa90000005fffffffffffffffffffffffd20000003affffffffffffffffffa900000060ffffffffffffffffffffffd30000003affffffffffffffffffb400000057ffffffffffffffffffffffca00000046ffffffffffffffffffc00000004effffffffffffffffffffffc100000052ffffffffffffffffffd100000037ffffffffffffffffffffffa900000063fffffffffffffffffff602000019ffffffffffffffffffffff8b00000089ffffffffffffffffffff21000001f1ffffffffffffffffffff66000000b3ffffffffffffffffffff50000000b8ffffffffffffffffffff2a000000e1ffffffffffffffffffff9c00000073ffffffffffffffffffe40100002fffffffffffffffffffffffea02000015f9ffffffffffffffff8200000080ffffffffffffffffffffffff5700000088ffffffffffffffe812000008e2ffffffffffffffffffffffffda04000008bcfffffffffff44300000073ffffffffffffffffffffffffffff830000000674d3f6e6a72b00000028f0ffffffffffffffffffffffffffffff60000000000000000000000016ddfffffffffffffffffffffffffffffffffe9309000000000000000048e6ffffffffffffffffffffffffffffffffffffffe88f3f1f07132e68c3fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9d7b28e69441f02000000afffffffffffffffffffffffffffffffffffff6300000000000000000000afffffffffffffffffffffffffffffffffffff6300000000000000000000afffffffffffffffffffffffffffffffffffff6a274c7095b9de64000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000affffffffffffffffffffffffffffffffffffff7000000000000000000000000000000003bfffffffffffffffffffffffff7000000000000000000000000000000003bfffffffffffffffffffffffff7000000000000000000000000000000003bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd48b56271005142a5ea0f6ffffffffffffffffffffffffffffffffdb7c20000000000000000000001392feffffffffffffffffffffffffffff1f00000000000000000000000000004cf9ffffffffffffffffffffffffff1f0000003784c7e7f9e8b1480000000056ffffffffffffffffffffffffff1f015accffffffffffffffff9701000000b0ffffffffffffffffffffffff58caffffffffffffffffffffff770000003cfffffffffffffffffffffffffffffffffffffffffffffffffff107000002edffffffffffffffffffffffffffffffffffffffffffffffffff3a000000ccffffffffffffffffffffffffffffffffffffffffffffffffff4c000000baffffffffffffffffffffffffffffffffffffffffffffffffff32000000cbffffffffffffffffffffffffffffffffffffffffffffffffec05000002edffffffffffffffffffffffffffffffffffffffffffffffff8d00000039ffffffffffffffffffffffffffffffffffffffffffffffffeb140000009affffffffffffffffffffffffffffffffffffffffffffffff520000002afbffffffffffffffffffffffffffffffffffffffffffffff8c00000003c7ffffffffffffffffffffffffffffffffffffffffffffffb30300000085ffffffffffffffffffffffffffffffffffffffffffffffc50a0000005dfeffffffffffffffffffffffffffffffffffffffffffffd2110000004efbffffffffffffffffffffffffffffffffffffffffffffdb1800000042f8ffffffffffffffffffffffffffffffffffffffffffffe21f00000039f3ffffffffffffffffffffffffffffffffffffffffffffe92600000030efffffffffffffffffffffffffffffffffffffffffffffee2e00000029eafffffffffffffffffffffffffffffffffffffffffffff33700000022e5fffffffffffffffffffffffffffffffffffffffffffff7410000001cdffffffffffffffffffffffffffffffffffffffffffffffb4c00000017d9fffffffffffffffffffffffffffffffffffffffffffffd5900000012d2ffffffffffffffffffffffffffffffffffffffffffffff680000000ecbffffffffffffffffffffffffffffffffffffffffffffffef0000000000000000000000000000000000008bffffffffffffffffffffef0000000000000000000000000000000000008bffffffffffffffffffffef0000000000000000000000000000000000008bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe2af8058392817060a1a3f74c8ffffffffffffffffffffffffffffffffeb0000000000000000000000000036cfffffffffffffffffffffffffffffeb000000000000000000000000000004a7ffffffffffffffffffffffffffeb00000f5a9dd0edfbf0ca841900000003c2ffffffffffffffffffffffffec3da8f9fffffffffffffffff0410000002bffffffffffffffffffffffffffffffffffffffffffffffffffee12000000cbffffffffffffffffffffffffffffffffffffffffffffffffff6900000090ffffffffffffffffffffffffffffffffffffffffffffffffff9600000078ffffffffffffffffffffffffffffffffffffffffffffffffff9a0000007effffffffffffffffffffffffffffffffffffffffffffffffff73000000a5fffffffffffffffffffffffffffffffffffffffffffffffff51b000009edfffffffffffffffffffffffffffffffffffffffffffffff7540000007efffffffffffffffffffffffffffffffffffffffffff3d3912400000055fcffffffffffffffffffffffffffffffffff1700000000000000001692feffffffffffffffffffffffffffffffffffff17000000000000002db8feffffffffffffffffffffffffffffffffffffff170000000000000000002bc3fffffffffffffffffffffffffffffffffffffffffffdf0cf922e00000003a5fffffffffffffffffffffffffffffffffffffffffffffffffd8700000007d1ffffffffffffffffffffffffffffffffffffffffffffffffff780000004ffffffffffffffffffffffffffffffffffffffffffffffffffff308000006f6ffffffffffffffffffffffffffffffffffffffffffffffffff3c000000d0ffffffffffffffffffffffffffffffffffffffffffffffffff4d000000c6ffffffffffffffffffffffffffffffffffffffffffffffffff35000000ddffffffffffffffffffffffffffffffffffffffffffffffffea0300000bf9ffffffffffffffffffffffffffffffffffffffffffffffff6200000054ffffffffffffffffffffff47bafefffffffffffffffffff56b00000002cbffffffffffffffffffffff0b001e71a9d7edfbf6e4ba771a000000007cffffffffffffffffffffffff0b0000000000000000000000000000017dffffffffffffffffffffffffff0b000000000000000000000000003cc8ffffffffffffffffffffffffffffe9b989593827160608162a5689dbffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbd0100000000f3fffffffffffffffffffffffffffffffffffffffffffff3200000000000f3ffffffffffffffffffffffffffffffffffffffffffff69000000000000f3ffffffffffffffffffffffffffffffffffffffffffbf01000b0e000000f3fffffffffffffffffffffffffffffffffffffffff42100008e1f000000f3ffffffffffffffffffffffffffffffffffffffff6a000035fc1f000000f3ffffffffffffffffffffffffffffffffffffffc0010004d1ff1f000000f3fffffffffffffffffffffffffffffffffffff42200007affff1f000000f3ffffffffffffffffffffffffffffffffffff6c000026f7ffff1f000000f3ffffffffffffffffffffffffffffffffffc1010001c1ffffff1f000000f3fffffffffffffffffffffffffffffffff523000066ffffffff1f000000f3ffffffffffffffffffffffffffffffff6d000019f0ffffffff1f000000f3ffffffffffffffffffffffffffffffc2010000aeffffffffff1f000000f3fffffffffffffffffffffffffffff524000052ffffffffffff1f000000f3ffffffffffffffffffffffffffff6e00000fe6ffffffffffff1f000000f3ffffffffffffffffffffffffffc30200009affffffffffffff1f000000f3fffffffffffffffffffffffff62400003ffeffffffffffffff1f000000f3ffffffffffffffffffffffff70000008daffffffffffffffff1f000000f3fffffffffffffffffffffff602000086ffffffffffffffffff1f000000f3fffffffffffffffffffffff3000000000000000000000000000000000000000000cbfffffffffffffff3000000000000000000000000000000000000000000cbfffffffffffffff3000000000000000000000000000000000000000000cbffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000000000000000000000000002fffffffffffffffffffffffffffff4f00000000000000000000000000002fffffffffffffffffffffffffffff4f00000000000000000000000000002fffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f000008672f120514275997efffffffffffffffffffffffffffffffffff4f00000000000000000000000b73f6ffffffffffffffffffffffffffffff4f000000000000000000000000002bdeffffffffffffffffffffffffffff60538cbad2e7faf0d599370000000025ebffffffffffffffffffffffffffffffffffffffffffffffffa0090000005bffffffffffffffffffffffffffffffffffffffffffffffffffb100000001d2ffffffffffffffffffffffffffffffffffffffffffffffffff560000007effffffffffffffffffffffffffffffffffffffffffffffffffb80000003dffffffffffffffffffffffffffffffffffffffffffffffffffec00000022fffffffffffffffffffffffffffffffffffffffffffffffffffd00000011ffffffffffffffffffffffffffffffffffffffffffffffffffec00000022ffffffffffffffffffffffffffffffffffffffffffffffffffb80000003cffffffffffffffffffffffffffffffffffffffffffffffffff580000007dffffffffffffffffffffffffffffffffffffffffffffffffb301000000cfffffffffffffffffffffff4cb1fdffffffffffffffffffa40a00000058ffffffffffffffffffffffff17001a6ea9d7eefbf2d69b380000000024e8ffffffffffffffffffffffff1700000000000000000000000000002de0ffffffffffffffffffffffffff17000000000000000000000000127ef9ffffffffffffffffffffffffffffebba8a59372615050a1a3569a6f7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffca753915050d233866a3e0ffffffffffffffffffffffffffffffffffd13f0000000000000000000000f7ffffffffffffffffffffffffffffff9d07000000000000000000000000f7ffffffffffffffffffffffffffff9700000000469fdbf3f5da9e490100f7ffffffffffffffffffffffffffca0300000eb3ffffffffffffffffd84df8fffffffffffffffffffffffffa2d000007c8ffffffffffffffffffffffffffffffffffffffffffffffff9100000081ffffffffffffffffffffffffffffffffffffffffffffffffff28000010f6ffffffffffffffffffffffffffffffffffffffffffffffffc20000006affffffffffffffffffffffffffffffffffffffffffffffffff79000000b2ffffffffffffffffffffffffffffffffffffffffffffffffff43000000ebffeb903d1a0616306fc0ffffffffffffffffffffffffffffff0f000015ffa211000000000000000041dcfffffffffffffffffffffffff30000003087000000000000000000000013c6ffffffffffffffffffffffe30000000f00000055beeef7d8881000000017e6ffffffffffffffffffffd30000000000019dffffffffffffe12200000056ffffffffffffffffffffd100000000006effffffffffffffffce04000002dbffffffffffffffffffdd0000000006eaffffffffffffffffff550000008bffffffffffffffffffe90000000043ffffffffffffffffffffa90000004dfffffffffffffffffff80200000074ffffffffffffffffffffdb0000002cffffffffffffffffffff2200000088ffffffffffffffffffffef00000019ffffffffffffffffffff4d00000088ffffffffffffffffffffee0000001affffffffffffffffffff7e00000074ffffffffffffffffffffdb0000002dffffffffffffffffffffcd00000042ffffffffffffffffffffa900000052ffffffffffffffffffffff21000005e9ffffffffffffffffff5400000093ffffffffffffffffffffff8f0000006dffffffffffffffffcd04000007e6fffffffffffffffffffffff9220000019effffffffffffe1230000006cffffffffffffffffffffffffffc00600000056beeff8d888110000002af3ffffffffffffffffffffffffffffa603000000000000000000000026ddffffffffffffffffffffffffffffffffc8280000000000000000025deffffffffffffffffffffffffffffffffffffffab25a2a1106193b7ed7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff47000000000000000000000000000000000000f7ffffffffffffffffffff47000000000000000000000000000000000003faffffffffffffffffffff4700000000000000000000000000000000004afffffffffffffffffffffffffffffffffffffffffffffffffc1a000000adffffffffffffffffffffffffffffffffffffffffffffffffb300000015faffffffffffffffffffffffffffffffffffffffffffffffff5100000073ffffffffffffffffffffffffffffffffffffffffffffffffea05000000d6ffffffffffffffffffffffffffffffffffffffffffffffff8d00000039ffffffffffffffffffffffffffffffffffffffffffffffffff2c0000009dffffffffffffffffffffffffffffffffffffffffffffffffc90000000cf3ffffffffffffffffffffffffffffffffffffffffffffffff6700000063fffffffffffffffffffffffffffffffffffffffffffffffff60f000000c6ffffffffffffffffffffffffffffffffffffffffffffffffa300000029ffffffffffffffffffffffffffffffffffffffffffffffffff410000008cffffffffffffffffffffffffffffffffffffffffffffffffdf01000005e9ffffffffffffffffffffffffffffffffffffffffffffffff7d00000052fffffffffffffffffffffffffffffffffffffffffffffffffd1e000000b5ffffffffffffffffffffffffffffffffffffffffffffffffb90000001bfcffffffffffffffffffffffffffffffffffffffffffffffff570000007bffffffffffffffffffffffffffffffffffffffffffffffffee07000001ddffffffffffffffffffffffffffffffffffffffffffffffff9300000042ffffffffffffffffffffffffffffffffffffffffffffffffff31000000a5ffffffffffffffffffffffffffffffffffffffffffffffffd000000010f7ffffffffffffffffffffffffffffffffffffffffffffffff6d0000006bfffffffffffffffffffffffffffffffffffffffffffffffff913000000ceffffffffffffffffffffffffffffffffffffffffffffffffa900000031ffffffffffffffffffffffffffffffffffffffffffffffffff4700000094ffffffffffffffffffffffffffffffffffffffffffffffffe302000008eeffffffffffffffffffffffffffffffffffffffffffffffff840000005afffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9a8602c13050c1d4882dfffffffffffffffffffffffffffffffffffffa918000000000000000000025eeeffffffffffffffffffffffffffffff780000000000000000000000000023e5ffffffffffffffffffffffffff9f0000000037a8e4faf1c66d0500000033fdfffffffffffffffffffffff81600000065fdffffffffffffc40a0000009fffffffffffffffffffffffb600000021faffffffffffffffff8d00000047ffffffffffffffffffffff820000007bffffffffffffffffffeb01000014ffffffffffffffffffffff6d000000a2ffffffffffffffffffff15000001fdffffffffffffffffffff76000000a2ffffffffffffffffffff14000007ffffffffffffffffffffffa10000007bffffffffffffffffffec01000033ffffffffffffffffffffffec08000022fbffffffffffffffff8e00000087ffffffffffffffffffffffff7d00000068fdffffffffffffc70b00001ef2fffffffffffffffffffffffffb5500000039aae5fbf2c87006000013d0fffffffffffffffffffffffffffffe93160000000000000000000153e3ffffffffffffffffffffffffffffffffffbd2e000000000000000780f0ffffffffffffffffffffffffffffffffce3500000000000000000000000e87fcffffffffffffffffffffffffffb3060000004fb2e6faf0cd82150000004ffaffffffffffffffffffffffda0b000004a9ffffffffffffffe93600000076ffffffffffffffffffffff5600000084ffffffffffffffffffe80e000005e2fffffffffffffffffff606000008f4ffffffffffffffffffff6f0000008dffffffffffffffffffcb00000039ffffffffffffffffffffffac0000005cffffffffffffffffffbc0000004affffffffffffffffffffffbe0000004dffffffffffffffffffcc00000039ffffffffffffffffffffffac0000005effffffffffffffffffea00000008f4ffffffffffffffffffff6e0000007cffffffffffffffffffff2f00000085ffffffffffffffffffe70d000000c1ffffffffffffffffffff9300000004a9ffffffffffffffe83400000028fcfffffffffffffffffffffa2d0000000050b2e7fbf2cd821400000002b8ffffffffffffffffffffffffe523000000000000000000000000000299fffffffffffffffffffffffffffff16605000000000000000000002cc5ffffffffffffffffffffffffffffffffffe88e542512040b1b3d72c1fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8a259251008203f8be2ffffffffffffffffffffffffffffffffffffffa91d0000000000000000047ffaffffffffffffffffffffffffffffffff7b00000000000000000000000040f8ffffffffffffffffffffffffffff94000000004db9ecf7da8b1300000057ffffffffffffffffffffffffffdc050000008fffffffffffffe527000000acffffffffffffffffffffffff630000005fffffffffffffffffd406000025fbfffffffffffffffffffffb0c000002e0ffffffffffffffffff5f000000b2ffffffffffffffffffffc600000036ffffffffffffffffffffb50000005fffffffffffffffffffffa000000068ffffffffffffffffffffe700000011feffffffffffffffffff8d0000007cfffffffffffffffffffffb00000000dfffffffffffffffffff8c0000007cfffffffffffffffffffffb00000000b4ffffffffffffffffff9e00000069ffffffffffffffffffffe7000000008dffffffffffffffffffbe00000038ffffffffffffffffffffb6000000007bfffffffffffffffffff606000003e2ffffffffffffffffff62000000006fffffffffffffffffffff4f00000064ffffffffffffffffd8080000000062ffffffffffffffffffffc50000000096ffffffffffffe82b000000000064ffffffffffffffffffffff6c0000000051bbeff8dc8e1500001000000074fffffffffffffffffffffff94f0000000000000000000000288c00000084fffffffffffffffffffffffffd810b000000000000000052ea830000009fffffffffffffffffffffffffffffea8d471d090d2864c1ffff5b000000d4ffffffffffffffffffffffffffffffffffffffffffffffffff2100000dfdffffffffffffffffffffffffffffffffffffffffffffffffd900000052ffffffffffffffffffffffffffffffffffffffffffffffffff75000000b8ffffffffffffffffffffffffffffffffffffffffffffffffe30d000023fefffffffffffffffffffffffffffffffffffffffffffffff945000000b7ffffffffffffffffffffffffff7fa2fdffffffffffffffe8480000005effffffffffffffffffffffffffff63002080c4ecfae7c0740e00000034f4ffffffffffffffffffffffffffff6300000000000000000000000043f0ffffffffffffffffffffffffffffff6300000000000000000000118efdfffffffffffffffffffffffffffffffff4bb7f462b15040b25569ff4ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+    return L"fffffffffffffffffffffff"; // fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe891412108153069c4ffffffffffffffffffffffffffffffffffffffff9409000000000000000049e7ffffffffffffffffffffffffffffffffff61000000000000000000000017ddffffffffffffffffffffffffffffff840000000573d3f5e5a62b00000028f0ffffffffffffffffffffffffffda04000008bcfffffffffff44200000073ffffffffffffffffffffffffff5700000088ffffffffffffffe812000008e3ffffffffffffffffffffffea02000015f9ffffffffffffffff8100000080ffffffffffffffffffffff9c00000072ffffffffffffffffffe40100002fffffffffffffffffffffff51000000b8ffffffffffffffffffff2a000000e2ffffffffffffffffffff21000001f0ffffffffffffffffffff65000000b3fffffffffffffffffff602000018ffffffffffffffffffffff8b0000008affffffffffffffffffd200000036ffffffffffffffffffffffa900000063ffffffffffffffffffc00000004effffffffffffffffffffffc100000052ffffffffffffffffffb500000057ffffffffffffffffffffffc900000046ffffffffffffffffffa90000005fffffffffffffffffffffffd20000003affffffffffffffffffa900000060ffffffffffffffffffffffd30000003affffffffffffffffffb400000057ffffffffffffffffffffffca00000046ffffffffffffffffffc00000004effffffffffffffffffffffc100000052ffffffffffffffffffd100000037ffffffffffffffffffffffa900000063fffffffffffffffffff602000019ffffffffffffffffffffff8b00000089ffffffffffffffffffff21000001f1ffffffffffffffffffff66000000b3ffffffffffffffffffff50000000b8ffffffffffffffffffff2a000000e1ffffffffffffffffffff9c00000073ffffffffffffffffffe40100002fffffffffffffffffffffffea02000015f9ffffffffffffffff8200000080ffffffffffffffffffffffff5700000088ffffffffffffffe812000008e2ffffffffffffffffffffffffda04000008bcfffffffffff44300000073ffffffffffffffffffffffffffff830000000674d3f6e6a72b00000028f0ffffffffffffffffffffffffffffff60000000000000000000000016ddfffffffffffffffffffffffffffffffffe9309000000000000000048e6ffffffffffffffffffffffffffffffffffffffe88f3f1f07132e68c3fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9d7b28e69441f02000000afffffffffffffffffffffffffffffffffffff6300000000000000000000afffffffffffffffffffffffffffffffffffff6300000000000000000000afffffffffffffffffffffffffffffffffffff6a274c7095b9de64000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000afffffffffffffffffffffffffffffffffffffffffffffffffff67000000affffffffffffffffffffffffffffffffffffff7000000000000000000000000000000003bfffffffffffffffffffffffff7000000000000000000000000000000003bfffffffffffffffffffffffff7000000000000000000000000000000003bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd48b56271005142a5ea0f6ffffffffffffffffffffffffffffffffdb7c20000000000000000000001392feffffffffffffffffffffffffffff1f00000000000000000000000000004cf9ffffffffffffffffffffffffff1f0000003784c7e7f9e8b1480000000056ffffffffffffffffffffffffff1f015accffffffffffffffff9701000000b0ffffffffffffffffffffffff58caffffffffffffffffffffff770000003cfffffffffffffffffffffffffffffffffffffffffffffffffff107000002edffffffffffffffffffffffffffffffffffffffffffffffffff3a000000ccffffffffffffffffffffffffffffffffffffffffffffffffff4c000000baffffffffffffffffffffffffffffffffffffffffffffffffff32000000cbffffffffffffffffffffffffffffffffffffffffffffffffec05000002edffffffffffffffffffffffffffffffffffffffffffffffff8d00000039ffffffffffffffffffffffffffffffffffffffffffffffffeb140000009affffffffffffffffffffffffffffffffffffffffffffffff520000002afbffffffffffffffffffffffffffffffffffffffffffffff8c00000003c7ffffffffffffffffffffffffffffffffffffffffffffffb30300000085ffffffffffffffffffffffffffffffffffffffffffffffc50a0000005dfeffffffffffffffffffffffffffffffffffffffffffffd2110000004efbffffffffffffffffffffffffffffffffffffffffffffdb1800000042f8ffffffffffffffffffffffffffffffffffffffffffffe21f00000039f3ffffffffffffffffffffffffffffffffffffffffffffe92600000030efffffffffffffffffffffffffffffffffffffffffffffee2e00000029eafffffffffffffffffffffffffffffffffffffffffffff33700000022e5fffffffffffffffffffffffffffffffffffffffffffff7410000001cdffffffffffffffffffffffffffffffffffffffffffffffb4c00000017d9fffffffffffffffffffffffffffffffffffffffffffffd5900000012d2ffffffffffffffffffffffffffffffffffffffffffffff680000000ecbffffffffffffffffffffffffffffffffffffffffffffffef0000000000000000000000000000000000008bffffffffffffffffffffef0000000000000000000000000000000000008bffffffffffffffffffffef0000000000000000000000000000000000008bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe2af8058392817060a1a3f74c8ffffffffffffffffffffffffffffffffeb0000000000000000000000000036cfffffffffffffffffffffffffffffeb000000000000000000000000000004a7ffffffffffffffffffffffffffeb00000f5a9dd0edfbf0ca841900000003c2ffffffffffffffffffffffffec3da8f9fffffffffffffffff0410000002bffffffffffffffffffffffffffffffffffffffffffffffffffee12000000cbffffffffffffffffffffffffffffffffffffffffffffffffff6900000090ffffffffffffffffffffffffffffffffffffffffffffffffff9600000078ffffffffffffffffffffffffffffffffffffffffffffffffff9a0000007effffffffffffffffffffffffffffffffffffffffffffffffff73000000a5fffffffffffffffffffffffffffffffffffffffffffffffff51b000009edfffffffffffffffffffffffffffffffffffffffffffffff7540000007efffffffffffffffffffffffffffffffffffffffffff3d3912400000055fcffffffffffffffffffffffffffffffffff1700000000000000001692feffffffffffffffffffffffffffffffffffff17000000000000002db8feffffffffffffffffffffffffffffffffffffff170000000000000000002bc3fffffffffffffffffffffffffffffffffffffffffffdf0cf922e00000003a5fffffffffffffffffffffffffffffffffffffffffffffffffd8700000007d1ffffffffffffffffffffffffffffffffffffffffffffffffff780000004ffffffffffffffffffffffffffffffffffffffffffffffffffff308000006f6ffffffffffffffffffffffffffffffffffffffffffffffffff3c000000d0ffffffffffffffffffffffffffffffffffffffffffffffffff4d000000c6ffffffffffffffffffffffffffffffffffffffffffffffffff35000000ddffffffffffffffffffffffffffffffffffffffffffffffffea0300000bf9ffffffffffffffffffffffffffffffffffffffffffffffff6200000054ffffffffffffffffffffff47bafefffffffffffffffffff56b00000002cbffffffffffffffffffffff0b001e71a9d7edfbf6e4ba771a000000007cffffffffffffffffffffffff0b0000000000000000000000000000017dffffffffffffffffffffffffff0b000000000000000000000000003cc8ffffffffffffffffffffffffffffe9b989593827160608162a5689dbffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbd0100000000f3fffffffffffffffffffffffffffffffffffffffffffff3200000000000f3ffffffffffffffffffffffffffffffffffffffffffff69000000000000f3ffffffffffffffffffffffffffffffffffffffffffbf01000b0e000000f3fffffffffffffffffffffffffffffffffffffffff42100008e1f000000f3ffffffffffffffffffffffffffffffffffffffff6a000035fc1f000000f3ffffffffffffffffffffffffffffffffffffffc0010004d1ff1f000000f3fffffffffffffffffffffffffffffffffffff42200007affff1f000000f3ffffffffffffffffffffffffffffffffffff6c000026f7ffff1f000000f3ffffffffffffffffffffffffffffffffffc1010001c1ffffff1f000000f3fffffffffffffffffffffffffffffffff523000066ffffffff1f000000f3ffffffffffffffffffffffffffffffff6d000019f0ffffffff1f000000f3ffffffffffffffffffffffffffffffc2010000aeffffffffff1f000000f3fffffffffffffffffffffffffffff524000052ffffffffffff1f000000f3ffffffffffffffffffffffffffff6e00000fe6ffffffffffff1f000000f3ffffffffffffffffffffffffffc30200009affffffffffffff1f000000f3fffffffffffffffffffffffff62400003ffeffffffffffffff1f000000f3ffffffffffffffffffffffff70000008daffffffffffffffff1f000000f3fffffffffffffffffffffff602000086ffffffffffffffffff1f000000f3fffffffffffffffffffffff3000000000000000000000000000000000000000000cbfffffffffffffff3000000000000000000000000000000000000000000cbfffffffffffffff3000000000000000000000000000000000000000000cbffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffff1f000000f3ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000000000000000000000000002fffffffffffffffffffffffffffff4f00000000000000000000000000002fffffffffffffffffffffffffffff4f00000000000000000000000000002fffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f00000fffffffffffffffffffffffffffffffffffffffffffffffffffff4f000008672f120514275997efffffffffffffffffffffffffffffffffff4f00000000000000000000000b73f6ffffffffffffffffffffffffffffff4f000000000000000000000000002bdeffffffffffffffffffffffffffff60538cbad2e7faf0d599370000000025ebffffffffffffffffffffffffffffffffffffffffffffffffa0090000005bffffffffffffffffffffffffffffffffffffffffffffffffffb100000001d2ffffffffffffffffffffffffffffffffffffffffffffffffff560000007effffffffffffffffffffffffffffffffffffffffffffffffffb80000003dffffffffffffffffffffffffffffffffffffffffffffffffffec00000022fffffffffffffffffffffffffffffffffffffffffffffffffffd00000011ffffffffffffffffffffffffffffffffffffffffffffffffffec00000022ffffffffffffffffffffffffffffffffffffffffffffffffffb80000003cffffffffffffffffffffffffffffffffffffffffffffffffff580000007dffffffffffffffffffffffffffffffffffffffffffffffffb301000000cfffffffffffffffffffffff4cb1fdffffffffffffffffffa40a00000058ffffffffffffffffffffffff17001a6ea9d7eefbf2d69b380000000024e8ffffffffffffffffffffffff1700000000000000000000000000002de0ffffffffffffffffffffffffff17000000000000000000000000127ef9ffffffffffffffffffffffffffffebba8a59372615050a1a3569a6f7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffca753915050d233866a3e0ffffffffffffffffffffffffffffffffffd13f0000000000000000000000f7ffffffffffffffffffffffffffffff9d07000000000000000000000000f7ffffffffffffffffffffffffffff9700000000469fdbf3f5da9e490100f7ffffffffffffffffffffffffffca0300000eb3ffffffffffffffffd84df8fffffffffffffffffffffffffa2d000007c8ffffffffffffffffffffffffffffffffffffffffffffffff9100000081ffffffffffffffffffffffffffffffffffffffffffffffffff28000010f6ffffffffffffffffffffffffffffffffffffffffffffffffc20000006affffffffffffffffffffffffffffffffffffffffffffffffff79000000b2ffffffffffffffffffffffffffffffffffffffffffffffffff43000000ebffeb903d1a0616306fc0ffffffffffffffffffffffffffffff0f000015ffa211000000000000000041dcfffffffffffffffffffffffff30000003087000000000000000000000013c6ffffffffffffffffffffffe30000000f00000055beeef7d8881000000017e6ffffffffffffffffffffd30000000000019dffffffffffffe12200000056ffffffffffffffffffffd100000000006effffffffffffffffce04000002dbffffffffffffffffffdd0000000006eaffffffffffffffffff550000008bffffffffffffffffffe90000000043ffffffffffffffffffffa90000004dfffffffffffffffffff80200000074ffffffffffffffffffffdb0000002cffffffffffffffffffff2200000088ffffffffffffffffffffef00000019ffffffffffffffffffff4d00000088ffffffffffffffffffffee0000001affffffffffffffffffff7e00000074ffffffffffffffffffffdb0000002dffffffffffffffffffffcd00000042ffffffffffffffffffffa900000052ffffffffffffffffffffff21000005e9ffffffffffffffffff5400000093ffffffffffffffffffffff8f0000006dffffffffffffffffcd04000007e6fffffffffffffffffffffff9220000019effffffffffffe1230000006cffffffffffffffffffffffffffc00600000056beeff8d888110000002af3ffffffffffffffffffffffffffffa603000000000000000000000026ddffffffffffffffffffffffffffffffffc8280000000000000000025deffffffffffffffffffffffffffffffffffffffab25a2a1106193b7ed7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff47000000000000000000000000000000000000f7ffffffffffffffffffff47000000000000000000000000000000000003faffffffffffffffffffff4700000000000000000000000000000000004afffffffffffffffffffffffffffffffffffffffffffffffffc1a000000adffffffffffffffffffffffffffffffffffffffffffffffffb300000015faffffffffffffffffffffffffffffffffffffffffffffffff5100000073ffffffffffffffffffffffffffffffffffffffffffffffffea05000000d6ffffffffffffffffffffffffffffffffffffffffffffffff8d00000039ffffffffffffffffffffffffffffffffffffffffffffffffff2c0000009dffffffffffffffffffffffffffffffffffffffffffffffffc90000000cf3ffffffffffffffffffffffffffffffffffffffffffffffff6700000063fffffffffffffffffffffffffffffffffffffffffffffffff60f000000c6ffffffffffffffffffffffffffffffffffffffffffffffffa300000029ffffffffffffffffffffffffffffffffffffffffffffffffff410000008cffffffffffffffffffffffffffffffffffffffffffffffffdf01000005e9ffffffffffffffffffffffffffffffffffffffffffffffff7d00000052fffffffffffffffffffffffffffffffffffffffffffffffffd1e000000b5ffffffffffffffffffffffffffffffffffffffffffffffffb90000001bfcffffffffffffffffffffffffffffffffffffffffffffffff570000007bffffffffffffffffffffffffffffffffffffffffffffffffee07000001ddffffffffffffffffffffffffffffffffffffffffffffffff9300000042ffffffffffffffffffffffffffffffffffffffffffffffffff31000000a5ffffffffffffffffffffffffffffffffffffffffffffffffd000000010f7ffffffffffffffffffffffffffffffffffffffffffffffff6d0000006bfffffffffffffffffffffffffffffffffffffffffffffffff913000000ceffffffffffffffffffffffffffffffffffffffffffffffffa900000031ffffffffffffffffffffffffffffffffffffffffffffffffff4700000094ffffffffffffffffffffffffffffffffffffffffffffffffe302000008eeffffffffffffffffffffffffffffffffffffffffffffffff840000005afffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9a8602c13050c1d4882dfffffffffffffffffffffffffffffffffffffa918000000000000000000025eeeffffffffffffffffffffffffffffff780000000000000000000000000023e5ffffffffffffffffffffffffff9f0000000037a8e4faf1c66d0500000033fdfffffffffffffffffffffff81600000065fdffffffffffffc40a0000009fffffffffffffffffffffffb600000021faffffffffffffffff8d00000047ffffffffffffffffffffff820000007bffffffffffffffffffeb01000014ffffffffffffffffffffff6d000000a2ffffffffffffffffffff15000001fdffffffffffffffffffff76000000a2ffffffffffffffffffff14000007ffffffffffffffffffffffa10000007bffffffffffffffffffec01000033ffffffffffffffffffffffec08000022fbffffffffffffffff8e00000087ffffffffffffffffffffffff7d00000068fdffffffffffffc70b00001ef2fffffffffffffffffffffffffb5500000039aae5fbf2c87006000013d0fffffffffffffffffffffffffffffe93160000000000000000000153e3ffffffffffffffffffffffffffffffffffbd2e000000000000000780f0ffffffffffffffffffffffffffffffffce3500000000000000000000000e87fcffffffffffffffffffffffffffb3060000004fb2e6faf0cd82150000004ffaffffffffffffffffffffffda0b000004a9ffffffffffffffe93600000076ffffffffffffffffffffff5600000084ffffffffffffffffffe80e000005e2fffffffffffffffffff606000008f4ffffffffffffffffffff6f0000008dffffffffffffffffffcb00000039ffffffffffffffffffffffac0000005cffffffffffffffffffbc0000004affffffffffffffffffffffbe0000004dffffffffffffffffffcc00000039ffffffffffffffffffffffac0000005effffffffffffffffffea00000008f4ffffffffffffffffffff6e0000007cffffffffffffffffffff2f00000085ffffffffffffffffffe70d000000c1ffffffffffffffffffff9300000004a9ffffffffffffffe83400000028fcfffffffffffffffffffffa2d0000000050b2e7fbf2cd821400000002b8ffffffffffffffffffffffffe523000000000000000000000000000299fffffffffffffffffffffffffffff16605000000000000000000002cc5ffffffffffffffffffffffffffffffffffe88e542512040b1b3d72c1fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8a259251008203f8be2ffffffffffffffffffffffffffffffffffffffa91d0000000000000000047ffaffffffffffffffffffffffffffffffff7b00000000000000000000000040f8ffffffffffffffffffffffffffff94000000004db9ecf7da8b1300000057ffffffffffffffffffffffffffdc050000008fffffffffffffe527000000acffffffffffffffffffffffff630000005fffffffffffffffffd406000025fbfffffffffffffffffffffb0c000002e0ffffffffffffffffff5f000000b2ffffffffffffffffffffc600000036ffffffffffffffffffffb50000005fffffffffffffffffffffa000000068ffffffffffffffffffffe700000011feffffffffffffffffff8d0000007cfffffffffffffffffffffb00000000dfffffffffffffffffff8c0000007cfffffffffffffffffffffb00000000b4ffffffffffffffffff9e00000069ffffffffffffffffffffe7000000008dffffffffffffffffffbe00000038ffffffffffffffffffffb6000000007bfffffffffffffffffff606000003e2ffffffffffffffffff62000000006fffffffffffffffffffff4f00000064ffffffffffffffffd8080000000062ffffffffffffffffffffc50000000096ffffffffffffe82b000000000064ffffffffffffffffffffff6c0000000051bbeff8dc8e1500001000000074fffffffffffffffffffffff94f0000000000000000000000288c00000084fffffffffffffffffffffffffd810b000000000000000052ea830000009fffffffffffffffffffffffffffffea8d471d090d2864c1ffff5b000000d4ffffffffffffffffffffffffffffffffffffffffffffffffff2100000dfdffffffffffffffffffffffffffffffffffffffffffffffffd900000052ffffffffffffffffffffffffffffffffffffffffffffffffff75000000b8ffffffffffffffffffffffffffffffffffffffffffffffffe30d000023fefffffffffffffffffffffffffffffffffffffffffffffff945000000b7ffffffffffffffffffffffffff7fa2fdffffffffffffffe8480000005effffffffffffffffffffffffffff63002080c4ecfae7c0740e00000034f4ffffffffffffffffffffffffffff6300000000000000000000000043f0ffffffffffffffffffffffffffffff6300000000000000000000118efdfffffffffffffffffffffffffffffffff4bb7f462b15040b25569ff4ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
 }
 void DrawDigitCharacter(RGBABitmapImage *image, double topx, double topy, double digit){
   double x, y;
@@ -4047,8 +4047,8 @@ void DrawDigitCharacter(RGBABitmapImage *image, double topx, double topy, double
   errorMessage = (StringReference *)malloc(sizeof(StringReference));
   color = (RGBA *)malloc(sizeof(RGBA));
 
-  colorChars = (wchar_t*)malloc(sizeof(wchar_t) * (2.0));
-  colorCharsLength = 2.0;
+  colorChars = (wchar_t*)malloc(sizeof(wchar_t) * (2));
+  colorCharsLength = 2;
 
   allCharData = DigitDataBase16(&allCharDataLength);
 
@@ -4230,8 +4230,8 @@ double *PNGSerializeChunks(size_t *returnArrayLength, PNGImage *png){
   if(png->physPresent){
     length = length + 4.0 + 4.0 + 1.0 + 12.0;
   }
-  data = (double*)malloc(sizeof(double) * (length));
-  dataLength = length;
+  data = (double*)malloc(sizeof(double) * (size_t)(length));
+  dataLength = (size_t)length;
   position = CreateNumberReference(0.0);
 
   /* Signature */
@@ -4300,8 +4300,8 @@ double *GetPNGColorData(size_t *returnArrayLength, RGBABitmapImage *image){
 
   length = 4.0*ImageWidth(image)*ImageHeight(image) + ImageHeight(image);
 
-  colordata = (double*)malloc(sizeof(double) * (length));
-  colordataLength = length;
+  colordata = (double*)malloc(sizeof(double) * (size_t)(length));
+  colordataLength = (size_t)length;
 
   next = 0.0;
 
@@ -4332,8 +4332,8 @@ double *GetPNGColorDataGreyscale(size_t *returnArrayLength, RGBABitmapImage *ima
 
   length = ImageWidth(image)*ImageHeight(image) + ImageHeight(image);
 
-  colordata = (double*)malloc(sizeof(double) * (length));
-  colordataLength = length;
+  colordata = (double*)malloc(sizeof(double) * (size_t)(length));
+  colordataLength = (size_t)length;
 
   next = 0.0;
 
@@ -4371,8 +4371,8 @@ double *PNGSignature(size_t *returnArrayLength){
   double *s;
   size_t sLength;
 
-  s = (double*)malloc(sizeof(double) * (8.0));
-  sLength = 8.0;
+  s = (double*)malloc(sizeof(double) * (8));
+  sLength = 8;
   s[0] = 137.0;
   s[1] = 80.0;
   s[2] = 78.0;
@@ -4399,8 +4399,8 @@ double *PNGReadDataChunks(size_t *returnArrayLength, Chunk **cs, size_t csLength
     }
   }
 
-  zlibData = (double*)malloc(sizeof(double) * (length));
-  zlibDataLength = length;
+  zlibData = (double*)malloc(sizeof(double) * (size_t)(length));
+  zlibDataLength = (size_t)length;
   zlibpos = 0.0;
 
   for(i = 0.0; i < csLength; i = i + 1.0){
@@ -4492,8 +4492,8 @@ Chunk **PNGReadChunks(size_t *returnArrayLength, double *data, size_t dataLength
     }
   }
   position->numberValue = prepos;
-  cs = (Chunk**)malloc(sizeof(Chunk) * chunks);
-  csLength = chunks;
+  cs = (Chunk**)malloc(sizeof(Chunk) * (size_t)chunks);
+  csLength = (size_t)chunks;
   for(i = 0.0; i < chunks; i = i + 1.0){
     cs[(int)(i)] = PNGReadChunk(data, dataLength, position);
   }
@@ -4507,12 +4507,12 @@ Chunk *PNGReadChunk(double *data, size_t dataLength, NumberReference *position){
   c = (Chunk *)malloc(sizeof(Chunk));
 
   c->length = Read4bytesBE(data, dataLength, position);
-  c->type = (wchar_t*)malloc(sizeof(wchar_t) * (4.0));
-  c->typeLength = 4.0;
-  c->type[0] = ReadByte(data, dataLength, position);
-  c->type[1] = ReadByte(data, dataLength, position);
-  c->type[2] = ReadByte(data, dataLength, position);
-  c->type[3] = ReadByte(data, dataLength, position);
+  c->type = (wchar_t*)malloc(sizeof(wchar_t) * (4));
+  c->typeLength = 4;
+  c->type[0] = (wchar_t)ReadByte(data, dataLength, position);
+  c->type[1] = (wchar_t)ReadByte(data, dataLength, position);
+  c->type[2] = (wchar_t)ReadByte(data, dataLength, position);
+  c->type[3] = (wchar_t)ReadByte(data, dataLength, position);
   c->data = ReadXbytes(&c->dataLength, data, dataLength, position, c->length);
   c->crc = Read4bytesBE(data, dataLength, position);
 
@@ -4556,8 +4556,8 @@ wchar_t *Substring(size_t *returnArrayLength, wchar_t *string, size_t stringLeng
 
   length = to - from;
 
-  n = (wchar_t*)malloc(sizeof(wchar_t) * (length));
-  nLength = length;
+  n = (wchar_t*)malloc(sizeof(wchar_t) * (size_t)(length));
+  nLength = (size_t)length;
 
   for(i = from; i < to; i = i + 1.0){
     n[(int)(i - from)] = string[(int)(i)];
@@ -4611,8 +4611,8 @@ wchar_t *ConcatenateCharacter(size_t *returnArrayLength, wchar_t *string, size_t
   wchar_t *newString;
   size_t newStringLength;
   double i;
-  newString = (wchar_t*)malloc(sizeof(wchar_t) * (stringLength + 1.0));
-  newStringLength = stringLength + 1.0;
+  newString = (wchar_t*)malloc(sizeof(wchar_t) * (stringLength + 1));
+  newStringLength = stringLength + 1;
 
   for(i = 0.0; i < stringLength; i = i + 1.0){
     newString[(int)(i)] = string[(int)(i)];
@@ -4629,8 +4629,8 @@ StringReference **SplitByCharacter(size_t *returnArrayLength, wchar_t *toSplit, 
   wchar_t *stringToSplitBy;
   size_t stringToSplitByLength;
 
-  stringToSplitBy = (wchar_t*)malloc(sizeof(wchar_t) * (1.0));
-  stringToSplitByLength = 1.0;
+  stringToSplitBy = (wchar_t*)malloc(sizeof(wchar_t) * (1));
+  stringToSplitByLength = 1;
   stringToSplitBy[0] = splitBy;
 
   split = SplitByString(&splitLength, toSplit, toSplitLength, stringToSplitBy, stringToSplitByLength);
@@ -4752,8 +4752,8 @@ wchar_t *ReplaceString(size_t *returnArrayLength, wchar_t *string, size_t string
   _Bool success;
 
   equalsReference = (BooleanReference *)malloc(sizeof(BooleanReference));
-  result = (wchar_t*)malloc(sizeof(wchar_t) * (0.0));
-  resultLength = 0.0;
+  result = (wchar_t*)malloc(sizeof(wchar_t) * (0));
+  resultLength = 0;
 
   for(i = 0.0; i < stringLength; ){
     success = SubstringEqualsWithCheck(string, stringLength, i, toReplace, toReplaceLength, equalsReference);
@@ -4778,8 +4778,8 @@ wchar_t *ReplaceCharacter(size_t *returnArrayLength, wchar_t *string, size_t str
   size_t resultLength;
   double i;
 
-  result = (wchar_t*)malloc(sizeof(wchar_t) * (0.0));
-  resultLength = 0.0;
+  result = (wchar_t*)malloc(sizeof(wchar_t) * (0));
+  resultLength = 0;
 
   for(i = 0.0; i < stringLength; i = i + 1.0){
     if(string[(int)(i)] == toReplace){
@@ -4823,8 +4823,8 @@ wchar_t *Trim(size_t *returnArrayLength, wchar_t *string, size_t stringLength){
   if(lastWhitespaceLocationStart < lastWhitespaceLocationEnd){
     result = Substring(&resultLength, string, stringLength, lastWhitespaceLocationStart + 1.0, lastWhitespaceLocationEnd);
   }else{
-    result = (wchar_t*)malloc(sizeof(wchar_t) * (0.0));
-    resultLength = 0.0;
+    result = (wchar_t*)malloc(sizeof(wchar_t) * (0));
+    resultLength = 0;
   }
 
   *returnArrayLength = resultLength;
@@ -4859,11 +4859,11 @@ StringReference **SplitByString(size_t *returnArrayLength, wchar_t *toSplit, siz
   wchar_t c;
   StringReference *n;
 
-  split = (StringReference**)malloc(sizeof(StringReference) * 0.0);
-  splitLength = 0.0;
+  split = (StringReference**)malloc(sizeof(StringReference) * 0);
+  splitLength = 0;
 
-  next = (wchar_t*)malloc(sizeof(wchar_t) * (0.0));
-  nextLength = 0.0;
+  next = (wchar_t*)malloc(sizeof(wchar_t) * (0));
+  nextLength = 0;
   for(i = 0.0; i < toSplitLength; ){
     c = toSplit[(int)(i)];
 
@@ -4872,8 +4872,8 @@ StringReference **SplitByString(size_t *returnArrayLength, wchar_t *toSplit, siz
       n->string = next;
       n->stringLength = nextLength;
       split = AddString(&splitLength, split, splitLength, n);
-      next = (wchar_t*)malloc(sizeof(wchar_t) * (0.0));
-      nextLength = 0.0;
+      next = (wchar_t*)malloc(sizeof(wchar_t) * (0));
+      nextLength = 0;
       i = i + splitByLength;
     }else{
       next = AppendCharacter(&nextLength, next, nextLength, c);
@@ -4926,8 +4926,8 @@ double *ReadXbytes(size_t *returnArrayLength, double *data, size_t dataLength, N
   size_t rLength;
   double i;
 
-  r = (double*)malloc(sizeof(double) * (length));
-  rLength = length;
+  r = (double*)malloc(sizeof(double) * (size_t)(length));
+  rLength = (size_t)length;
 
   for(i = 0.0; i < length; i = i + 1.0){
     r[(int)(i)] = ReadByte(data, dataLength, position);
@@ -5024,8 +5024,8 @@ double *MakeCRC32Table(size_t *returnArrayLength){
   double *crcTable;
   size_t crcTableLength;
 
-  crcTable = (double*)malloc(sizeof(double) * (256.0));
-  crcTableLength = 256.0;
+  crcTable = (double*)malloc(sizeof(double) * (256));
+  crcTableLength = 256;
 
   for(n = 0.0; n < 256.0; n = n + 1.0){
     c = n;
@@ -5069,8 +5069,8 @@ double CRC32OfInterval(double *data, size_t dataLength, double from, double leng
   size_t crcBaseLength;
   double i, crc;
 
-  crcBase = (double*)malloc(sizeof(double) * (length));
-  crcBaseLength = length;
+  crcBase = (double*)malloc(sizeof(double) * (size_t)(length));
+  crcBaseLength = (size_t)length;
 
   for(i = 0.0; i < length; i = i + 1.0){
     crcBase[(int)(i)] = data[(int)(from + i)];
@@ -5111,8 +5111,8 @@ double *AddNumber(size_t *returnArrayLength, double *list, size_t listLength, do
   size_t newlistLength;
   double i;
 
-  newlist = (double*)malloc(sizeof(double) * (listLength + 1.0));
-  newlistLength = listLength + 1.0;
+  newlist = (double*)malloc(sizeof(double) * (listLength + 1));
+  newlistLength = listLength + 1;
   for(i = 0.0; i < listLength; i = i + 1.0){
     newlist[(int)(i)] = list[(int)(i)];
   }
@@ -5131,8 +5131,8 @@ double *RemoveNumber(size_t *returnArrayLength, double *list, size_t listLength,
   size_t newlistLength;
   double i;
 
-  newlist = (double*)malloc(sizeof(double) * (listLength - 1.0));
-  newlistLength = listLength - 1.0;
+  newlist = (double*)malloc(sizeof(double) * (listLength - 1));
+  newlistLength = listLength - 1;
 
   if(n >= 0.0 && n < listLength){
     for(i = 0.0; i < listLength; i = i + 1.0){
@@ -5163,8 +5163,8 @@ StringReference **AddString(size_t *returnArrayLength, StringReference **list, s
   size_t newlistLength;
   double i;
 
-  newlist = (StringReference**)malloc(sizeof(StringReference) * listLength + 1.0);
-  newlistLength = listLength + 1.0;
+  newlist = (StringReference**)malloc(sizeof(StringReference) * listLength + 1);
+  newlistLength = listLength + 1;
 
   for(i = 0.0; i < listLength; i = i + 1.0){
     newlist[(int)(i)] = list[(int)(i)];
@@ -5184,8 +5184,8 @@ StringReference **RemoveString(size_t *returnArrayLength, StringReference **list
   size_t newlistLength;
   double i;
 
-  newlist = (StringReference**)malloc(sizeof(StringReference) * listLength - 1.0);
-  newlistLength = listLength - 1.0;
+  newlist = (StringReference**)malloc(sizeof(StringReference) * listLength - 1);
+  newlistLength = listLength - 1;
 
   if(n >= 0.0 && n < listLength){
     for(i = 0.0; i < listLength; i = i + 1.0){
@@ -5216,8 +5216,8 @@ _Bool *AddBoolean(size_t *returnArrayLength, _Bool *list, size_t listLength, _Bo
   size_t newlistLength;
   double i;
 
-  newlist = (_Bool*)malloc(sizeof(_Bool) * (listLength + 1.0));
-  newlistLength = listLength + 1.0;
+  newlist = (_Bool*)malloc(sizeof(_Bool) * (listLength + 1));
+  newlistLength = listLength + 1;
   for(i = 0.0; i < listLength; i = i + 1.0){
     newlist[(int)(i)] = list[(int)(i)];
   }
@@ -5236,8 +5236,8 @@ _Bool *RemoveBoolean(size_t *returnArrayLength, _Bool *list, size_t listLength, 
   size_t newlistLength;
   double i;
 
-  newlist = (_Bool*)malloc(sizeof(_Bool) * (listLength - 1.0));
-  newlistLength = listLength - 1.0;
+  newlist = (_Bool*)malloc(sizeof(_Bool) * (listLength - 1));
+  newlistLength = listLength - 1;
 
   if(n >= 0.0 && n < listLength){
     for(i = 0.0; i < listLength; i = i + 1.0){
@@ -5291,8 +5291,8 @@ StringReference **LinkedListStringsToArray(size_t *returnArrayLength, LinkedList
 
   length = LinkedListStringsLength(ll);
 
-  array = (StringReference**)malloc(sizeof(StringReference) * length);
-  arrayLength = length;
+  array = (StringReference**)malloc(sizeof(StringReference) * (size_t)length);
+  arrayLength = (size_t)length;
 
   for(i = 0.0; i < length; i = i + 1.0){
     array[(int)(i)] = (StringReference *)malloc(sizeof(StringReference));
@@ -5345,8 +5345,8 @@ LinkedListNumbers **CreateLinkedListNumbersArray(size_t *returnArrayLength, doub
   size_t llsLength;
   double i;
 
-  lls = (LinkedListNumbers**)malloc(sizeof(LinkedListNumbers) * length);
-  llsLength = length;
+  lls = (LinkedListNumbers**)malloc(sizeof(LinkedListNumbers) * (size_t)length);
+  llsLength = (size_t)length;
   for(i = 0.0; i < llsLength; i = i + 1.0){
     lls[(int)(i)] = CreateLinkedListNumbers();
   }
@@ -5469,8 +5469,8 @@ double *LinkedListNumbersToArray(size_t *returnArrayLength, LinkedListNumbers *l
 
   length = LinkedListNumbersLength(ll);
 
-  array = (double*)malloc(sizeof(double) * (length));
-  arrayLength = length;
+  array = (double*)malloc(sizeof(double) * (size_t)(length));
+  arrayLength = (size_t)length;
 
   for(i = 0.0; i < length; i = i + 1.0){
     array[(int)(i)] = node->value;
@@ -5545,8 +5545,8 @@ wchar_t *LinkedListCharactersToArray(size_t *returnArrayLength, LinkedListCharac
 
   length = LinkedListCharactersLength(ll);
 
-  array = (wchar_t*)malloc(sizeof(wchar_t) * (length));
-  arrayLength = length;
+  array = (wchar_t*)malloc(sizeof(wchar_t) * (size_t)(length));
+  arrayLength = (size_t)length;
 
   for(i = 0.0; i < length; i = i + 1.0){
     array[(int)(i)] = node->value;
@@ -5586,8 +5586,8 @@ DynamicArrayNumbers *CreateDynamicArrayNumbers(){
   DynamicArrayNumbers *da;
 
   da = (DynamicArrayNumbers *)malloc(sizeof(DynamicArrayNumbers));
-  da->array = (double*)malloc(sizeof(double) * (10.0));
-  da->arrayLength = 10.0;
+  da->array = (double*)malloc(sizeof(double) * (10));
+  da->arrayLength = 10;
   da->length = 0.0;
 
   return da;
@@ -5596,8 +5596,8 @@ DynamicArrayNumbers *CreateDynamicArrayNumbersWithInitialCapacity(double capacit
   DynamicArrayNumbers *da;
 
   da = (DynamicArrayNumbers *)malloc(sizeof(DynamicArrayNumbers));
-  da->array = (double*)malloc(sizeof(double) * (capacity));
-  da->arrayLength = capacity;
+  da->array = (double*)malloc(sizeof(double) * (size_t)(capacity));
+  da->arrayLength = (size_t)capacity;
   da->length = 0.0;
 
   return da;
@@ -5616,8 +5616,8 @@ void DynamicArrayNumbersIncreaseSize(DynamicArrayNumbers *da){
   size_t newArrayLength;
 
   newLength = round(da->arrayLength*3.0/2.0);
-  newArray = (double*)malloc(sizeof(double) * (newLength));
-  newArrayLength = newLength;
+  newArray = (double*)malloc(sizeof(double) * (size_t)(newLength));
+  newArrayLength = (size_t)newLength;
 
   for(i = 0.0; i < da->arrayLength; i = i + 1.0){
     newArray[(int)(i)] = da->array[(int)(i)];
@@ -5645,8 +5645,8 @@ void DynamicArrayNumbersDecreaseSize(DynamicArrayNumbers *da){
   size_t newArrayLength;
 
   newLength = round(da->arrayLength*2.0/3.0);
-  newArray = (double*)malloc(sizeof(double) * (newLength));
-  newArrayLength = newLength;
+  newArray = (double*)malloc(sizeof(double) * (size_t)(newLength));
+  newArrayLength = (size_t)newLength;
 
   for(i = 0.0; i < newLength; i = i + 1.0){
     newArray[(int)(i)] = da->array[(int)(i)];
@@ -5703,8 +5703,8 @@ double *DynamicArrayNumbersToArray(size_t *returnArrayLength, DynamicArrayNumber
   size_t arrayLength;
   double i;
 
-  array = (double*)malloc(sizeof(double) * (da->length));
-  arrayLength = da->length;
+  array = (double*)malloc(sizeof(double) * (size_t)(da->length));
+  arrayLength = (size_t)da->length;
 
   for(i = 0.0; i < da->length; i = i + 1.0){
     array[(int)(i)] = da->array[(int)(i)];
@@ -5787,8 +5787,8 @@ DynamicArrayNumbers *LinkedListToDynamicArrayNumbers(LinkedListNumbers *ll){
   da = (DynamicArrayNumbers *)malloc(sizeof(DynamicArrayNumbers));
   da->length = LinkedListNumbersLength(ll);
 
-  da->array = (double*)malloc(sizeof(double) * (da->length));
-  da->arrayLength = da->length;
+  da->array = (double*)malloc(sizeof(double) * (size_t)(da->length));
+  da->arrayLength = (size_t)da->length;
 
   for(i = 0.0; i < da->length; i = i + 1.0){
     da->array[(int)(i)] = node->value;
@@ -5802,8 +5802,8 @@ wchar_t *AddCharacter(size_t *returnArrayLength, wchar_t *list, size_t listLengt
   size_t newlistLength;
   double i;
 
-  newlist = (wchar_t*)malloc(sizeof(wchar_t) * (listLength + 1.0));
-  newlistLength = listLength + 1.0;
+  newlist = (wchar_t*)malloc(sizeof(wchar_t) * (listLength + 1));
+  newlistLength = listLength + 1;
   for(i = 0.0; i < listLength; i = i + 1.0){
     newlist[(int)(i)] = list[(int)(i)];
   }
@@ -5822,8 +5822,8 @@ wchar_t *RemoveCharacter(size_t *returnArrayLength, wchar_t *list, size_t listLe
   size_t newlistLength;
   double i;
 
-  newlist = (wchar_t*)malloc(sizeof(wchar_t) * (listLength - 1.0));
-  newlistLength = listLength - 1.0;
+  newlist = (wchar_t*)malloc(sizeof(wchar_t) * (listLength - 1));
+  newlistLength = listLength - 1;
 
   if(n >= 0.0 && n < listLength){
     for(i = 0.0; i < listLength; i = i + 1.0){
@@ -6473,7 +6473,7 @@ double BitExtract(double b, double fromInc, double toInc){
 double ReadBitRange(double *data, size_t dataLength, NumberReference *nextbit, double length){
   double startbyte, endbyte;
   double startbit, endbit;
-  double number, i;
+  double number;
 
   number = 0.0;
 
@@ -6554,8 +6554,8 @@ double *DeflateDataStaticHuffman(size_t *returnArrayLength, double *data, size_t
   distanceAdditionLengthReference = CreateNumberReference(0.0);
   match = (BooleanReference *)malloc(sizeof(BooleanReference));
 
-  bytes = (double*)malloc(sizeof(double) * (fmax(dataLength*2.0, 100.0)));
-  bytesLength = fmax(dataLength*2.0, 100.0);
+  bytes = (double*)malloc(sizeof(double) * (size_t)(fmax(dataLength*2.0, 100.0)));
+  bytesLength = (size_t)fmax(dataLength*2.0, 100.0);
   aFillNumberArray(bytes, bytesLength, 0.0);
   currentBit = CreateNumberReference(0.0);
 
@@ -6655,8 +6655,8 @@ double *GenerateBitReverseLookupTable(size_t *returnArrayLength, double bits){
   size_t tableLength;
   double i;
 
-  table = (double*)malloc(sizeof(double) * (pow(2.0, bits)));
-  tableLength = pow(2.0, bits);
+  table = (double*)malloc(sizeof(double) * (size_t)(pow(2.0, bits)));
+  tableLength = (size_t)pow(2.0, bits);
 
   for(i = 0.0; i < tableLength; i = i + 1.0){
     table[(int)(i)] = ReverseBits(i, 32.0);
@@ -6690,8 +6690,8 @@ double *DeflateDataNoCompression(size_t *returnArrayLength, double *data, size_t
 
   position = CreateNumberReference(0.0);
 
-  deflated = (double*)malloc(sizeof(double) * ((1.0 + 4.0)*blocks + dataLength));
-  deflatedLength = (1.0 + 4.0)*blocks + dataLength;
+  deflated = (double*)malloc(sizeof(double) * (size_t)((1.0 + 4.0)*blocks + dataLength));
+  deflatedLength = (size_t)((1.0 + 4.0)*blocks + dataLength);
 
   for(block = 0.0; block < blocks; block = block + 1.0){
     if(block + 1.0 == blocks){
