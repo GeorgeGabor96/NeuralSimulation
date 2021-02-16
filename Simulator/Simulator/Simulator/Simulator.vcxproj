@@ -155,6 +155,8 @@
     <ClCompile Include="src\MemoryManagement.c" />
     <ClCompile Include="src\Network.c" />
     <ClCompile Include="src\Neuron.c" />
+    <ClCompile Include="src\pbPlots\pbPlots.c" />
+    <ClCompile Include="src\pbPlots\supportLib.c" />
     <ClCompile Include="src\Printing.c" />
     <ClCompile Include="src\Queue.c" />
     <ClCompile Include="src\Stack.c" />
@@ -169,6 +171,8 @@
     <ClInclude Include="include\MemoryManagement.h" />
     <ClInclude Include="include\Network.h" />
     <ClInclude Include="include\Neuron.h" />
+    <ClInclude Include="include\pbPlots\pbPlots.h" />
+    <ClInclude Include="include\pbPlots\supportLib.h" />
     <ClInclude Include="include\Simulator.h" />
     <ClInclude Include="include\Synapse.h" />
   </ItemGroup>

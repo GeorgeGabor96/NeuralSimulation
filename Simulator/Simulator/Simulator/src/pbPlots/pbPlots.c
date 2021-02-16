@@ -1,6 +1,7 @@
 /* Downloaded from https://repo.progsbase.com - Code Developed Using progsbase. */
 
-#include "pbPlots.h"
+#include <stdbool.h>
+#include "pbPlots/pbPlots.h"
 
 #define strparam(str) (str), wcslen(str)
 
@@ -1186,7 +1187,7 @@ _Bool DrawBarPlotFromSettings(RGBABitmapImageReference *canvasReference, BarPlot
 
     canvas = CreateImage(settings->width, settings->height, GetWhite());
 
-    ss = settings->barPlotSeriesLength;
+    ss = (double)settings->barPlotSeriesLength;
     gridLabelColor = GetGray(0.5);
 
     /* padding */
@@ -1286,7 +1287,7 @@ _Bool DrawBarPlotFromSettings(RGBABitmapImageReference *canvasReference, BarPlot
     }
 
     /* distances */
-    bs = settings->barPlotSeries[0]->ysLength;
+    bs = (double)settings->barPlotSeries[0]->ysLength;
 
     if(settings->autoSpacing){
       groupSeparation = ImageWidth(canvas)*0.05;
@@ -1392,7 +1393,7 @@ _Bool BarPlotSettingsIsValid(BarPlotSettings *settings){
     series = settings->barPlotSeries[(int)(i)];
 
     if( !lengthSet ){
-      length = series->ysLength;
+      length = (double)series->ysLength;
       lengthSet = true;
     }else if(length != series->ysLength){
       success = false;
@@ -1479,39 +1480,39 @@ double test(){
 
   z = 10.0;
   gridlines = ComputeGridLinePositions(&gridlinesLength,  -z/2.0, z/2.0, labels, labelPriorities);
-  AssertEquals(gridlinesLength, 11.0, failures);
+  AssertEquals((double)gridlinesLength, 11.0, failures);
 
   z = 9.0;
   gridlines = ComputeGridLinePositions(&gridlinesLength,  -z/2.0, z/2.0, labels, labelPriorities);
-  AssertEquals(gridlinesLength, 19.0, failures);
+  AssertEquals((double)gridlinesLength, 19.0, failures);
 
   z = 8.0;
   gridlines = ComputeGridLinePositions(&gridlinesLength,  -z/2.0, z/2.0, labels, labelPriorities);
-  AssertEquals(gridlinesLength, 17.0, failures);
+  AssertEquals((double)gridlinesLength, 17.0, failures);
 
   z = 7.0;
   gridlines = ComputeGridLinePositions(&gridlinesLength,  -z/2.0, z/2.0, labels, labelPriorities);
-  AssertEquals(gridlinesLength, 15.0, failures);
+  AssertEquals((double)gridlinesLength, 15.0, failures);
 
   z = 6.0;
   gridlines = ComputeGridLinePositions(&gridlinesLength,  -z/2.0, z/2.0, labels, labelPriorities);
-  AssertEquals(gridlinesLength, 13.0, failures);
+  AssertEquals((double)gridlinesLength, 13.0, failures);
 
   z = 5.0;
   gridlines = ComputeGridLinePositions(&gridlinesLength,  -z/2.0, z/2.0, labels, labelPriorities);
-  AssertEquals(gridlinesLength, 21.0, failures);
+  AssertEquals((double)gridlinesLength, 21.0, failures);
 
   z = 4.0;
   gridlines = ComputeGridLinePositions(&gridlinesLength,  -z/2.0, z/2.0, labels, labelPriorities);
-  AssertEquals(gridlinesLength, 17.0, failures);
+  AssertEquals((double)gridlinesLength, 17.0, failures);
 
   z = 3.0;
   gridlines = ComputeGridLinePositions(&gridlinesLength,  -z/2.0, z/2.0, labels, labelPriorities);
-  AssertEquals(gridlinesLength, 31.0, failures);
+  AssertEquals((double)gridlinesLength, 31.0, failures);
 
   z = 2.0;
   gridlines = ComputeGridLinePositions(&gridlinesLength,  -z/2.0, z/2.0, labels, labelPriorities);
-  AssertEquals(gridlinesLength, 21.0, failures);
+  AssertEquals((double)gridlinesLength, 21.0, failures);
 
   xs = (double*)malloc(sizeof(double) * (5));
   xsLength = 5;
@@ -1764,7 +1765,7 @@ void DeleteImage(RGBABitmapImage *image){
   free(image);
 }
 double ImageWidth(RGBABitmapImage *image){
-  return image->xLength;
+  return (double)image->xLength;
 }
 double ImageHeight(RGBABitmapImage *image){
   double height;
@@ -1772,7 +1773,7 @@ double ImageHeight(RGBABitmapImage *image){
   if(ImageWidth(image) == 0.0){
     height = 0.0;
   }else{
-    height = image->x[0]->yLength;
+    height = (double)image->x[0]->yLength;
   }
 
   return height;
@@ -2529,8 +2530,8 @@ RGBA *CreateBlurForPoint(RGBABitmapImage *src, double x, double y, double pixels
   double w, h;
   double alpha;
 
-  w = src->xLength;
-  h = src->x[0]->yLength;
+  w = (double)src->xLength;
+  h = (double)src->x[0]->yLength;
 
   rgba = (RGBA *)malloc(sizeof(RGBA));
   rgba->r = 0.0;
@@ -4810,7 +4811,7 @@ wchar_t *Trim(size_t *returnArrayLength, wchar_t *string, size_t stringLength){
   }
 
   /* Find whitepaces at the end. */
-  lastWhitespaceLocationEnd = stringLength;
+  lastWhitespaceLocationEnd = (double)stringLength;
   firstNonWhitespaceFound = false;
   for(i = stringLength - 1.0; i >= 0.0 &&  !firstNonWhitespaceFound ; i = i - 1.0){
     if(charIsWhiteSpace(string[(int)(i)])){
@@ -4845,7 +4846,7 @@ _Bool EndsWith(wchar_t *string, size_t stringLength, wchar_t *end, size_t endLen
 
   endsWithString = false;
   if(stringLength >= endLength){
-    endsWithString = SubstringEquals(string, stringLength, stringLength - endLength, end, endLength);
+    endsWithString = SubstringEquals(string, stringLength, (double)(stringLength - endLength), end, endLength);
   }
 
   return endsWithString;
@@ -5727,7 +5728,7 @@ DynamicArrayNumbers *ArrayToDynamicArrayNumbersWithOptimalSize(double *array, si
          log(c) - 1 = n*log(3/2)
          n = (log(c) - 1)/log(3/2)
          */
-  c = arrayLength;
+  c = (double)arrayLength;
   n = (log(c) - 1.0)/log(3.0/2.0);
   newCapacity = floor(n) + 1.0;
 
@@ -5744,7 +5745,7 @@ DynamicArrayNumbers *ArrayToDynamicArrayNumbers(double *array, size_t arrayLengt
 
   da = (DynamicArrayNumbers *)malloc(sizeof(DynamicArrayNumbers));
   da->array = aCopyNumberArray(&da->arrayLength, array, arrayLength);
-  da->length = arrayLength;
+  da->length = (double)arrayLength;
 
   return da;
 }
