@@ -56,7 +56,7 @@ typedef struct Neuron {
 	Array in_synapses_refs;	  // references to input synapses
 	Array out_synapses_refs;  // references to output synapses
 	float u;
-	bool spike;
+	BOOL spike;
 } Neuron;
 
 

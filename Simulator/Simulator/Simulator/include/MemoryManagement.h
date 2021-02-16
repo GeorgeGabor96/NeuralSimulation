@@ -4,7 +4,7 @@
 #include "config.h"
 
 // for debuging to see how the memory structure is filled
-void memory_manage_show_inner_state(bool show_entries, bool show_empty);
+void memory_manage_show_inner_state(BOOL show_entries, BOOL show_empty);
 
 // number of memory allocations that are currently not freed
 size_t memory_manage_memory_blocks();
@@ -13,7 +13,7 @@ size_t memory_manage_memory_blocks();
 size_t memory_manage_memory_size();
 
 // TRUE if allocations were freed
-bool memory_manage_is_empty();
+BOOL memory_manage_is_empty();
 
 // Shows information about every memory allocations not freed
 void memory_manage_report();

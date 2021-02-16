@@ -31,7 +31,7 @@ typedef struct Network {
 	Array input_layers;		// one or more, keeps references to @layers
 	Array input_names;		// names of the input layers, reference to @layers->name
 	Array output_names;		// names of the output layers, reference to @layers->name
-	bool compiled;			// if the network has been compiled
+	BOOL compiled;			// if the network has been compiled
 } Network;
 
 
@@ -44,7 +44,7 @@ typedef struct Network {
 * 5. @network->input_names is valid
 * 6. @network->output_names is valid
 */
-bool network_is_valid(Network* network);
+BOOL network_is_valid(Network* network);
 
 Network* network_create();
 void network_destroy(Network* network);
@@ -59,7 +59,7 @@ void network_destroy(Network* network);
 * 2. If the layer was on the heap and the @layer structure is still needed then set @should_free = FALSE
 * 3. If the layer was on the heap and the @layer structure is not needed anymore set @should_free = TRUE
 */
-Status network_add_layer(Network* network, Layer* layer, bool should_free, bool is_input, bool is_output);
+Status network_add_layer(Network* network, Layer* layer, BOOL should_free, BOOL is_input, BOOL is_output);
 
 Layer* network_get_layer_by_idx(Network* network, uint32_t layer_idx);
 Layer* network_get_layer_by_string(Network* network, String* name);

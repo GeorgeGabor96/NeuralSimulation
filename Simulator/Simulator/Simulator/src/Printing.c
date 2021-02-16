@@ -8,7 +8,7 @@ void show_float(void* data) {
 
 
 void show_bool(void* data) {
-	float a = *((bool*)data);
+	float a = *((BOOL*)data);
 	if (a > 0) {
 		printf("1 ");
 	} 

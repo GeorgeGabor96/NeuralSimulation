@@ -34,6 +34,7 @@ typedef struct Array {
 } Array;
 
 typedef Array ArrayBool;
+typedef Array ArrayDouble;
 typedef Array ArrayFloat;
 typedef Array ArrayUint8;
 typedef Array ArrayUint16;
@@ -57,7 +58,7 @@ Verify that an @array is valid, meaning:
 4. array->element_size > 0
 5. array->data != NULL
 */
-bool array_is_valid(Array* array);
+BOOL array_is_valid(Array* array);
 Array* array_create(uint32_t length, uint32_t initial_length, size_t element_size);
 Status array_init(Array* array, uint32_t length, uint32_t initial_length, size_t element_size);
 void array_reset(Array* array, ElemReset reset);
@@ -94,14 +95,14 @@ void* stack_top(Stack* stack_p);
 // string have at most 256 chars currently
 #define STRING_LIMIT 256
 typedef Array String;
-bool string_is_valid(String* string);
+BOOL string_is_valid(String* string);
 String* string_create(char* c_string_p);
 char* string_get_C_string(String* string);
 String* string_copy(String* string);
 void string_destroy(String* string_p);
 Array* strings_create(char** strings_pp, uint32_t cnt);
 void strings_destroy(Array* strings_p);
-bool string_equal(String* string1_p, String* string2_p);
+BOOL string_equal(String* string1_p, String* string2_p);
 
 
 /*************************************************************

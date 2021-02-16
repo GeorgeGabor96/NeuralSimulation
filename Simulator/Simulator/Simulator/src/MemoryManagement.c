@@ -113,7 +113,7 @@ static inline void hash_table_add(HashTable* table, Node* node);
 static inline Node* hash_table_remove(HashTable* table, void* key);
 
 
-static inline bool is_prime(size_t n) {
+static inline BOOL is_prime(size_t n) {
 	size_t i = 0;
 	for (i = 2; i < n / 2; ++i) {
 		if (n % i == 0) return FALSE;
@@ -319,7 +319,7 @@ size_t memory_manage_memory_size() {
 	return mem_size;
 }
 
-bool memory_manage_is_empty() {
+BOOL memory_manage_is_empty() {
 	if (memory_table == NULL) memory_table = hash_table_create(TABLE_INITIAL_LENGTH);
 	if (memory_table->length == 0) return TRUE;
 	return FALSE;
@@ -353,7 +353,7 @@ ERROR
 }
 
 
-void memory_manage_show_inner_state(bool show_entries, bool show_empty) {
+void memory_manage_show_inner_state(BOOL show_entries, BOOL show_empty) {
 	if (memory_table == NULL) memory_table = hash_table_create(TABLE_INITIAL_LENGTH);
 
 	size_t i = 0;

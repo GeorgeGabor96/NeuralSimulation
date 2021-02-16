@@ -58,8 +58,8 @@ const char* neuron_type_C_string(type) {
 /*************************************************************
 * UPDATE functions for neurons
 *************************************************************/
-static inline bool neuron_update(Neuron* neuron, float PSC) {
-	bool spike = FALSE;
+static inline BOOL neuron_update(Neuron* neuron, float PSC) {
+	BOOL spike = FALSE;
 	
 	switch (neuron->n_class->type)
 	{
