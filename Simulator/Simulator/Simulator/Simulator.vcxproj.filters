@@ -42,10 +42,13 @@
     <ClInclude Include="include\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\pbPlots\pbPlots.h">
+    <ClInclude Include="include\plotting\pbPlots.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\pbPlots\supportLib.h">
+    <ClInclude Include="include\plotting\supportLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\plotting\plotting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -80,10 +83,13 @@
     <ClCompile Include="src\MemoryManagement.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\pbPlots\pbPlots.c">
+    <ClCompile Include="src\plotting\pbPlots.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\pbPlots\supportLib.c">
+    <ClCompile Include="src\plotting\supportLib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\plotting\plotting.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

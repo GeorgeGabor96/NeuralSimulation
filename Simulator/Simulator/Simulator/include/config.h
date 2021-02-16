@@ -11,7 +11,7 @@
 #include <time.h>
 #include "debug.h"
 
-typedef uint8_t bool;
+typedef uint8_t BOOL;
 #define TRUE 1ui8
 #define FALSE 0ui8
 

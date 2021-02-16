@@ -1,7 +1,6 @@
 /* Downloaded from https://repo.progsbase.com - Code Developed Using progsbase. */
 
-#include <stdbool.h>
-#include "pbPlots/pbPlots.h"
+#include "plotting/pbPlots.h"
 
 #define strparam(str) (str), wcslen(str)
 

@@ -34,6 +34,7 @@ typedef struct Array {
 } Array;
 
 typedef Array ArrayBool;
+typedef Array ArrayDouble;
 typedef Array ArrayFloat;
 typedef Array ArrayUint8;
 typedef Array ArrayUint16;

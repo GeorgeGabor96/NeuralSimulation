@@ -1,4 +1,8 @@
+#ifndef __PBPLOTS_PBPLOTS__
+#define __PBPLOTS_PBPLOTS__
+
 #include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
 #include <string.h>
 #include <wchar.h>
@@ -741,3 +745,5 @@ void GetDeflateLengthCode(double length, NumberReference *code, NumberReference 
 void GetDeflateDistanceCode(double distance, NumberReference *code, NumberReference *distanceAdditionReference, NumberReference *distanceAdditionLengthReference, double *bitReverseLookupTable, size_t bitReverseLookupTableLength);
 void AppendBitsToBytesLeft(double *bytes, size_t bytesLength, NumberReference *nextbit, double data, double length);
 void AppendBitsToBytesRight(double *bytes, size_t bytesLength, NumberReference *nextbit, double data, double length);
+
+#endif // __PBPLOTS_PBPLOTS__
