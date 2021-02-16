@@ -82,7 +82,7 @@ TestStatus memory_manage_report_test() {
 	
 	void* ptr1 = malloc(100000, "malloc_simple");
 	void* ptr2 = calloc(3, 300000, "calloc_simple");
-	bool is_empty = memory_manage_is_empty();
+	BOOL is_empty = memory_manage_is_empty();
 	assert(is_empty == FALSE, "should have memory");
 	size_t memory_blocks = memory_manage_memory_blocks();
 	assert(memory_blocks == 2, "@memory_blocks is %llu, not 2", memory_blocks);

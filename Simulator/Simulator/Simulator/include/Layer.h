@@ -38,7 +38,7 @@ struct Layer {
 	String* name;				 // array of char's
 	Array* input_names;			 // vector of array's of char's
 	Array neurons;				 // managed by the layer
-	bool is_input;				 // if the step function was called for this layer
+	BOOL is_input;				 // if the step function was called for this layer
 };
 
 /*
@@ -52,8 +52,8 @@ struct Layer {
 * 7. @layer->input_names is valid
 * 8. @layer->neurons is valid
 */
-bool layer_is_valid(Layer* layer);
-bool layer_type_is_valid(LayerType type);
+BOOL layer_is_valid(Layer* layer);
+BOOL layer_type_is_valid(LayerType type);
 
 // NEW CREATION API
 Status layer_init(

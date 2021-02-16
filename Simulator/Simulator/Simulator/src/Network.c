@@ -5,7 +5,7 @@
 /*************************************************************
 * CHECKS FUNCTIONS
 *************************************************************/
-bool network_is_valid(Network* network) {
+BOOL network_is_valid(Network* network) {
 	check(network != NULL, null_argument("network"));
 	check(array_is_valid(&(network->layers)) == TRUE, invalid_argument("network->layers"));
 	check(array_is_valid(&(network->input_layers)) == TRUE, invalid_argument("network->input_layers"));
@@ -17,7 +17,7 @@ bool network_is_valid(Network* network) {
 	uint32_t j = 0;
 	Layer* layer = NULL;
 	Layer* layer_p = NULL;
-	bool ok = FALSE;
+	BOOL ok = FALSE;
 
 	for (i = 0; i < network->layers.length; ++i) {
 		layer = (Layer*)array_get(&(network->layers), i);
@@ -114,7 +114,7 @@ ERROR
 }
 
 
-Status network_add_layer(Network* network, Layer* layer, bool should_free, bool is_input, bool is_output) {
+Status network_add_layer(Network* network, Layer* layer, BOOL should_free, BOOL is_input, BOOL is_output) {
 	check(network_is_valid(network) == TRUE, invalid_argument("network"));
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 

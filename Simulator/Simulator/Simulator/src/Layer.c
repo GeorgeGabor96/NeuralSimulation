@@ -5,7 +5,7 @@
 /*************************************************************
 * CHECKS FUNCTIONS
 *************************************************************/
-bool layer_is_valid(Layer* layer) {
+BOOL layer_is_valid(Layer* layer) {
 	check(layer != NULL, null_argument("layer"));
 	check(layer_type_is_valid(layer->type) == TRUE, invalid_argument("layer->type"));
 	check(neuron_class_is_valid(layer->neuron_class) == TRUE, invalid_argument("layer->neuron_class"));
@@ -45,7 +45,7 @@ const char* layer_type_C_string(LayerType type) {
 *************************************************************/
 
 // may add multiple layer types in the future
-bool layer_type_is_valid(LayerType type) {
+BOOL layer_type_is_valid(LayerType type) {
 	check(type == LAYER_FULLY_CONNECTED, "@type is %d", type);
 
 	return TRUE;
@@ -237,11 +237,11 @@ Status layer_step_force_spikes(Layer* layer, ArrayBool* spikes, uint32_t time) {
 	check(layer->neurons.length == spikes->length, "@layer->neurons.length is %u and @spikes->length is %u at time %u", layer->neurons.length, spikes->length, time);
 
 	uint32_t i = 0;
-	bool spike = FALSE;
+	BOOL spike = FALSE;
 	Neuron* neuron = NULL;
 
 	for (i = 0; i < spikes->length; ++i) {
-		spike = *((bool*)array_get(spikes, i));
+		spike = *((BOOL*)array_get(spikes, i));
 		if (spike == TRUE) {
 			neuron = (Neuron*)array_get(&(layer->neurons), i);
 			check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
@@ -283,7 +283,7 @@ ArrayBool* layer_get_spikes(Layer* layer) {
 	uint32_t i = 0;
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 
-	spikes = array_create(layer->neurons.length, 0, sizeof(bool));
+	spikes = array_create(layer->neurons.length, 0, sizeof(BOOL));
 	check(array_is_valid(spikes) == TRUE, invalid_argument("spikes"));
 
 	for (i = 0; i < layer->neurons.length; ++i) {

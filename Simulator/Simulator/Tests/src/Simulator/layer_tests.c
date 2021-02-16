@@ -33,8 +33,8 @@ TestStatus layer_general_use_case_test() {
 	}
 
 	// test case 1: force spike on every neuron, make a step, and verify that no neuron has spiked
-	ArrayBool* spikes = array_create(layer->neurons.length, layer->neurons.length, sizeof(bool));
-	bool spike = FALSE;
+	ArrayBool* spikes = array_create(layer->neurons.length, layer->neurons.length, sizeof(BOOL));
+	BOOL spike = FALSE;
 	for (i = 0; i < spikes->length; ++i) {
 		spike = TRUE;
 		array_set(spikes, i, &spike);
@@ -55,7 +55,7 @@ TestStatus layer_general_use_case_test() {
 	assert(array_is_valid(spikes) == TRUE, invalid_argument("spikes"));
 	assert(spikes->length == layer->neurons.length, "spikes->length is %u - layer->neurons.length is %u", spikes->length, layer->neurons.length);
 	for (i = 0; i < spikes->length; ++i) {
-		spike = *((bool*)array_get(spikes, i));
+		spike = *((BOOL*)array_get(spikes, i));
 		assert(spike == FALSE, "neuron %u spiked", i);
 	}
 	array_destroy(spikes, NULL);
@@ -81,7 +81,7 @@ TestStatus layer_general_use_case_test() {
 	assert(array_is_valid(spikes) == TRUE, invalid_argument("spikes"));
 	assert(spikes->length == layer->neurons.length, "spikes->length is %u - layer->neurons.length is %u", spikes->length, layer->neurons.length);
 	for (i = 0; i < spikes->length; ++i) {
-		spike = *((bool*)array_get(spikes, i));
+		spike = *((BOOL*)array_get(spikes, i));
 		assert(spike == FALSE, "neuron %u spiked", i);
 	}
 	array_destroy(spikes, NULL);
@@ -107,7 +107,7 @@ TestStatus layer_general_use_case_test() {
 	assert(array_is_valid(spikes) == TRUE, invalid_argument("spikes"));
 	assert(spikes->length == layer->neurons.length, "spikes->length is %u - layer->neurons.length is %u", spikes->length, layer->neurons.length);
 	for (i = 0; i < spikes->length; ++i) {
-		spike = *((bool*)array_get(spikes, i));
+		spike = *((BOOL*)array_get(spikes, i));
 		assert(spike == FALSE, "neuron %u spiked", i);
 	}
 	array_destroy(spikes, NULL);
@@ -159,7 +159,7 @@ TestStatus layer_memory_test_test() {
 	ArrayBool* spikes = NULL;
 	ArrayFloat* voltages = NULL;
 	ArrayFloat* currents = NULL;
-	bool spike = FALSE;
+	BOOL spike = FALSE;
 
 	Layer* layers[100] = { NULL };
 	for (i = 0; i < 100; ++i) {
@@ -168,7 +168,7 @@ TestStatus layer_memory_test_test() {
 		layers[i] = layer_create_with_input_names(LAYER_FULLY_CONNECTED, 100, n_class, s_class, l_name, l_input_names);
 	}
 
-	spikes = array_create(layers[0]->neurons.length, layers[0]->neurons.length, sizeof(bool));
+	spikes = array_create(layers[0]->neurons.length, layers[0]->neurons.length, sizeof(BOOL));
 	spike = TRUE;
 	for (i = 0; i < 100; ++i) array_set(spikes, i, &spike);
 	for (i = 0; i < 100; ++i) {

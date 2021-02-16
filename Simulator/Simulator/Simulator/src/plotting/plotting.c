@@ -1,7 +1,8 @@
 #include "plotting/plotting.h"
 
 // DO NOT TEST THIS MODULE UNTIL YOU CAN DO THE FULL PIPELINE (load image, plots, save image)
-static inline array_float_to_double(ArrayFloat* floats) {
+// I am sure there are a lot of memory leaks
+static inline ArrayDouble* array_float_to_double(ArrayFloat* floats) {
 	ArrayDouble* doubles = array_create(floats->length, floats->length, sizeof(double));
 	float f_value = 0.0f;
 	double d_value = 0.0;
@@ -29,7 +30,13 @@ void plotting_scatter_plot_floats(ArrayFloat* xs, ArrayFloat* ys, size_t width, 
 
 void plotting_scatter_plot_doubles(ArrayDouble* xs, ArrayDouble* ys, size_t width, size_t height, char* path) {
 	RGBABitmapImageReference* image_reference = CreateRGBABitmapImageReference();
-	DrawScatterPlot(image_reference, (double)width, (double)height, xs->data, (size_t)(xs->length), ys->data, (size_t)(xs->length));
+	DrawScatterPlot(image_reference, 
+					(double)width, 
+					(double)height, 
+					(double*)xs->data, 
+					(size_t)(xs->length), 
+					(double*)ys->data, 
+					(size_t)(xs->length));
 
 	size_t length;
 	double* pngdata = ConvertToPNG(&length, image_reference->image);

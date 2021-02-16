@@ -4,7 +4,7 @@
 /*************************************************************
 * Check Functions
 *************************************************************/
-bool string_is_valid(String* string) {
+BOOL string_is_valid(String* string) {
 	check(array_is_valid(string) == TRUE, invalid_argument("string"));
 	check(string->element_size == 1, "@string->element_size != 1");
 	return TRUE;
@@ -120,7 +120,7 @@ ERROR
 }
 
 
-bool string_equal(String* string1_p, String* string2_p) {
+BOOL string_equal(String* string1_p, String* string2_p) {
 	check(string_is_valid(string1_p), invalid_argument("string1_p"));
 	check(string_is_valid(string2_p), invalid_argument("string2_p"));
 	

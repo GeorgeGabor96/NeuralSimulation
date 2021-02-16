@@ -7,7 +7,7 @@
 /*************************************************************
 * CHECKS FUNCTIONS
 *************************************************************/
-bool array_is_valid(Array* array) {
+BOOL array_is_valid(Array* array) {
 	check(array != NULL, null_argument("array"));
 	check(array->length <= array->max_length, "@array->length > @array->max_length");
 	check(array->max_length > 0, "@array->max_length == 0");
