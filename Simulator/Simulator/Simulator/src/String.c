@@ -1,4 +1,5 @@
 #include "Containers.h"
+#include "MemoryManagement.h"
 
 
 /*************************************************************
@@ -30,21 +31,45 @@ static inline uint32_t safe_strlen(char* c_string_p) {
 /*************************************************************
 * String Functionality
 *************************************************************/
-String* string_create(char* c_string_p) {
+// UNTESTED
+Status string_init(String* string_p, char* c_string_p) {
+	check(string_p != NULL, null_argument("string_p"));
 	check(c_string_p != NULL, null_argument("c_string_p"));
+
 	uint32_t n_chars = safe_strlen(c_string_p);
-	String* string_p = array_create(n_chars + 1, n_chars, sizeof(char));
-	check_memory(string_p);
+	Status status = array_init(string_p, n_chars + 1, n_chars, sizeof(char));
+	check(status == SUCCESS, "array_init failed");
 	array_copy_data(string_p, c_string_p, 0, n_chars);
 
 	// didn't put end of string
 	char end_s = '\0';
 	array_append(string_p, &end_s);
 
+ERROR
+	return;
+}
+
+
+String* string_create(char* c_string_p) {
+	// make a blank string
+	String* string_p = (String*)malloc(sizeof(String), "string_create");
+	check_memory(string_p);
+	Status status = string_init(string_p, c_string_p);
+	check(status == SUCCESS, "string_init failed");
 	return string_p;
 
 ERROR
+	if (string_p != NULL) free(string_p);
 	return NULL;
+}
+
+
+void string_reset(String* string_p) {
+	check(array_is_valid(string_p) == TRUE, invalid_argument("string_p"));
+	array_reset(string_p, NULL);
+
+ERROR
+	return;
 }
 
 

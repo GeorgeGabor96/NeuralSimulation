@@ -51,6 +51,12 @@
     <ClInclude Include="include\plotting\plotting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\callbacks\callback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\callbacks\callback_visualize_layer_neurons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Array.c">

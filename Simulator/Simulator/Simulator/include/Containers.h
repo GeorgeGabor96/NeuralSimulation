@@ -96,9 +96,11 @@ void* stack_top(Stack* stack_p);
 #define STRING_LIMIT 256
 typedef Array String;
 BOOL string_is_valid(String* string);
+Status string_init(String* string_p, char* c_string_p);
 String* string_create(char* c_string_p);
 char* string_get_C_string(String* string);
 String* string_copy(String* string);
+void string_reset(String* string_p);
 void string_destroy(String* string_p);
 Array* strings_create(char** strings_pp, uint32_t cnt);
 void strings_destroy(Array* strings_p);
