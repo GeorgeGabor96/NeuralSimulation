@@ -2,6 +2,8 @@
 
 // DO NOT TEST THIS MODULE UNTIL YOU CAN DO THE FULL PIPELINE (load image, plots, save image)
 // I am sure there are a lot of memory leaks
+
+// MOVE THIS TO CONTAINERS
 static inline ArrayDouble* array_float_to_double(ArrayFloat* floats) {
 	ArrayDouble* doubles = array_create(floats->length, floats->length, sizeof(double));
 	float f_value = 0.0f;

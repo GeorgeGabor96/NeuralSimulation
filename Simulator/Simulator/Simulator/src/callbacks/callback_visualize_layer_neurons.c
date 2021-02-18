@@ -22,8 +22,10 @@ BOOL callback_visualize_layer_neurons_is_valid(Callback* callback) {
 	check(callback->destroy != NULL, null_argument("callback->destroy"));
 
 	C_Data* data = (C_Data*)(callback->data);
-	check(string_is_valid(&(data->layer_name)) == TRUE, invalid_argument("data->layer_name"));
 	check(string_is_valid(&(data->output_folder)) == TRUE, invalid_argument("data->output_folder"));
+	check(layer_is_valid(&(data->layer)) == TRUE, invalid_argument("data->layer"));
+	check(array_is_valid(&(data->voltages_per_neuron) == TRUE, invalid_argument("data->voltages_per_neuron")));
+	check(array_is_valid(&(data->spikes_per_neuron) == TRUE, invalid_argument("data->spikes_per_neuron")));
 
 	return TRUE;
 ERROR
@@ -56,6 +58,25 @@ ERROR
 		}
 	}
 	return FAIL;
+}
+
+
+static inline Status __array_of_arrays_reset(Array* data) {
+	uint32_t i = 0;
+	Array* inner_array = NULL;
+
+	check(array_is_valid(data) == TRUE, invalid_argument("data"));
+	for (i = 0; i < data->length; ++i) {
+		inner_array = (Array*)array_get(data, i);
+		check(array_is_valid(inner_array) == TRUE, "invalid @inner_array %u", i);
+		array_reset(inner_array, NULL);
+	}
+	array_reset(data, NULL);
+	return SUCCESS;
+
+ERROR
+	return FAIL;
+
 }
 
 
@@ -103,12 +124,61 @@ ERROR
 }
 
 void callback_visualize_layer_neurons_update(Callback* callback, Network* net) {
+	(net);
+	check(callback_visualize_layer_neurons_is_valid(callback) == TRUE, invalid_argument("callback"));
+	C_Data* data = (C_Data*)(callback->data);
+	uint32_t i = 0; 
+
+	ArrayFloat* voltages = layer_get_voltages(data->layer);
+	ArrayBool* spikes = layer_get_spikes(data->layer);
+	float* voltage_p = NULL;
+	BOOL* spike_p = NULL;
+
+	// save info about voltages and spikes
+	for (i = 0; i < data->layer->neurons.length; ++i) {
+		voltage_p = (float*)array_get(voltages, i);
+		spike_p = (BOOL*)array_get(spikes, i);
+		array_append(&(data->voltages_per_neuron), voltage_p);
+		array_append(&(data->spikes_per_neuron), spike_p);
+	}
+	array_destroy(voltages, NULL);
+	array_destroy(spikes, NULL);
+
+ERROR
 	return;
 }
 
-void callback_visualize_layer_neurons_run(Callback* callback) {
-	// TODO: need to be able to work with paths, join them
-	
+void callback_visualize_layer_neurons_run(Callback* callback, Network* net) {
+	(net);
+	check(callback_visualize_layer_neurons_is_valid(callback) == TRUE, invalid_argument("callback"));
+	uint32_t i = 0;
+	C_Data* data = (C_Data*)(callback->data);
+	ArrayFloat* voltages = NULL;
+	ArrayBool* spikes = NULL;
+	String* output_folder = string_path_join(data->output_folder, data->layer->name);
+	String* file_path = NULL;
+	char file_name[128] = { 0 };
+	Array* steps = array_arange_float(data->layer->neurons.length);
+
+	// version 1 - create 2 plots per neuron, one for voltages one for spikes
+	for (i = 0; i < data->layer->neurons.length; ++i) {
+		voltages = (ArrayFloat*)array_get(&(data->voltages_per_neuron), i);
+		sprintf(file_name, "Voltages_N%u.png", i);
+		// need some work
+		file_path = string_path_join(output_folder, file_name); // need to write this
+		plotting_scatter_plot_floats(steps, voltages, 600, 400, string_get_C_string(file_path));
+		string_destroy(file_path);
+
+		spikes = (ArrayBool*)array_get(&(data->spikes_per_neuron), i);
+		sprintf(file_name, "Spikes_N%u.png", i);
+		file_path = string_path_join(output_folder, file_name);
+		plotting_scatter_plot_floats(steps, spikes, 600, 400, string_get_C_string(file_path));
+		string_destroy(file_path);
+	}
+	string_destroy(output_folder);
+	array_destroy(steps, NULL);
+
+ERROR
 	return;
 }
 
@@ -117,8 +187,10 @@ void callback_visualize_layer_neurons_destroy(Callback* callback) {
 
 	// free data
 	C_Data* data = (C_Data*)(callback->data);
-	string_reset(&(data->layer_name));
 	string_reset(&(data->output_folder));
+	data->layer = NULL;
+	__array_of_arrays_reset(&(data->voltages_per_neuron));
+	__array_of_arrays_reset(&(data->spikes_per_neuron));
 	free(callback->data);
 
 	// clear memory

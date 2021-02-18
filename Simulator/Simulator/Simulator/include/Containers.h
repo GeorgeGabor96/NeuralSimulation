@@ -72,6 +72,10 @@ void array_copy_data(Array* array, void* data, uint32_t start_idx, uint32_t elem
 Status array_swap(Array* array, uint32_t i, uint32_t j);
 Status array_resize(Array* array, uint32_t new_max_length);
 
+// conversion functions
+ArrayFloat* array_Bool_to_Float(ArrayBool* array);
+ArrayFloat* array_arange_float(uint32_t length);
+
 // stack functionality
 typedef Array Stack;
 #define stack_is_full(stack) array_is_full(stack)
