@@ -231,3 +231,67 @@ Status array_resize(Array* array, uint32_t new_max_length) {
 ERROR
 	return FAIL;
 }
+
+
+
+// conversion functions
+ArrayFloat* array_bool_to_float(ArrayBool* array_b, BOOL destroy_array_bool) {
+	ArrayFloat* array_f = (ArrayFloat*)array_create(array_b->length, array_b->length, sizeof(BOOL));
+	check_memory(array_f);
+	uint32_t i = 0;
+	float float_v = 0.0f;
+	BOOL bool_v = FALSE;
+
+	for (i = 0; i < array_b->length; ++i) {
+		bool_v = *((BOOL*)array_get(array_b, i));
+		float_v = (float)bool_v;
+		array_set(array_f, i, &float_v);
+	}
+	if (destroy_array_bool == TRUE) 
+		array_destroy(array_b, NULL);
+
+	return array_f;
+
+ERROR
+	return NULL;
+}
+
+
+ArrayDouble* array_float_to_double(ArrayFloat* array_f, BOOL destroy_array_float) {
+	ArrayDouble* array_d = (ArrayDouble*)array_create(array_f->length, array_f->length, sizeof(double));
+	check_memory(array_d);
+	uint32_t i = 0;
+	double double_v = 0.0;
+	float float_v = 0.0f;
+
+	for (i = 0; i < array_f->length; ++i) {
+		float_v = *((float*)array_get(array_f, i));
+		double_v = (double)float_v;
+		array_set(array_d, i, &double_v);
+	}
+	if (destroy_array_float == TRUE)
+		array_destroy(array_f, NULL);
+
+	return array_d;
+
+ERROR
+	return NULL;
+}
+
+
+
+// utility functions
+ArrayFloat* array_arange_float(uint32_t length) {
+	ArrayFloat* array_f = (ArrayFloat*)array_create(length, length, sizeof(float));
+	check_memory(array_f);
+
+	float i_f = 0.0f;
+	uint32_t i = 0;
+	for (i = 0; i < length; ++i) {
+		i_f = (float)i;
+		array_set(array_f, i, &i_f);
+	}
+
+ERROR
+	return array_f;
+}

@@ -73,10 +73,16 @@ Status array_swap(Array* array, uint32_t i, uint32_t j);
 Status array_resize(Array* array, uint32_t new_max_length);
 
 // conversion functions
-ArrayFloat* array_Bool_to_Float(ArrayBool* array);
+ArrayFloat* array_bool_to_float(ArrayBool* array_b, BOOL destroy_array_bool);
+ArrayDouble* array_float_to_double(ArrayFloat* array_f, BOOL destroy_array_float);
+
+// utility functions
 ArrayFloat* array_arange_float(uint32_t length);
 
-// stack functionality
+
+/*************************************************************
+* Stack Functionality
+*************************************************************/
 typedef Array Stack;
 #define stack_is_full(stack) array_is_full(stack)
 #define stack_is_empty(stack) array_is_empty(stack)
@@ -109,6 +115,9 @@ void string_destroy(String* string_p);
 Array* strings_create(char** strings_pp, uint32_t cnt);
 void strings_destroy(Array* strings_p);
 BOOL string_equal(String* string1_p, String* string2_p);
+
+// function for working with paths
+String* string_path_join(String* string1, String* string2);
 
 
 /*************************************************************

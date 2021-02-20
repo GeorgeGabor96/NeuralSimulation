@@ -3,25 +3,10 @@
 // DO NOT TEST THIS MODULE UNTIL YOU CAN DO THE FULL PIPELINE (load image, plots, save image)
 // I am sure there are a lot of memory leaks
 
-// MOVE THIS TO CONTAINERS
-static inline ArrayDouble* array_float_to_double(ArrayFloat* floats) {
-	ArrayDouble* doubles = array_create(floats->length, floats->length, sizeof(double));
-	float f_value = 0.0f;
-	double d_value = 0.0;
-
-	for (uint32_t i = 0; i < floats->length; ++i) {
-		f_value = *((float*)array_get(floats, i));
-		d_value = (double)f_value;
-		array_set(doubles, i, &d_value);
-	}
-
-	return doubles;
-}
-
 
 void plotting_scatter_plot_floats(ArrayFloat* xs, ArrayFloat* ys, size_t width, size_t height, char* path) {
-	ArrayDouble* d_xs = array_float_to_double(xs);
-	ArrayDouble* d_ys = array_float_to_double(ys);
+	ArrayDouble* d_xs = array_float_to_double(xs, FALSE);
+	ArrayDouble* d_ys = array_float_to_double(ys, FALSE);
 
 	plotting_scatter_plot_doubles(d_xs, d_ys, width, height, path);
 

@@ -23,9 +23,9 @@ BOOL callback_visualize_layer_neurons_is_valid(Callback* callback) {
 
 	C_Data* data = (C_Data*)(callback->data);
 	check(string_is_valid(&(data->output_folder)) == TRUE, invalid_argument("data->output_folder"));
-	check(layer_is_valid(&(data->layer)) == TRUE, invalid_argument("data->layer"));
-	check(array_is_valid(&(data->voltages_per_neuron) == TRUE, invalid_argument("data->voltages_per_neuron")));
-	check(array_is_valid(&(data->spikes_per_neuron) == TRUE, invalid_argument("data->spikes_per_neuron")));
+	check(layer_is_valid(data->layer) == TRUE, invalid_argument("data->layer"));
+	check(array_is_valid(&(data->voltages_per_neuron)) == TRUE, invalid_argument("data->voltages_per_neuron"));
+	check(array_is_valid(&(data->spikes_per_neuron)) == TRUE, invalid_argument("data->spikes_per_neuron"));
 
 	return TRUE;
 ERROR

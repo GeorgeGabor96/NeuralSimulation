@@ -33,11 +33,12 @@ static inline uint32_t safe_strlen(char* c_string_p) {
 *************************************************************/
 // UNTESTED
 Status string_init(String* string_p, char* c_string_p) {
+	Status status = FAIL;
 	check(string_p != NULL, null_argument("string_p"));
 	check(c_string_p != NULL, null_argument("c_string_p"));
 
 	uint32_t n_chars = safe_strlen(c_string_p);
-	Status status = array_init(string_p, n_chars + 1, n_chars, sizeof(char));
+	status = array_init(string_p, n_chars + 1, n_chars, sizeof(char));
 	check(status == SUCCESS, "array_init failed");
 	array_copy_data(string_p, c_string_p, 0, n_chars);
 
@@ -46,7 +47,7 @@ Status string_init(String* string_p, char* c_string_p) {
 	array_append(string_p, &end_s);
 
 ERROR
-	return;
+	return status;
 }
 
 
@@ -153,4 +154,12 @@ BOOL string_equal(String* string1_p, String* string2_p) {
 	if (memcmp(string1_p->data, string2_p->data, string1_p->element_size * string1_p->length) == 0) return TRUE;
 ERROR
 	return FALSE;
+}
+
+
+// function for working with paths
+
+
+String* string_path_join(String* string1, String* string2) {
+
 }
