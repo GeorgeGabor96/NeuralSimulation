@@ -9,7 +9,5 @@
 // will dump voltages and spikes | can I do this in one plot??
 
 Callback* callback_visualize_layer_neurons_create(Layer* layer, const char* output_folder);
-Callback* callback_visualize_layer_neurons_txt_create(const char* layer_name, const char* output_folder);
-
 
 #endif

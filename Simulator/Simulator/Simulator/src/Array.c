@@ -234,7 +234,6 @@ ERROR
 }
 
 
-
 // conversion functions
 ArrayFloat* array_bool_to_float(ArrayBool* array_b, BOOL destroy_array_bool) {
 	ArrayFloat* array_f = (ArrayFloat*)array_create(array_b->length, array_b->length, sizeof(float));
@@ -338,14 +337,14 @@ Status array_of_arrays_init(Array* data, uint32_t length, size_t inner_element_s
 	}
 	return SUCCESS;
 
-	ERROR
-		if (status_data == SUCCESS) {
-			// I know it failed at i, reset everything under i
-			while (i != 0) {
-				i--;
-				array_reset((Array*)array_get(data, i), NULL);
-			}
+ERROR
+	if (status_data == SUCCESS) {
+		// I know it failed at i, reset everything under i
+		while (i != 0) {
+			i--;
+			array_reset((Array*)array_get(data, i), NULL);
 		}
+	}
 	return FAIL;
 }
 
@@ -363,7 +362,6 @@ Status array_of_arrays_reset(Array* data) {
 	array_reset(data, NULL);
 	return SUCCESS;
 
-	ERROR
-		return FAIL;
-
+ERROR
+	return FAIL;
 }

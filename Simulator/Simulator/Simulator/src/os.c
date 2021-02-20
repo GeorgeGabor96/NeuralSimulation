@@ -12,6 +12,8 @@ BOOL os_mkdir(const char* dir) {
 
 BOOL os_rmdir(const char* dir) {
 	char rmdir_command[COMMAND_MAX_LENGTH] = { 0 };
+	// /S - deletes even if not empty
+	// /Q - does not ask for permission to delete
 	sprintf(rmdir_command, "rmdir /Q /S \"%s\"", dir);
 	if (system(rmdir_command) == 0) return TRUE;
 	return FALSE;
