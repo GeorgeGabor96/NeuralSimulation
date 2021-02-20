@@ -53,6 +53,7 @@ TestInfo tests[] = {
 	{ string_create_destroy_test, "string_create_destroy_test" },
 	{ strings_create_destroy_test, "strings_create_destroy_test" },
 	{ string_memory_stress_test, "string_memory_stress_test" },
+	{ string_path_join_test, "string_path_join_test" },
 
 	// ARRAY
 	{ array_general_use_case_test, "array_general_use_case_test" },

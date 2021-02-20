@@ -18,6 +18,8 @@ TestStatus os_mkdir_rmdir_test() {
 	success = os_rmdir(".\\non_existent");
 	assert(success == TRUE, "Should delete dir");
 
+	assert(memory_leak() == FALSE, "Memory leak");
+
 	return TEST_SUCCESS;
 ERROR
 	return TEST_FAILED;
@@ -36,6 +38,8 @@ TestStatus os_file_exits_test() {
 	success = os_file_exits(".\\file.txt");
 	assert(success == TRUE, "file should exit");
 	remove(".\\file.txt");
+
+	assert(memory_leak() == FALSE, "Memory leak");
 
 	return TEST_SUCCESS;
 ERROR

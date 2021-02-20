@@ -158,8 +158,26 @@ ERROR
 
 
 // function for working with paths
+#define MAX_PATH_LENGTH 256
 
+String* string_path_join_strings(String* string1, String* string2) {
+	check(string_is_valid(string1) == TRUE, invalid_argument("string1"));
+	check(string_is_valid(string2) == TRUE, invalid_argument("string2"));
+	char path[MAX_PATH_LENGTH] = { 0 };
+	sprintf(path, "%s\\%s", (const char*)string1->data, (const char*)string2->data);
+	return string_create(path);
+ERROR
+	return NULL;
+}
 
-String* string_path_join(String* string1, String* string2) {
+String* string_path_join_string_and_C(String* string1, const char* string2) {
+	check(string2 != NULL, null_argument("string2"));
+	String s;
+	string_init(&s, string2);
+	String* string_join = string_path_join_strings(string1, &s);
+	string_reset(&s);
 
+	return string_join;
+ERROR
+	return NULL;
 }
