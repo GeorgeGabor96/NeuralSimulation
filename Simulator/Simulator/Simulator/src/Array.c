@@ -321,3 +321,49 @@ ArrayFloat* array_ones_float(uint32_t length) {
 ERROR
 	return array_f;
 }
+
+
+Status array_of_arrays_init(Array* data, uint32_t length, size_t inner_element_size) {
+	uint32_t i = 0;
+	Status status = FAIL;
+	Status status_data = FAIL;
+
+	check(data != NULL, null_argument("data"));
+
+	status_data = array_init(data, length, length, sizeof(Array));
+	check(status_data == SUCCESS, "@status is %u", status_data);
+	for (i = 0; i < data->length; ++i) {
+		status = array_init((Array*)array_get(data, i), 10, 0, inner_element_size);
+		check(status == SUCCESS, "@status is %u", status);
+	}
+	return SUCCESS;
+
+	ERROR
+		if (status_data == SUCCESS) {
+			// I know it failed at i, reset everything under i
+			while (i != 0) {
+				i--;
+				array_reset((Array*)array_get(data, i), NULL);
+			}
+		}
+	return FAIL;
+}
+
+
+Status array_of_arrays_reset(Array* data) {
+	uint32_t i = 0;
+	Array* inner_array = NULL;
+
+	check(array_is_valid(data) == TRUE, invalid_argument("data"));
+	for (i = 0; i < data->length; ++i) {
+		inner_array = (Array*)array_get(data, i);
+		check(array_is_valid(inner_array) == TRUE, "invalid @inner_array %u", i);
+		array_reset(inner_array, NULL);
+	}
+	array_reset(data, NULL);
+	return SUCCESS;
+
+	ERROR
+		return FAIL;
+
+}

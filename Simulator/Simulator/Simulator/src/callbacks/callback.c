@@ -2,13 +2,10 @@
 
 
 BOOL callback_is_valid(Callback* callback) {
-	check(callback != NULL, null_argument("callback"));
-	check(callback->destroy != NULL, null_argument("callback"));
-	return TRUE;
-ERROR
+	if (callback->is_valid != NULL)
+		return callback->is_valid(callback);
 	return FALSE;
 }
-
 
 void callback_update(Callback* callback, Network* net) {
 	if (callback->update != NULL)
@@ -23,4 +20,9 @@ void callback_run(Callback* callback, Network* net) {
 void callback_destroy(Callback* callback) {
 	if (callback->destroy != NULL)
 		callback->destroy(callback);
+}
+
+void callback_reset(Callback* callback) {
+	if (callback->reset != NULL)
+		callback->reset(callback);
 }

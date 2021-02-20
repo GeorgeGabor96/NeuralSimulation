@@ -26,7 +26,7 @@ typedef Array NetworkOutputs;
 void network_values_show(Array* values);
 
 typedef struct Network {
-	Array layers;			// will be added one by one
+	Array layers;			// will be added one by one, network has ownership
 	Array output_layers;	// one or more, keeps references to @layers
 	Array input_layers;		// one or more, keeps references to @layers
 	Array input_names;		// names of the input layers, reference to @layers->name

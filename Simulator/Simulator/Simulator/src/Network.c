@@ -86,10 +86,10 @@ Network* network_create() {
 ERROR
 	if (network != NULL) {
 		if (network->layers.data != NULL) array_reset(&(network->layers), NULL);
-		if (network->output_layers.data != NULL) array_destroy(&(network->output_layers), NULL);
-		if (network->input_layers.data != NULL) array_destroy(&(network->input_layers), NULL);
-		if (network->input_names.data != NULL) array_destroy(&(network->input_names), NULL);
-		if (network->output_names.data != NULL) array_destroy(&(network->output_names), NULL);
+		if (network->output_layers.data != NULL) array_reset(&(network->output_layers), NULL);
+		if (network->input_layers.data != NULL) array_reset(&(network->input_layers), NULL);
+		if (network->input_names.data != NULL) array_reset(&(network->input_names), NULL);
+		if (network->output_names.data != NULL) array_reset(&(network->output_names), NULL);
 		free(network);
 	}
 	return NULL;
@@ -203,7 +203,6 @@ uint32_t network_get_layer_idx_by_string(Network* network, String* name) {
 ERROR
 	return UINT32_MAX;
 }
-
 
 
 uint32_t network_get_layer_idx_by_name(Network* network, char* name) {
@@ -347,7 +346,6 @@ ERROR
 }
 
 
-
 // TODO: what if the inputs can be NULL, just to see the evolution
 void network_step(Network* network, NetworkInputs* inputs, uint32_t time) {
 	check(network_is_valid(network) == TRUE, invalid_argument("network"));
@@ -359,6 +357,7 @@ void network_step(Network* network, NetworkInputs* inputs, uint32_t time) {
 	Layer* layer = NULL;
 	NetworkValues* input = NULL;
 
+	// run on input layers
 	for (i = 0; i < inputs->length; ++i) {
 		input = (NetworkValues*)array_get(inputs, i);
 		check(array_is_valid(input->values) == TRUE, invalid_argument("input->values"));
@@ -378,6 +377,7 @@ void network_step(Network* network, NetworkInputs* inputs, uint32_t time) {
 		}
 	}
 
+	// run on the rest of layers
 	for (i = 0; i < network->layers.length; ++i) {
 		layer = (Layer*)array_get(&(network->layers), i);
 		check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
