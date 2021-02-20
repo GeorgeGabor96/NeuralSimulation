@@ -107,5 +107,8 @@
     <ClCompile Include="src\os.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\callbacks\callback.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

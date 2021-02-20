@@ -19,7 +19,7 @@
 // TODO: some tests take time, mark them and set a flag to run them or not
 TestInfo tests[] = {
 	// callback
-	//{ callbacks_visualize_layer_neurons_test, "callbacks_visualize_layer_neurons_test" },
+	{ callbacks_visualize_layer_neurons_test, "callbacks_visualize_layer_neurons_test" },
 
 	// OS
 	{ os_mkdir_rmdir_test, "os_mkdir_rmdir_test" },

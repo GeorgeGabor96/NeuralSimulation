@@ -78,6 +78,8 @@ ArrayDouble* array_float_to_double(ArrayFloat* array_f, BOOL destroy_array_float
 
 // utility functions
 ArrayFloat* array_arange_float(uint32_t length);
+ArrayFloat* array_ones_float(uint32_t length);
+ArrayBool* array_ones_bool(uint32_t length);
 
 
 /*************************************************************
@@ -119,7 +121,7 @@ BOOL string_equal(String* string1_p, String* string2_p);
 // function for working with paths, will create a new string with independent memory
 String* string_path_join_strings(String* string1, String* string2);
 String* string_path_join_string_and_C(String* string1, const char* string2);
-
+String* string_path_join_C_and_string(const char* string1, String* string2);
 
 /*************************************************************
 * Queue Functionality

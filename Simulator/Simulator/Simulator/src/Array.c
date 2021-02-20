@@ -161,6 +161,7 @@ void array_show(Array* array, ShowElem show) {
 	for (i = 0; i < array->length; ++i) {
 		show(array_get(array, i));
 	}
+	printf("\n");
 
 ERROR
 	return;
@@ -236,7 +237,7 @@ ERROR
 
 // conversion functions
 ArrayFloat* array_bool_to_float(ArrayBool* array_b, BOOL destroy_array_bool) {
-	ArrayFloat* array_f = (ArrayFloat*)array_create(array_b->length, array_b->length, sizeof(BOOL));
+	ArrayFloat* array_f = (ArrayFloat*)array_create(array_b->length, array_b->length, sizeof(float));
 	check_memory(array_f);
 	uint32_t i = 0;
 	float float_v = 0.0f;
@@ -279,7 +280,6 @@ ERROR
 }
 
 
-
 // utility functions
 ArrayFloat* array_arange_float(uint32_t length) {
 	ArrayFloat* array_f = (ArrayFloat*)array_create(length, length, sizeof(float));
@@ -292,6 +292,32 @@ ArrayFloat* array_arange_float(uint32_t length) {
 		array_set(array_f, i, &i_f);
 	}
 
+ERROR
+	return array_f;
+}
+
+
+ArrayBool* array_ones_bool(uint32_t length) {
+	ArrayBool* array_b = (ArrayBool*)array_create(length, length, sizeof(BOOL));
+	check_memory(array_b);
+
+	BOOL true_v = TRUE;
+	uint32_t i = 0;
+	for (i = 0; i < length; ++i)
+		array_set(array_b, i, &true_v);
+
+ERROR
+	return array_b;
+}
+
+ArrayFloat* array_ones_float(uint32_t length) {
+	ArrayFloat* array_f = (ArrayFloat*)array_create(length, length, sizeof(float));
+	check_memory(array_f);
+
+	float one = 1.0f;
+	uint32_t i = 0;
+	for (i = 0; i < length; ++i)
+		array_set(array_f, i, &one);
 ERROR
 	return array_f;
 }

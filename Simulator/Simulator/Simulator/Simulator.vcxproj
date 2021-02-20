@@ -151,6 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Array.c" />
+    <ClCompile Include="src\callbacks\callback.c" />
     <ClCompile Include="src\callbacks\callback_visualize_layer_neurons.c" />
     <ClCompile Include="src\Layer.c" />
     <ClCompile Include="src\MemoryManagement.c" />

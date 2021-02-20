@@ -48,10 +48,9 @@ struct Callback {
 	__callback_destroy destroy;		// knows how to free the information of a given callback
 };
 
-#define callback_is_valid(callback) ((callback) == NULL ? FALSE : TRUE)
-
-#define callback_update(callback, net) ((callback)->update((callback), (net)))
-#define callback_run(callback, net) ((callback)->run((callback), (net)))
-#define callback_destroy(callback) ((callback)->destroy((callback)))
+BOOL callback_is_valid(Callback* callback);
+void callback_update(Callback* callback, Network* net);
+void callback_run(Callback* callback, Network* net);
+void callback_destroy(Callback* callback);
 
 #endif // __CALLBACK_H__

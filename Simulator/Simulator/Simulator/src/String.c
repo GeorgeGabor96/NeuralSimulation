@@ -181,3 +181,15 @@ String* string_path_join_string_and_C(String* string1, const char* string2) {
 ERROR
 	return NULL;
 }
+
+String* string_path_join_C_and_string(const char* string1, String* string2) {
+	check(string1 != NULL, null_argument("string1"));
+	String s;
+	string_init(&s, string1);
+	String* string_join = string_path_join_strings(&s, string2);
+	string_reset(&s);
+
+	return string_join;
+ERROR
+	return NULL;
+}
