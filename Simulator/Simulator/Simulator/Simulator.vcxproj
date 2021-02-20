@@ -156,6 +156,7 @@
     <ClCompile Include="src\MemoryManagement.c" />
     <ClCompile Include="src\Network.c" />
     <ClCompile Include="src\Neuron.c" />
+    <ClCompile Include="src\os.c" />
     <ClCompile Include="src\plotting\pbPlots.c" />
     <ClCompile Include="src\plotting\plotting.c" />
     <ClCompile Include="src\plotting\supportLib.c" />
@@ -175,6 +176,7 @@
     <ClInclude Include="include\MemoryManagement.h" />
     <ClInclude Include="include\Network.h" />
     <ClInclude Include="include\Neuron.h" />
+    <ClInclude Include="include\os.h" />
     <ClInclude Include="include\plotting\pbPlots.h" />
     <ClInclude Include="include\plotting\plotting.h" />
     <ClInclude Include="include\plotting\supportLib.h" />

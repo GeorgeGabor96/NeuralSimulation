@@ -117,7 +117,8 @@ void strings_destroy(Array* strings_p);
 BOOL string_equal(String* string1_p, String* string2_p);
 
 // function for working with paths
-String* string_path_join(String* string1, String* string2);
+String* string_path_join_strings(String* string1, String* string2);
+String* string_path_join_string_and_C(String* string1, const char* string2);
 
 
 /*************************************************************

@@ -5,6 +5,11 @@
 #include "plotting/plotting.h"
 
 
+void callback_visualize_layer_neurons_update(Callback* callback, Network* net);
+void callback_visualize_layer_neurons_run(Callback* callback, Network* net);
+void callback_visualize_layer_neurons_destroy(Callback* callback);
+
+
 // I need to know how many neurons there are in the layer because I need an array of array or 2, one that keeps voltages and one for spikes
 typedef struct C_Data {
 	String output_folder;		
@@ -155,7 +160,7 @@ void callback_visualize_layer_neurons_run(Callback* callback, Network* net) {
 	C_Data* data = (C_Data*)(callback->data);
 	ArrayFloat* voltages = NULL;
 	ArrayBool* spikes = NULL;
-	String* output_folder = string_path_join(data->output_folder, data->layer->name);
+	String* output_folder = string_path_join_strings(&(data->output_folder), data->layer->name);
 	String* file_path = NULL;
 	char file_name[128] = { 0 };
 	Array* steps = array_arange_float(data->layer->neurons.length);
@@ -165,13 +170,13 @@ void callback_visualize_layer_neurons_run(Callback* callback, Network* net) {
 		voltages = (ArrayFloat*)array_get(&(data->voltages_per_neuron), i);
 		sprintf(file_name, "Voltages_N%u.png", i);
 		// need some work
-		file_path = string_path_join(output_folder, file_name); // need to write this
+		file_path = string_path_join_string_and_C(output_folder, file_name); // need to write this
 		plotting_scatter_plot_floats(steps, voltages, 600, 400, string_get_C_string(file_path));
 		string_destroy(file_path);
 
 		spikes = (ArrayBool*)array_get(&(data->spikes_per_neuron), i);
 		sprintf(file_name, "Spikes_N%u.png", i);
-		file_path = string_path_join(output_folder, file_name);
+		file_path = string_path_join_string_and_C(output_folder, file_name);
 		plotting_scatter_plot_floats(steps, spikes, 600, 400, string_get_C_string(file_path));
 		string_destroy(file_path);
 	}

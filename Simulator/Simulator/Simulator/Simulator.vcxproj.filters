@@ -57,6 +57,9 @@
     <ClInclude Include="include\callbacks\callback_visualize_layer_neurons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\os.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Array.c">
@@ -96,6 +99,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\plotting\plotting.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\callbacks\callback_visualize_layer_neurons.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\os.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

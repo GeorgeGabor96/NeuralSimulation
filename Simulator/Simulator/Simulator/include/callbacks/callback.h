@@ -16,7 +16,7 @@ typedef struct Callback Callback;
 // need the network to get outputs and save them in the callback structure
 // because I need to plot at the end everythong
 typedef void(*callback_update)(Callback* callback, Network* net);
-typedef void(*callback_run)(Callback* callback);
+typedef void(*callback_run)(Callback* callback, Network* net);
 typedef void(*callback_destroy)(Callback* callback);
 
 /*
@@ -43,9 +43,9 @@ typedef void CallbackData;
 
 struct Callback {
 	CallbackData* data;				// callback dependent data
-	callback_update* update;		// updates the callback state
-	callback_run* run;				// does something based on data gathered by callback
-	callback_destroy* destroy;		// knows how to free the information of a given callback
+	callback_update update;		// updates the callback state
+	callback_run run;				// does something based on data gathered by callback
+	callback_destroy destroy;		// knows how to free the information of a given callback
 };
 
 
