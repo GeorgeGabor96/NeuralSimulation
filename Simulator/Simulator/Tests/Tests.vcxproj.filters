@@ -48,6 +48,9 @@
     <ClInclude Include="src\Simulator\os_tests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Simulator\callbacks_tests.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\tests.c">
@@ -81,6 +84,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Simulator\os_tests.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Simulator\callbacks_tests.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

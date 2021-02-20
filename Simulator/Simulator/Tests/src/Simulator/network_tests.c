@@ -221,6 +221,7 @@ error:
 
 
 TestStatus network_summary_test() {
+	assert(memory_leak() == FALSE, "Memory leak");
 	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
 	SynapseClass* s_class = synapse_class_create_default();
 

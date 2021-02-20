@@ -10,7 +10,6 @@ void callback_visualize_layer_neurons_run(Callback* callback, Network* net);
 void callback_visualize_layer_neurons_destroy(Callback* callback);
 
 
-// I need to know how many neurons there are in the layer because I need an array of array or 2, one that keeps voltages and one for spikes
 typedef struct C_Data {
 	String output_folder;		
 	Layer* layer;
@@ -36,7 +35,6 @@ BOOL callback_visualize_layer_neurons_is_valid(Callback* callback) {
 ERROR
 	return FALSE;
 }
-
 
 
 static inline Status __array_of_arrays_init(Array* data, uint32_t length, size_t inner_element_size) {
@@ -95,6 +93,8 @@ Callback* callback_visualize_layer_neurons_create(Layer* layer, const char* outp
 
 	callback = (Callback*)calloc(1, sizeof(Callback*), "callback_visualize_layer_neurons_create callback");
 	check_memory(callback);
+	callback->destroy = callback_visualize_layer_neurons_destroy;
+	return callback;
 
 	data = (C_Data*)malloc(sizeof(C_Data), "callback_visualize_layer_neurons_create data");
 	check_memory(data);
@@ -112,11 +112,6 @@ Callback* callback_visualize_layer_neurons_create(Layer* layer, const char* outp
 	callback->update = callback_visualize_layer_neurons_update;
 	callback->run = callback_visualize_layer_neurons_run;
 	callback->destroy = callback_visualize_layer_neurons_destroy;
-
-	// big question?
-	// Do I need to create a folder???? -> or the fopen already will do this?
-	// fopen is the answer
-
 	return callback;
 
 ERROR
@@ -188,8 +183,10 @@ ERROR
 }
 
 void callback_visualize_layer_neurons_destroy(Callback* callback) {
-	check(callback_visualize_layer_neurons_is_valid(callback) == TRUE, invalid_argument("callback"));
 
+	free(callback);
+	return;
+	check(callback_visualize_layer_neurons_is_valid(callback) == TRUE, invalid_argument("callback"));
 	// free data
 	C_Data* data = (C_Data*)(callback->data);
 	string_reset(&(data->output_folder));
