@@ -79,3 +79,39 @@ TestStatus string_memory_stress_test() {
 error:
 	return status;
 }
+
+
+TestStatus string_path_join_test() {
+	String s1;
+	String s2;
+	String s3;
+	string_init(&s1, "dir1");
+	string_init(&s2, "dir2");
+	string_init(&s3, "dir3");
+
+	String* s1_s2 = string_path_join_strings(&s1, &s2);
+	assert(string_is_valid(s1_s2) == TRUE, invalid_argument("s1_s2"));
+	assert(strcmp("dir1\\dir2", s1_s2->data) == 0, "@s1_s2 is %s", s1_s2->data);
+
+	String* s3_s1_s2 = string_path_join_strings(&s3, s1_s2);
+	assert(string_is_valid(s3_s1_s2) == TRUE, invalid_argument("s3_s1_s2"));
+	assert(strcmp("dir3\\dir1\\dir2", s3_s1_s2->data) == 0, "@s3_s1_s2 is %s", s3_s1_s2->data);
+
+	String* s1_s2_s3 = string_path_join_strings(s1_s2, &s3);
+	assert(string_is_valid(s1_s2_s3) == TRUE, invalid_argument("s1_s2_s3"));
+	assert(strcmp("dir1\\dir2\\dir3", s1_s2_s3->data) == 0, "@s1_s2_s3 is %s", s1_s2_s3->data);
+
+	string_destroy(s1_s2);
+	string_destroy(s3_s1_s2);
+	string_destroy(s1_s2_s3);
+
+	string_reset(&s1);
+	string_reset(&s2);
+	string_reset(&s3);
+
+	assert(memory_leak() == FALSE, "Memory leak");
+
+	return TEST_SUCCESS;
+ERROR
+	return TEST_FAILED;
+}

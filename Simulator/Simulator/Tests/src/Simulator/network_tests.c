@@ -254,9 +254,9 @@ TestStatus network_summary_test() {
 	network_compile(network);
 	network_summary(network);
 
+	network_destroy(network);
 	neuron_class_destroy(n_class);
 	synapse_class_destroy(s_class);
-	network_destroy(network);
 	assert(memory_leak() == FALSE, "Memory leak");
 
 	return TEST_SUCCESS;

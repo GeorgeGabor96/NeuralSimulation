@@ -4,21 +4,27 @@
 #include "config.h"
 
 #include "Simulator/memory_management_tests.h"
-
-// need rework
+#include "Simulator/os_tests.h"
 #include "Simulator/array_tests.h"
 #include "Simulator/string_tests.h"
 #include "Simulator/stack_tests.h"
-
 #include "Simulator/queue_tests.h"
 #include "Simulator/synapse_tests.h"
 #include "Simulator/neuron_tests.h"
 #include "Simulator/layer_tests.h"
 #include "Simulator/network_tests.h"
+#include "Simulator/callbacks_tests.h"
 
 
 // TODO: some tests take time, mark them and set a flag to run them or not
 TestInfo tests[] = {
+	// callback
+	{ callbacks_visualize_layer_neurons_test, "callbacks_visualize_layer_neurons_test" },
+
+	// OS
+	{ os_mkdir_rmdir_test, "os_mkdir_rmdir_test" },
+	{ os_file_exits_test, "os_file_exits_test" },
+
 	// NETWORK
 	{ network_summary_test, "network_summary_test" },
 	{ network_compile_general_use_case_test, "network_compile_general_use_case_test" },
@@ -51,6 +57,7 @@ TestInfo tests[] = {
 	{ string_create_destroy_test, "string_create_destroy_test" },
 	{ strings_create_destroy_test, "strings_create_destroy_test" },
 	{ string_memory_stress_test, "string_memory_stress_test" },
+	{ string_path_join_test, "string_path_join_test" },
 
 	// ARRAY
 	{ array_general_use_case_test, "array_general_use_case_test" },

@@ -160,10 +160,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Simulator\array_tests.h" />
+    <ClInclude Include="src\Simulator\callbacks_tests.h" />
     <ClInclude Include="src\Simulator\layer_tests.h" />
     <ClInclude Include="src\Simulator\memory_management_tests.h" />
     <ClInclude Include="src\Simulator\network_tests.h" />
     <ClInclude Include="src\Simulator\neuron_tests.h" />
+    <ClInclude Include="src\Simulator\os_tests.h" />
     <ClInclude Include="src\Simulator\queue_tests.h" />
     <ClInclude Include="src\Simulator\stack_tests.h" />
     <ClInclude Include="src\Simulator\string_tests.h" />
@@ -172,10 +174,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Simulator\array_tests.c" />
+    <ClCompile Include="src\Simulator\callbacks_tests.c" />
     <ClCompile Include="src\Simulator\layer_tests.c" />
     <ClCompile Include="src\Simulator\memory_management_tests.c" />
     <ClCompile Include="src\Simulator\network_tests.c" />
     <ClCompile Include="src\Simulator\neuron_tests.c" />
+    <ClCompile Include="src\Simulator\os_tests.c" />
     <ClCompile Include="src\Simulator\queue_tests.c" />
     <ClCompile Include="src\Simulator\stack_tests.c" />
     <ClCompile Include="src\Simulator\string_tests.c" />

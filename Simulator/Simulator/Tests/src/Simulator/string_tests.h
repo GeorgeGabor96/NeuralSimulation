@@ -7,6 +7,7 @@
 TestStatus string_create_destroy_test();
 TestStatus strings_create_destroy_test();
 TestStatus string_memory_stress_test();
+TestStatus string_path_join_test();
 
 
 #endif // __STRINGS_TESTS__

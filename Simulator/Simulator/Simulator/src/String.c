@@ -1,4 +1,5 @@
 #include "Containers.h"
+#include "MemoryManagement.h"
 
 
 /*************************************************************
@@ -30,21 +31,46 @@ static inline uint32_t safe_strlen(char* c_string_p) {
 /*************************************************************
 * String Functionality
 *************************************************************/
-String* string_create(char* c_string_p) {
+// UNTESTED
+Status string_init(String* string_p, char* c_string_p) {
+	Status status = FAIL;
+	check(string_p != NULL, null_argument("string_p"));
 	check(c_string_p != NULL, null_argument("c_string_p"));
+
 	uint32_t n_chars = safe_strlen(c_string_p);
-	String* string_p = array_create(n_chars + 1, n_chars, sizeof(char));
-	check_memory(string_p);
+	status = array_init(string_p, n_chars + 1, n_chars, sizeof(char));
+	check(status == SUCCESS, "array_init failed");
 	array_copy_data(string_p, c_string_p, 0, n_chars);
 
 	// didn't put end of string
 	char end_s = '\0';
 	array_append(string_p, &end_s);
 
+ERROR
+	return status;
+}
+
+
+String* string_create(char* c_string_p) {
+	// make a blank string
+	String* string_p = (String*)malloc(sizeof(String), "string_create");
+	check_memory(string_p);
+	Status status = string_init(string_p, c_string_p);
+	check(status == SUCCESS, "string_init failed");
 	return string_p;
 
 ERROR
+	if (string_p != NULL) free(string_p);
 	return NULL;
+}
+
+
+void string_reset(String* string_p) {
+	check(array_is_valid(string_p) == TRUE, invalid_argument("string_p"));
+	array_reset(string_p, NULL);
+
+ERROR
+	return;
 }
 
 
@@ -128,4 +154,42 @@ BOOL string_equal(String* string1_p, String* string2_p) {
 	if (memcmp(string1_p->data, string2_p->data, string1_p->element_size * string1_p->length) == 0) return TRUE;
 ERROR
 	return FALSE;
+}
+
+
+// function for working with paths
+#define MAX_PATH_LENGTH 256
+
+String* string_path_join_strings(String* string1, String* string2) {
+	check(string_is_valid(string1) == TRUE, invalid_argument("string1"));
+	check(string_is_valid(string2) == TRUE, invalid_argument("string2"));
+	char path[MAX_PATH_LENGTH] = { 0 };
+	sprintf(path, "%s\\%s", (const char*)string1->data, (const char*)string2->data);
+	return string_create(path);
+ERROR
+	return NULL;
+}
+
+String* string_path_join_string_and_C(String* string1, const char* string2) {
+	check(string2 != NULL, null_argument("string2"));
+	String s;
+	string_init(&s, string2);
+	String* string_join = string_path_join_strings(string1, &s);
+	string_reset(&s);
+
+	return string_join;
+ERROR
+	return NULL;
+}
+
+String* string_path_join_C_and_string(const char* string1, String* string2) {
+	check(string1 != NULL, null_argument("string1"));
+	String s;
+	string_init(&s, string1);
+	String* string_join = string_path_join_strings(&s, string2);
+	string_reset(&s);
+
+	return string_join;
+ERROR
+	return NULL;
 }
