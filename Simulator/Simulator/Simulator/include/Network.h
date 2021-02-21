@@ -80,6 +80,9 @@ void network_summary(Network* network);
 void network_step(Network* network, NetworkInputs* inputs, uint32_t time);
 NetworkOutputs* network_get_outputs(Network* network, NetworkValueType type);
 
+// Resets all the neurons and synapses to default and initial values also removes all spikes generated
+void network_clear_state(Network* network);
+
 // TODO: maybe is easier to be specific
 // TODO: get output by index???
 Array* network_get_output_spikes(Network* network);

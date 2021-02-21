@@ -13,6 +13,7 @@
 
 struct Callback;
 typedef struct Callback Callback;
+typedef Array ArrayCallback;
 
 typedef void CallbackData;
 
