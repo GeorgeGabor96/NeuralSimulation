@@ -88,6 +88,9 @@ and if a spike is generated, it will be propagated to the output synapses
 */
 Status neuron_step(Neuron* neuron, uint32_t simulation_time);
 
+// remove the spike of the neuron, resets its voltage and clears the state of its input synapses
+void neuron_clear_state(Neuron* neuron);
+
 /*
 * Similar to @neuron_step, but it only propagates a spike through the output synapses
 */

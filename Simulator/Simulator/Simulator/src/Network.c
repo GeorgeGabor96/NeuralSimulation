@@ -427,6 +427,21 @@ ERROR
 }
 
 
+void network_clear_state(Network* network) {
+	check(network_is_valid(network) == TRUE, invalid_argument("network"));
+	uint32_t i = 0;
+	Layer* layer = NULL;
+
+	for (i = 0; i < network->layers.length; ++i) {
+		layer = (Layer*)array_get(&(network->layers), i);
+		layer_clear_state(layer);
+	}
+
+ERROR
+	return;
+}
+
+
 Array* network_get_output_spikes(Network* network) {
 	check(network_is_valid(network) == TRUE, invalid_argument("network"));
 	Array* outputs = array_create(network->output_layers.length, 0, sizeof(ArrayBool));

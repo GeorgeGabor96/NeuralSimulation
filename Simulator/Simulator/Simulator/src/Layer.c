@@ -231,6 +231,22 @@ ERROR
 }
 
 
+void layer_clear_state(Layer* layer) {
+	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+	uint32_t i = 0;
+	Neuron* neuron = NULL;
+	
+	for (i = 0; i < layer->neurons.length; ++i) {
+		neuron = (Neuron*)array_get(&(layer->neurons), i);
+		neuron_clear_state(neuron);
+	}
+
+ERROR
+	return;
+}
+
+
+
 Status layer_step_force_spikes(Layer* layer, ArrayBool* spikes, uint32_t time) {
 	check(layer_is_valid(layer), invalid_argument("layer"));
 	check(array_is_valid(spikes), invalid_argument("spikes"));
