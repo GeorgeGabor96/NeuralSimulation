@@ -153,6 +153,7 @@
     <ClCompile Include="src\Array.c" />
     <ClCompile Include="src\callbacks\callback.c" />
     <ClCompile Include="src\callbacks\callback_visualize_layer_neurons.c" />
+    <ClCompile Include="src\data\data_gen_constant_current.c" />
     <ClCompile Include="src\Layer.c" />
     <ClCompile Include="src\MemoryManagement.c" />
     <ClCompile Include="src\Network.c" />
@@ -163,6 +164,7 @@
     <ClCompile Include="src\plotting\supportLib.c" />
     <ClCompile Include="src\Printing.c" />
     <ClCompile Include="src\Queue.c" />
+    <ClCompile Include="src\Simulator.c" />
     <ClCompile Include="src\Stack.c" />
     <ClCompile Include="src\String.c" />
     <ClCompile Include="src\Synapse.c" />
@@ -171,6 +173,7 @@
     <ClInclude Include="include\callbacks\callback.h" />
     <ClInclude Include="include\callbacks\callback_visualize_layer_neurons.h" />
     <ClInclude Include="include\config.h" />
+    <ClInclude Include="include\data\DataGen.h" />
     <ClInclude Include="include\debug.h" />
     <ClInclude Include="include\Containers.h" />
     <ClInclude Include="include\Layer.h" />

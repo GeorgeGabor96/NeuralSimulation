@@ -1,6 +1,7 @@
 #include "callbacks/callback.h"
 
-
+// TODO: you can remove this for macros, see data gen
+// also you dont verify that callback != NULL
 BOOL callback_is_valid(Callback* callback) {
 	if (callback->is_valid != NULL)
 		return callback->is_valid(callback);

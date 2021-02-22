@@ -15,7 +15,7 @@ struct Callback;
 typedef struct Callback Callback;
 typedef Array ArrayCallback;
 
-typedef void CallbackData;
+typedef void __CallbackData;
 
 typedef BOOL(*__callback_is_valid)(Callback* callback);
 typedef void(*__callback_update)(Callback* callback, Network* net);
@@ -24,7 +24,7 @@ typedef void(*__callback_destroy)(Callback* callback);
 typedef void(*__callback_reset)(Callback* callback);
 
 struct Callback {
-	CallbackData* data;				// callback dependent data
+	__CallbackData* data;				// callback dependent data
 	__callback_is_valid is_valid;   // checks if callback is valid
 	__callback_update update;		// updates the callback state
 	__callback_run run;				// does something based on data gathered by callback

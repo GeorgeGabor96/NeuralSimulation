@@ -18,7 +18,7 @@ typedef enum { SPIKES = 0, CURRENT = 1, VOLTAGE = 2 } NetworkValueType;
 // if I add a type to the array and the other structures, i could directly use an array, and i could also verify the type when i receive an array
 typedef struct NetworkValues {
 	NetworkValueType type;
-	Array* values;
+	Array* values; // maybe can remove pointer??
 } NetworkValues;
 typedef Array NetworkInputs;
 typedef Array NetworkOutputs;

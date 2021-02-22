@@ -112,7 +112,7 @@ void simulator_infer(Simulator* sim) {
 		check(data_element_is_valid(element) == TRUE, invalid_argument("element"));
 
 		network_clear_state(sim->network);
-		for (time = 0; time < element->length; ++time) {
+		for (time = 0; time < element->duration; ++time) {
 			NetworkInputs* inputs = data_element_get_values(element, time);
 			check(array_is_valid(inputs) == TRUE, invalid_argument("inputs"));
 			
