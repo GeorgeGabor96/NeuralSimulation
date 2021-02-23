@@ -4,6 +4,10 @@
 #include "config.h"
 #include "Network.h"
 
+
+/*************************************************************
+* STRUCTS
+*************************************************************/
 struct DataGenerator;
 typedef struct DataGenerator DataGenerator;
 
@@ -11,6 +15,9 @@ struct DataElement;
 typedef struct DataElement DataElement;
 
 
+/*************************************************************
+* DATA GENERATOR FUNCTIONALITY
+*************************************************************/
 typedef void __DataGeneratorData;
 typedef BOOL(*__data_generator_is_valid)(DataGenerator* data);
 typedef void(*__data_generator_destroy)(DataGenerator* data);
@@ -30,6 +37,9 @@ struct DataGenerator {
 #define data_generator_get_element(data, idx) ((data) != NULL && (data)->get_elem != NULL ? (data)->get_elem(data, idx) : NULL)
 
 
+/*************************************************************
+* DATA ELEMENT FUNCTIONALITY
+*************************************************************/
 typedef void __DataElementData;
 typedef BOOL(*__data_element_is_valid)(DataElement* element);
 typedef void(*__data_element_destroy)(DataElement* element);
