@@ -4,24 +4,26 @@
 BOOL data_element_constant_current_is_valid(DataElement* element);
 void data_element_constant_current_destroy(DataElement* element);
 NetworkInputs* data_element_constant_current_get_values(DataElement* element, uint32_t time);
+void data_element_constant_current_remove_values(DataElement* element, NetworkInputs* inputs);
 
 
 typedef struct DataElementData {
 	float value;
-	float length;
+	Network* net;
 }DataElementData;
 
 
-DataElement* data_element_constant_current_create(float current_value, uint32_t n_currents, uint32_t duration) {
-	check(n_currents > 0, "@number_of_values == 0");
-	check(duration > 0, "@duration == 0");
+// need the network be know how many inputs to generate and for each input how many currents to make
+DataElement* data_element_constant_current_create(Network* net, float current_value, uint32_t duration) {
 	DataElement* element = NULL;
-	DataElementData* data = NULL;
+	DataElementData* data = NULL;	
+	check(network_is_valid(net) == TRUE, invalid_argument("network"));
+	check(duration > 0, "@duration == 0");
 
 	data = (DataElementData*)malloc(sizeof(DataElementData));
 	check_memory(data);
 	data->value = current_value;
-	data->length = n_currents;
+	data->net = net;
 
 	element = (DataElement*)malloc(sizeof(DataElement));
 	check_memory(element);
@@ -30,6 +32,7 @@ DataElement* data_element_constant_current_create(float current_value, uint32_t 
 	element->is_valid = data_element_constant_current_is_valid;
 	element->destroy = data_element_constant_current_destroy;
 	element->get_values = data_element_constant_current_get_values;
+	element->remove_values = data_element_constant_current_remove_values;
 
 	return element;
 
@@ -49,7 +52,7 @@ BOOL data_element_constant_current_is_valid(DataElement* element) {
 	check(element->get_values != NULL, null_argument("element->get_values"));
 
 	DataElementData* data = (DataElementData*)element->data;
-	check(data->length > 0, "@data->length == 0");
+	check(network_is_valid(data->net) == TRUE, invalid_argument("data->net"));
 
 	return TRUE;
 ERROR
@@ -61,7 +64,7 @@ void data_element_constant_current_destroy(DataElement* element) {
 	check(data_element_is_valid(element) == TRUE, invalid_argument("element"));
 
 	DataElementData* data = (DataElementData*)element->data;
-	data->length = 0;
+	data->net = NULL;
 	data->value = 0.0f;
 	free(data);
 
@@ -76,12 +79,13 @@ ERROR
 	return;
 }
 
-// Consider that it creates input for a single input layer -> limitation but its simple now
+
 NetworkInputs* data_element_constant_current_get_values(DataElement* element, uint32_t time) {
-	NetworkValues* currents = NULL;
+	Status status = FAIL;
 	NetworkInputs* inputs = NULL;
 	DataElementData* data = NULL;
-	ArrayFloat* current_values = NULL;
+	Network* net = NULL;
+	NetworkValues net_input = { 0 };
 	uint32_t i = 0;
 	float current_value = 0.0f;
 
@@ -90,27 +94,45 @@ NetworkInputs* data_element_constant_current_get_values(DataElement* element, ui
 	
 	data = (DataElementData*)element->data;
 	current_value = data->value;
+	net = data->net;
 
-	current_values = array_create(data->length, data->length, sizeof(float));
-	check(array_is_valid(current_values) == TRUE, invalid_argument("array"));
-	for (i = 0; i < data->length; ++i)
-		array_set(current_values, i, &current_value);
-
-	currents = (NetworkValues*)malloc(sizeof(NetworkValues));
-	check_memory(currents); 
-	currents->values = current_values;
-	currents->type = CURRENT;
-
-	// currents should be on stack
-	// wand network inputs to be array of currents not array of pointers to currents
-
-	inputs = array_create(1, 1, sizeof(NetworkValues));
+	inputs = array_create(net->input_layers.length, 0, sizeof(NetworkValues));
 	check(array_is_valid(inputs) == TRUE, invalid_argument("inputs"));
-	array_set(inputs, 0, &currents);
+	// for each network input
+	for (i = 0; i < net->input_layers.length; ++i) {
+		Layer* layer = *((Layer**)array_get(&(net->input_layers), i));
+		check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 
+		status = array_init(&(net_input.values), layer->neurons.length, layer->neurons.length, sizeof(float));
+		check(status == SUCCESS, invalid_argument("status"));
+		net_input.type = CURRENT;
+
+		status = array_append(inputs, &net_input);
+		check(status == SUCCESS, invalid_argument("status"));
+	}
 
 	return inputs;
 
 ERROR
+	if (inputs != NULL)
+		data_element_constant_current_remove_values(element, inputs);
 	return NULL;
+}
+
+
+void data_element_constant_current_remove_values(DataElement* element, NetworkInputs* inputs) {
+	(element);
+	check(array_is_valid(inputs) == TRUE, invalid_argument("inputs"));
+	uint32_t i = 0;
+	NetworkValues* net_vals = NULL;
+
+	for (i = 0; i < inputs->length; ++i) {
+		net_vals = (NetworkValues*)array_get(inputs, i);
+		net_vals->type = 0;
+		array_reset(&(net_vals->values), NULL);
+	}
+	array_destroy(inputs, NULL);
+
+ERROR
+	return;
 }

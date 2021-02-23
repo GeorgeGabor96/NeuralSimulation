@@ -360,17 +360,17 @@ void network_step(Network* network, NetworkInputs* inputs, uint32_t time) {
 	// run on input layers
 	for (i = 0; i < inputs->length; ++i) {
 		input = (NetworkValues*)array_get(inputs, i);
-		check(array_is_valid(input->values) == TRUE, invalid_argument("input->values"));
+		check(array_is_valid(&(input->values)) == TRUE, invalid_argument("input->values"));
 
 		layer = *((Layer**)array_get(&(network->input_layers), i));
 		check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 
-		check(input->values->length == layer->neurons.length, "for input %u - input lenght %u while layer length %u", i, input->values->length, layer->neurons.length);
+		check(input->values.length == layer->neurons.length, "for input %u - input lenght %u while layer length %u", i, input->values.length, layer->neurons.length);
 		if (input->type == SPIKES) {
-			layer_step_force_spikes(layer, input->values, time);
+			layer_step_force_spikes(layer, &(input->values), time);
 		}
 		else if (input->type == CURRENT) {
-			layer_step_inject_currents(layer, input->values, time);
+			layer_step_inject_currents(layer, &(input->values), time);
 		}
 		else {
 			log_error("Undefined NETWORK input type %d", input->type);
@@ -417,7 +417,8 @@ NetworkOutputs* network_get_outputs(Network* network, NetworkValueType type) {
 			log_error(invalid_argument("type"));
 		}
 		net_values.type = type;
-		net_values.values = values;
+		memcpy(&(net_values.values), values, sizeof(Array));
+		free(values);
 		array_set(outputs, i, &net_values);
 	}
 	return outputs;
@@ -516,10 +517,10 @@ void network_values_show(Array* values) {
 		net_values = (NetworkValues*)array_get(values, i);
 		printf("\n[%d]-Type: %d\n", i, net_values->type);
 		if (net_values->type == SPIKES) {
-			array_show(net_values->values, show_bool);
+			array_show(&(net_values->values), show_bool);
 		}
 		else if (net_values->type == VOLTAGE) {
-			array_show(net_values->values, show_float);
+			array_show(&(net_values->values), show_float);
 		}
 	}
 }
