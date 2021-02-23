@@ -91,6 +91,7 @@ NetworkInputs* data_element_constant_current_get_values(DataElement* element, ui
 	Network* net = NULL;
 	NetworkValues net_input = { 0 };
 	uint32_t i = 0;
+	uint32_t j = 0;
 	float current_value = 0.0f;
 
 	(time);
@@ -109,6 +110,8 @@ NetworkInputs* data_element_constant_current_get_values(DataElement* element, ui
 
 		status = array_init(&(net_input.values), layer->neurons.length, layer->neurons.length, sizeof(float));
 		check(status == SUCCESS, invalid_argument("status"));
+		for (j = 0; j < layer->neurons.length; ++j)
+			array_set(&(net_input.values), j, &current_value);
 		net_input.type = CURRENT;
 
 		status = array_append(inputs, &net_input);
@@ -182,6 +185,8 @@ DataGenerator* data_generator_constant_current_create(uint32_t length, Network* 
 ERROR
 	if (data != NULL) free(data);
 	if (data_gen != NULL) free(data_gen);
+
+	return NULL;
 }
 
 

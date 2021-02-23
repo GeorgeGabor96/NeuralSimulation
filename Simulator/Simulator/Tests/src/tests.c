@@ -14,11 +14,15 @@
 #include "Simulator/layer_tests.h"
 #include "Simulator/network_tests.h"
 #include "Simulator/callbacks_tests.h"
+#include "Simulator/data_gen_tests.h"
 
 
 // TODO: some tests take time, mark them and set a flag to run them or not
 TestInfo tests[] = {
-	// callback
+	// data generators
+	{ data_generator_constant_current_test, "data_generator_constant_current_test" },
+
+	// callbacks
 	{ callbacks_visualize_layer_neurons_test, "callbacks_visualize_layer_neurons_test" },
 
 	// OS
