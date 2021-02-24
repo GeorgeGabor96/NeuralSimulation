@@ -18,7 +18,7 @@ typedef struct Simulator {
 BOOL simulator_is_valid(Simulator* sim);
 Simulator* simulator_create(DataGenerator* data, Network* net);
 void simulator_destroy(Simulator* sim);
-Status simulator_add_callback(Simulator* sim, Callback* call);
+Status simulator_add_callback(Simulator* sim, Callback* call);  // takes ownership over the callback
 void simulator_infer(Simulator* sim);
 void simulator_train(Simulator* sim);
 void simulator_test(Simulator* sim);

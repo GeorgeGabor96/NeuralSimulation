@@ -173,14 +173,14 @@ void callback_visualize_layer_neurons_run(Callback* callback, Network* net) {
 		voltages = (ArrayFloat*)array_get(&(data->voltages_per_neuron), i);
 		sprintf(file_name, "Voltages_N%u.png", i);
 		file_path = string_path_join_string_and_C(&(data->output_folder), file_name);
-		plotting_scatter_plot_floats(steps, voltages, 600, 400, string_get_C_string(file_path));
+		plotting_scatter_plot_floats(steps, voltages, 1000, 500, string_get_C_string(file_path));
 		string_destroy(file_path);
 
 		spikes = (ArrayBool*)array_get(&(data->spikes_per_neuron), i);
 		spikes_f = array_bool_to_float(spikes, FALSE);
 		sprintf(file_name, "Spikes_N%u.png", i);
 		file_path = string_path_join_string_and_C(&(data->output_folder), file_name);
-		plotting_scatter_plot_floats(steps, spikes_f, 600, 400, string_get_C_string(file_path));
+		plotting_scatter_plot_floats(steps, spikes_f, 1000, 500, string_get_C_string(file_path));
 		string_destroy(file_path);
 		array_destroy(spikes_f, NULL);
 	}

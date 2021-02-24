@@ -1,4 +1,5 @@
 #include "Simulator.h"
+#include "MemoryManagement.h"
 
 
 BOOL simulator_is_valid(Simulator* sim) {
@@ -27,9 +28,9 @@ Simulator* simulator_create(DataGenerator* data, Network* net) {
 	check(data_generator_is_valid(data) == TRUE, invalid_argument("data"));
 	check(network_is_valid(net) == TRUE, invalid_argument("net"));
 	
-	sim = (Simulator*)malloc(sizeof(Simulator));
+	sim = (Simulator*)malloc(sizeof(Simulator), "simulator_create");
 	check_memory(sim);
-	array_init(&(sim->callbacks), 1, 0, sizeof(Callback));
+	status = array_init(&(sim->callbacks), 1, 0, sizeof(Callback));
 	check(status == SUCCESS, "Couldn't init array of callbacks");
 
 	sim->data = data;
@@ -48,9 +49,10 @@ ERROR
 void simulator_destroy(Simulator* sim) {
 	check(simulator_is_valid(sim) == TRUE, invalid_argument("sim"));
 
+	// free callback, then data generator then the net, because callbacks and data_gen may have references to net
+	array_reset(&(sim->callbacks), callback_reset);
 	data_generator_destroy(sim->data);
 	network_destroy(sim->network);
-	array_reset(&(sim->callbacks), callback_reset);
 	free(sim);
 
 ERROR
@@ -102,27 +104,36 @@ static inline void run_callbacks(Simulator* sim) {
 void simulator_infer(Simulator* sim) {
 	check(simulator_is_valid(sim) == TRUE, invalid_argument("sim"));
 
+	DataElement* element = NULL;
+	NetworkInputs* inputs = NULL;
 	uint32_t elem_idx = 0;
 	uint32_t time = 0;
-	uint32_t callback_idx = 0;
-	Callback* callback = NULL;
 
+
+	printf("-------------------------\n");
+	printf("STARTING INFERENCE\n");
 	for (elem_idx = 0; elem_idx < sim->data->length; ++elem_idx) {
-		DataElement* element = data_generator_get_element(sim->data, elem_idx);
+		printf("Example %d\n", elem_idx);
+		element = data_generator_get_element(sim->data, elem_idx);
 		check(data_element_is_valid(element) == TRUE, invalid_argument("element"));
 
 		network_clear_state(sim->network);
 		for (time = 0; time < element->duration; ++time) {
-			NetworkInputs* inputs = data_element_get_values(element, time);
+			inputs = data_element_get_values(element, time);
 			check(array_is_valid(inputs) == TRUE, invalid_argument("inputs"));
 			
 			network_step(sim->network, inputs, time);
 			
 			update_callbacks(sim);
+			
+			data_element_remove_values(element, inputs);
 		}
+		data_element_destroy(element);
+
 		run_callbacks(sim);
 	}
-	
+	printf("-------------------------\n");
+
 ERROR
 	return;
 }

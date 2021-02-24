@@ -168,6 +168,7 @@
     <ClInclude Include="src\Simulator\neuron_tests.h" />
     <ClInclude Include="src\Simulator\os_tests.h" />
     <ClInclude Include="src\Simulator\queue_tests.h" />
+    <ClInclude Include="src\Simulator\simulator_tests.h" />
     <ClInclude Include="src\Simulator\stack_tests.h" />
     <ClInclude Include="src\Simulator\string_tests.h" />
     <ClInclude Include="src\Simulator\synapse_tests.h" />
@@ -183,6 +184,7 @@
     <ClCompile Include="src\Simulator\neuron_tests.c" />
     <ClCompile Include="src\Simulator\os_tests.c" />
     <ClCompile Include="src\Simulator\queue_tests.c" />
+    <ClCompile Include="src\Simulator\simulator_tests.c" />
     <ClCompile Include="src\Simulator\stack_tests.c" />
     <ClCompile Include="src\Simulator\string_tests.c" />
     <ClCompile Include="src\Simulator\synapse_tests.c" />

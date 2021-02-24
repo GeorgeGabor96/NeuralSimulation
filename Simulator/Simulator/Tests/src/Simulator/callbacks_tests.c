@@ -8,7 +8,7 @@ TestStatus callbacks_visualize_layer_neurons_test() {
 	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
 	SynapseClass* s_class = synapse_class_create_default();
 	Layer* layer = layer_create_fully_connected(10, n_class, s_class, "layer_visu");
-	Callback* callback_visu = callback_visualize_layer_neurons_create(layer, ".\\visu");
+	Callback* callback_visu = callback_visualize_layer_neurons_create(layer, ".\\callback_visu");
 	ArrayFloat* constant_current = array_ones_float(10);
 	assert(callback_is_valid(callback_visu) == TRUE, invalid_argument("callback"));
 
@@ -24,7 +24,7 @@ TestStatus callbacks_visualize_layer_neurons_test() {
 	synapse_class_destroy(s_class);
 	array_destroy(constant_current, NULL);
 	
-	os_rmdir(".\\visu");
+	os_rmdir(".\\callback_visu");
 
 	assert(memory_leak() == FALSE, "Memory leak");
 	return TEST_SUCCESS;

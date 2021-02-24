@@ -15,10 +15,14 @@
 #include "Simulator/network_tests.h"
 #include "Simulator/callbacks_tests.h"
 #include "Simulator/data_gen_tests.h"
+#include "Simulator/simulator_tests.h"
 
 
 // TODO: some tests take time, mark them and set a flag to run them or not
 TestInfo tests[] = {
+	// simulator
+	{ simulator_infer_test, "simulator_infer_test" },
+
 	// data generators
 	{ data_generator_constant_current_test, "data_generator_constant_current_test" },
 
