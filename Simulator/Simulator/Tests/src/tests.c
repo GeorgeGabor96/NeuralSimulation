@@ -25,6 +25,7 @@ TestInfo tests[] = {
 
 	// data generators
 	{ data_generator_constant_current_test, "data_generator_constant_current_test" },
+	{ data_generator_random_spikes_test, "data_generator_random_spikes_test"},
 
 	// callbacks
 	{ callbacks_visualize_layer_neurons_test, "callbacks_visualize_layer_neurons_test" },

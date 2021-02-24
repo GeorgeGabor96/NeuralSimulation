@@ -1,4 +1,6 @@
 #include "data_gen_tests.h"
+#include "data/data_gen_constant_current.h"
+#include "data/data_gen_random_spikes.h"
 
 
 Network* create_basic_network(NeuronClass* n_class, SynapseClass* s_class) {
@@ -68,7 +70,77 @@ TestStatus data_generator_constant_current_test() {
 					assert(current_from_data_gen == current_value, "current_from_data_gen should be %f not %f", current_value, current_from_data_gen);
 				}
 			}
-			network_step(net, inputs, duration);
+			network_step(net, inputs, j);
+
+			data_element_remove_values(element, inputs);
+		}
+		data_element_destroy(element);
+	}
+
+	data_generator_destroy(generator);
+	network_destroy(net);
+	neuron_class_destroy(n_class);
+	synapse_class_destroy(s_class);
+	assert(memory_leak() == FALSE, "Memory leak");
+
+	return TEST_SUCCESS;
+ERROR
+	return TEST_FAILED;
+}
+
+
+TestStatus data_generator_random_spikes_test() {
+	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
+	SynapseClass* s_class = synapse_class_create_default();
+	Network* net = NULL;
+	Layer* layer = NULL;
+	DataGenerator* generator = NULL;
+	DataElement* element = NULL;
+	NetworkInputs* inputs = NULL;
+	NetworkValues* values = NULL;
+	uint32_t i = 0;
+	uint32_t j = 0;
+	uint32_t k = 0;
+	uint32_t u = 0;
+	uint32_t length = 10;
+	uint32_t duration = 20;
+	float spike_percent = 0.5f;
+	BOOL spikes_from_data_gen = FALSE;
+
+	net = create_basic_network(n_class, s_class);
+
+	// make the generator
+	generator = data_generator_random_spikes_create(length, net, spike_percent, duration);
+	assert(data_generator_is_valid(generator) == TRUE, invalid_argument("generator"));
+	assert(generator->length == length, "@generator->length should be %u not %u", length, generator->length);
+
+	for (i = 0; i < length; ++i) {
+		element = data_generator_get_element(generator, i);
+		assert(data_element_is_valid(element) == TRUE, invalid_argument("element"));
+		assert(element->duration == duration, "element->duration should be %u not %u", duration, element->duration);
+		
+		// need this to reset the left over spikes from previous example
+		network_clear_state(net);
+
+		for (j = 0; j < element->duration; ++j) {
+			inputs = data_element_get_values(element, j);
+			assert(array_is_valid(inputs) == TRUE, invalid_argument("inputs"));
+			assert(inputs->length == net->input_layers.length, "number of inputs should be %u not %u", net->input_layers.length, inputs->length);
+
+			for (k = 0; k < inputs->length; ++k) {
+				values = (NetworkValues*)array_get(inputs, k);
+				layer = *((Layer**)array_get(&(net->input_layers), k));
+
+				assert(values->type == SPIKES, "@values->tpe != SPIKES");
+				assert(array_is_valid(&(values->values)) == TRUE, invalid_argument("values->values"));
+				assert(values->values.length == layer->neurons.length, "@values->values.length should be %u not %u", layer->neurons.length, values->values.length);
+
+				for (u = 0; u < values->values.length; ++u) {
+					spikes_from_data_gen = *((BOOL*)array_get(&(values->values), u));
+					assert(spikes_from_data_gen == TRUE || spikes_from_data_gen == FALSE, "spikes_from_data_gen should be 1 or 0 not %d", spikes_from_data_gen);
+				}
+			}
+			network_step(net, inputs, j);
 
 			data_element_remove_values(element, inputs);
 		}
