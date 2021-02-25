@@ -159,7 +159,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.c" />
+    <ClCompile Include="src\experiments\constant_current_experiment.c" />
+    <ClCompile Include="src\experiments\random_spikes_experiment.c" />
+    <ClCompile Include="src\main.c" />
+    <ClCompile Include="src\networks.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\experiments.h" />
+    <ClInclude Include="include\networks.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
