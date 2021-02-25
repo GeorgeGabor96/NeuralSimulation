@@ -18,10 +18,10 @@ typedef enum { SPIKES = 0, CURRENT = 1, VOLTAGE = 2 } NetworkValueType;
 // if I add a type to the array and the other structures, i could directly use an array, and i could also verify the type when i receive an array
 typedef struct NetworkValues {
 	NetworkValueType type;
-	Array* values;
+	Array values;
 } NetworkValues;
-typedef Array NetworkInputs;
-typedef Array NetworkOutputs;
+typedef Array NetworkInputs; // array of NetworkValues
+typedef Array NetworkOutputs; // array of NetworkValues
 
 void network_values_show(Array* values);
 
@@ -79,6 +79,9 @@ void network_summary(Network* network);
 // NOTE the inputs vector should have the same length as the number of input layers and the same number of values
 void network_step(Network* network, NetworkInputs* inputs, uint32_t time);
 NetworkOutputs* network_get_outputs(Network* network, NetworkValueType type);
+
+// Resets all the neurons and synapses to default and initial values also removes all spikes generated
+void network_clear_state(Network* network);
 
 // TODO: maybe is easier to be specific
 // TODO: get output by index???

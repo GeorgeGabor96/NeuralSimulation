@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{dcd5a7ad-ddb8-497e-960d-5e18414d3c97}</ProjectGuid>
-    <RootNamespace>Tests</RootNamespace>
+    <ProjectGuid>{fa28fd2a-d2bc-4ac4-944e-1e2f9236a1c1}</ProjectGuid>
+    <RootNamespace>Experiments</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -94,15 +94,15 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\Simulator\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Simulator/bin/x64/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Simulator.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Simulator/bin/x64/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -111,7 +111,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\Simulator\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -120,23 +120,23 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Simulator/bin/x64/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Simulator.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Simulator/bin/x64/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\Simulator\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Simulator/bin/x64/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Simulator.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Simulator/bin/x64/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -145,7 +145,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)\Simulator\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -154,41 +154,19 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Simulator/bin/x64/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Simulator.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Simulator/bin/x64/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Simulator\array_tests.h" />
-    <ClInclude Include="src\Simulator\callbacks_tests.h" />
-    <ClInclude Include="src\Simulator\data_gen_tests.h" />
-    <ClInclude Include="src\Simulator\layer_tests.h" />
-    <ClInclude Include="src\Simulator\memory_management_tests.h" />
-    <ClInclude Include="src\Simulator\network_tests.h" />
-    <ClInclude Include="src\Simulator\neuron_tests.h" />
-    <ClInclude Include="src\Simulator\os_tests.h" />
-    <ClInclude Include="src\Simulator\queue_tests.h" />
-    <ClInclude Include="src\Simulator\simulator_tests.h" />
-    <ClInclude Include="src\Simulator\stack_tests.h" />
-    <ClInclude Include="src\Simulator\string_tests.h" />
-    <ClInclude Include="src\Simulator\synapse_tests.h" />
-    <ClInclude Include="src\testing.h" />
+    <ClCompile Include="src\experiments\constant_current_experiment.c" />
+    <ClCompile Include="src\experiments\random_spikes_experiment.c" />
+    <ClCompile Include="src\main.c" />
+    <ClCompile Include="src\networks.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Simulator\array_tests.c" />
-    <ClCompile Include="src\Simulator\callbacks_tests.c" />
-    <ClCompile Include="src\Simulator\data_gen_tests.c" />
-    <ClCompile Include="src\Simulator\layer_tests.c" />
-    <ClCompile Include="src\Simulator\memory_management_tests.c" />
-    <ClCompile Include="src\Simulator\network_tests.c" />
-    <ClCompile Include="src\Simulator\neuron_tests.c" />
-    <ClCompile Include="src\Simulator\os_tests.c" />
-    <ClCompile Include="src\Simulator\queue_tests.c" />
-    <ClCompile Include="src\Simulator\simulator_tests.c" />
-    <ClCompile Include="src\Simulator\stack_tests.c" />
-    <ClCompile Include="src\Simulator\string_tests.c" />
-    <ClCompile Include="src\Simulator\synapse_tests.c" />
-    <ClCompile Include="src\tests.c" />
+    <ClInclude Include="include\experiments.h" />
+    <ClInclude Include="include\networks.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

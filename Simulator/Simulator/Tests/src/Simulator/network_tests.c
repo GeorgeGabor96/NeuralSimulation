@@ -189,9 +189,9 @@ TestStatus network_step_test() {
 	NetworkInputs* inputs = array_create(1, 0, sizeof(NetworkValues));
 	NetworkValues currents;
 	currents.type = CURRENT;
-	currents.values = array_create(input_neuron_length, input_neuron_length, sizeof(float));
+	array_init(&(currents.values), input_neuron_length, input_neuron_length, sizeof(float));
 	float PSC = 10.0f;
-	for (i = 0; i < currents.values->length; ++i) array_set(currents.values, i, &PSC);
+	for (i = 0; i < currents.values.length; ++i) array_set(&(currents.values), i, &PSC);
 	array_append(inputs, &currents);
 
 	for (i = 0; i < 100; ++i) {
@@ -205,7 +205,7 @@ TestStatus network_step_test() {
 		}
 		array_destroy(output_spikes, NULL);
 	}
-	array_destroy(currents.values, NULL);
+	array_reset(&(currents.values), NULL);
 	array_destroy(inputs, NULL);
 
 	network_destroy(network);

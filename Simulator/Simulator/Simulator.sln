@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Simulator", "Simulator\Simu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxproj", "{DCD5A7AD-DDB8-497E-960D-5E18414D3C97}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Experiments", "Experiments\Experiments.vcxproj", "{FA28FD2A-D2BC-4AC4-944E-1E2F9236A1C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{DCD5A7AD-DDB8-497E-960D-5E18414D3C97}.Release|x64.Build.0 = Release|x64
 		{DCD5A7AD-DDB8-497E-960D-5E18414D3C97}.Release|x86.ActiveCfg = Release|Win32
 		{DCD5A7AD-DDB8-497E-960D-5E18414D3C97}.Release|x86.Build.0 = Release|Win32
+		{FA28FD2A-D2BC-4AC4-944E-1E2F9236A1C1}.Debug|x64.ActiveCfg = Debug|x64
+		{FA28FD2A-D2BC-4AC4-944E-1E2F9236A1C1}.Debug|x64.Build.0 = Debug|x64
+		{FA28FD2A-D2BC-4AC4-944E-1E2F9236A1C1}.Debug|x86.ActiveCfg = Debug|Win32
+		{FA28FD2A-D2BC-4AC4-944E-1E2F9236A1C1}.Debug|x86.Build.0 = Debug|Win32
+		{FA28FD2A-D2BC-4AC4-944E-1E2F9236A1C1}.Release|x64.ActiveCfg = Release|x64
+		{FA28FD2A-D2BC-4AC4-944E-1E2F9236A1C1}.Release|x64.Build.0 = Release|x64
+		{FA28FD2A-D2BC-4AC4-944E-1E2F9236A1C1}.Release|x86.ActiveCfg = Release|Win32
+		{FA28FD2A-D2BC-4AC4-944E-1E2F9236A1C1}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

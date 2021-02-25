@@ -60,6 +60,15 @@
     <ClInclude Include="include\os.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\data\DataGen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\data\data_gen_constant_current.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\data\data_gen_random_spikes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Array.c">
@@ -107,7 +116,13 @@
     <ClCompile Include="src\os.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\callbacks\callback.c">
+    <ClCompile Include="src\Simulator.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\data\data_gen_constant_current.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\data\data_gen_random_spikes.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

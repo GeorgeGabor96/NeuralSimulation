@@ -97,6 +97,10 @@ void layer_reset(Layer* layer);
 void layer_destroy(Layer* layer);
 
 Status layer_step(Layer* layer, uint32_t time);
+
+// clear the state of neurons
+void layer_clear_state(Layer* layer);
+
 /*
 Use these to set the input of the network
 */

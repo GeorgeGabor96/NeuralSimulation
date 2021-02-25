@@ -213,3 +213,18 @@ ERROR
 	return FAIL;
 }
 
+
+void synapse_clear_state(Synapse* synapse) {
+	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
+	
+	// empty the queue
+	while (queue_is_empty(&(synapse->spike_times)) == FALSE) {
+		queue_dequeue(&(synapse->spike_times));
+	}
+	
+	// reset conductance
+	synapse->g = 0.0f;
+ERROR
+	return;
+}
+

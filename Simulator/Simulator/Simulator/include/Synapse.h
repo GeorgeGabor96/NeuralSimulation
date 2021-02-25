@@ -87,4 +87,8 @@ float synapse_compute_PSC(Synapse* synapse, float u);
 
 Status synapse_step(Synapse* synapse, uint32_t simulation_time);
 
+// empties the queue of spikes and resets the conductance
+void synapse_clear_state(Synapse* synapse);
+
+
 #endif  // __SYNAPSE_H__
