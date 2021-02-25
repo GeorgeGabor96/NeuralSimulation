@@ -224,8 +224,6 @@ void synapse_clear_state(Synapse* synapse) {
 	
 	// reset conductance
 	synapse->g = 0.0f;
-
-
 ERROR
 	return;
 }

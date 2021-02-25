@@ -40,8 +40,8 @@ DataElement* data_element_constant_current_create(Network* net, float current_va
 
 	return element;
 
-	ERROR
-		if (element != NULL) free(element);
+ERROR
+	if (element != NULL) free(element);
 	if (data != NULL) free(data);
 	return NULL;
 }
@@ -59,8 +59,8 @@ BOOL data_element_constant_current_is_valid(DataElement* element) {
 	check(network_is_valid(data->net) == TRUE, invalid_argument("data->net"));
 
 	return TRUE;
-	ERROR
-		return FALSE;
+ERROR
+	return FALSE;
 }
 
 
@@ -79,8 +79,8 @@ void data_element_constant_current_destroy(DataElement* element) {
 	element->get_values = NULL;
 	free(element);
 
-	ERROR
-		return;
+ERROR
+	return;
 }
 
 
@@ -120,9 +120,9 @@ NetworkInputs* data_element_constant_current_get_values(DataElement* element, ui
 
 	return inputs;
 
-	ERROR
-		if (inputs != NULL)
-			data_element_constant_current_remove_values(element, inputs);
+ERROR
+	if (inputs != NULL)
+		data_element_constant_current_remove_values(element, inputs);
 	return NULL;
 }
 
@@ -140,8 +140,8 @@ void data_element_constant_current_remove_values(DataElement* element, NetworkIn
 	}
 	array_destroy(inputs, NULL);
 
-	ERROR
-		return;
+ERROR
+	return;
 }
 
 

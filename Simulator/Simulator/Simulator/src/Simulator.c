@@ -50,7 +50,11 @@ void simulator_destroy(Simulator* sim) {
 	check(simulator_is_valid(sim) == TRUE, invalid_argument("sim"));
 
 	// free callback, then data generator then the net, because callbacks and data_gen may have references to net
-	array_reset(&(sim->callbacks), callback_reset);
+	for (uint32_t i = 0; i < sim->callbacks.length; ++i) {
+		Callback* callback = (Callback*)array_get(&(sim->callbacks), i);
+		callback_reset(callback);
+	}
+	array_reset(&(sim->callbacks), NULL);
 	data_generator_destroy(sim->data);
 	network_destroy(sim->network);
 	free(sim);

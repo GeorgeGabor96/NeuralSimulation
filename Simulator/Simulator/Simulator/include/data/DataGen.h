@@ -58,7 +58,7 @@ typedef struct DataElement {
 }DataElement;
 
 #define data_element_is_valid(element) ((element) != NULL && (element)->is_valid != NULL ? (element)->is_valid(element) : FALSE)
-#define data_element_destroy(element) ((element) != NULL && (element)->destroy != NULL ? (element)->destroy(element) : FALSE)
+#define data_element_destroy(element) ((element) != NULL && (element)->destroy != NULL ? (element)->destroy(element) : 0)
 #define data_element_get_values(element, t) ((element) != NULL && (element)->get_values != NULL ? (element)->get_values(element, t) : NULL)
 #define data_element_remove_values(element, values) ((element) != NULL && (element->remove_values) != NULL ? (element)->remove_values(element, values) : 0)
 

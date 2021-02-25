@@ -116,9 +116,6 @@
     <ClCompile Include="src\os.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\callbacks\callback.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Simulator.c">
       <Filter>Source Files</Filter>
     </ClCompile>
