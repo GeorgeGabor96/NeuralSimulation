@@ -12,15 +12,12 @@ TestStatus network_compile_general_use_case_test() {
 	String* string = NULL;
 
 	// create a few layers
-	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
-	SynapseClass* s_class = synapse_class_create_default();
-
 	char* name1 = "layer_1";
 	char* name2 = "layer_2";
 	char* name3 = "layer_3";
-	Layer* l1 = layer_create_fully_connected(10, n_class, s_class, name1);
-	Layer* l2 = layer_create_fully_connected(100, n_class, s_class, name2);
-	Layer* l3 = layer_create_fully_connected(1, n_class, s_class, name3);
+	Layer* l1 = layer_create_fully_connected(10, neuron_class_create(LIF_NEURON), synapse_class_create_default(), name1);
+	Layer* l2 = layer_create_fully_connected(100, neuron_class_create(LIF_NEURON), synapse_class_create_default(), name2);
+	Layer* l3 = layer_create_fully_connected(1, neuron_class_create(LIF_NEURON), synapse_class_create_default(), name3);
 	layer_add_input_layer(l2, l1);
 	layer_add_input_layer(l3, l1);
 	layer_add_input_layer(l3, l2);
@@ -149,8 +146,6 @@ TestStatus network_compile_general_use_case_test() {
 
 	/*----------network_destroy----------*/
 	network_destroy(network);
-	neuron_class_destroy(n_class);
-	synapse_class_destroy(s_class);
 	assert(memory_leak() == FALSE, "Memory leak");
 
 	t_status = TEST_SUCCESS;
@@ -165,14 +160,10 @@ TestStatus network_step_test() {
 	uint32_t i = 0;
 
 	// create a few layers
-	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
-	SynapseClass* s_class = synapse_class_create_default();
-
-	// build layers
 	uint32_t input_neuron_length = 5;
-	Layer* layer1 = layer_create_fully_connected(input_neuron_length, n_class, s_class, "layer1");
-	Layer* layer2 = layer_create_fully_connected(100, n_class, s_class, "layer2");
-	Layer* layer3 = layer_create_fully_connected(10, n_class, s_class, "layer3");
+	Layer* layer1 = layer_create_fully_connected(input_neuron_length, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "layer1");
+	Layer* layer2 = layer_create_fully_connected(100, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "layer2");
+	Layer* layer3 = layer_create_fully_connected(10, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "layer3");
 	layer_add_input_layer(layer2, layer1);
 	layer_add_input_layer(layer3, layer2);
 
@@ -209,8 +200,6 @@ TestStatus network_step_test() {
 	array_destroy(inputs, NULL);
 
 	network_destroy(network);
-	neuron_class_destroy(n_class);
-	synapse_class_destroy(s_class);
 	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
@@ -221,15 +210,12 @@ error:
 
 
 TestStatus network_summary_test() {
-	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
-	SynapseClass* s_class = synapse_class_create_default();
-
-	Layer* l_input_1 = layer_create_fully_connected(10, n_class, s_class, "l_input_1");
-	Layer* l_input_2 = layer_create_fully_connected(100, n_class, s_class, "l_input_2");
-	Layer* l_inner_1 = layer_create_fully_connected(100, n_class, s_class, "l_inner_1");
-	Layer* l_inner_2 = layer_create_fully_connected(100, n_class, s_class, "l_inner_2");
-	Layer* l_output_1 = layer_create_fully_connected(100, n_class, s_class, "l_output_1");
-	Layer* l_output_2 = layer_create_fully_connected(10, n_class, s_class, "l_output_2");
+	Layer* l_input_1 = layer_create_fully_connected(10, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "l_input_1");
+	Layer* l_input_2 = layer_create_fully_connected(100, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "l_input_2");
+	Layer* l_inner_1 = layer_create_fully_connected(100, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "l_inner_1");
+	Layer* l_inner_2 = layer_create_fully_connected(100, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "l_inner_2");
+	Layer* l_output_1 = layer_create_fully_connected(100, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "l_output_1");
+	Layer* l_output_2 = layer_create_fully_connected(10, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "l_output_2");
 	layer_add_input_layer(l_inner_1, l_input_1);
 	layer_add_input_layer(l_inner_1, l_input_2);
 	
@@ -255,8 +241,6 @@ TestStatus network_summary_test() {
 	network_summary(network);
 
 	network_destroy(network);
-	neuron_class_destroy(n_class);
-	synapse_class_destroy(s_class);
 	assert(memory_leak() == FALSE, "Memory leak");
 
 	return TEST_SUCCESS;

@@ -137,8 +137,23 @@ ERROR
 }
 
 
+void neuron_class_reset(NeuronClass* neuron_class) {
+	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
+	neuron_class->free_factor = 0.0f;
+	neuron_class->i_factor = 0.0f;
+	neuron_class->u_factor = 0.0f;
+	neuron_class->tau = 0.0f;
+	neuron_class->type = INVALID_NEURON;
+	neuron_class->u_rest = 0.0f;
+	neuron_class->u_th = 0.0f;
+		
+ERROR
+	return;
+}
+
 void neuron_class_destroy(NeuronClass* neuron_class) {
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
+	neuron_class_reset(neuron_class);
 	free(neuron_class);
 ERROR
 	return;

@@ -12,7 +12,7 @@
 * SynapseClass Functionality
 *************************************************************/
 
-typedef enum { CONDUCTANCE_SYNAPSE = 0, VOLTAGE_DEPENDENT_SYNAPSE = 1 } SynapseType;
+typedef enum { INVALID_SYNAPSE = 0, CONDUCTANCE_SYNAPSE = 1, VOLTAGE_DEPENDENT_SYNAPSE = 2 } SynapseType;
 const char* synapse_type_C_string(SynapseType type);
 
 
@@ -47,7 +47,7 @@ Preconditions: @tau_ms > 0
 SynapseClass* synapse_class_create(float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms);
 
 SynapseClass* synapse_class_create_default(); 
-
+void synapse_class_reset(SynapseClass* synapse_class);
 void synapse_class_destroy(SynapseClass* synapse_class);
 
 

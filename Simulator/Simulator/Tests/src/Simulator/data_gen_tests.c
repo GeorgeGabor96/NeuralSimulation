@@ -3,11 +3,11 @@
 #include "data/data_gen_random_spikes.h"
 
 
-Network* create_basic_network(NeuronClass* n_class, SynapseClass* s_class) {
+Network* create_basic_network() {
 	// make a network with 2 input layers and one output layer
-	Layer* layer_i1 = layer_create_fully_connected(10, n_class, s_class, "layer_i1");
-	Layer* layer_i2 = layer_create_fully_connected(20, n_class, s_class, "layer_i2");
-	Layer* layer_out = layer_create_fully_connected(1, n_class, s_class, "layer_out");
+	Layer* layer_i1 = layer_create_fully_connected(10, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "layer_i1");
+	Layer* layer_i2 = layer_create_fully_connected(20, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "layer_i2");
+	Layer* layer_out = layer_create_fully_connected(1, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "layer_out");
 	layer_add_input_layer(layer_out, layer_i1);
 	layer_add_input_layer(layer_out, layer_i2);
 
@@ -23,8 +23,6 @@ Network* create_basic_network(NeuronClass* n_class, SynapseClass* s_class) {
 
 
 TestStatus data_generator_constant_current_test() {
-	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
-	SynapseClass* s_class = synapse_class_create_default();
 	Network* net = NULL;
 	Layer* layer = NULL;
 	DataGenerator* generator = NULL;
@@ -40,7 +38,7 @@ TestStatus data_generator_constant_current_test() {
 	float current_value = 2.0f;
 	float current_from_data_gen = 0.0f;
 
-	net = create_basic_network(n_class, s_class);
+	net = create_basic_network();
 
 	// make the generator
 	generator = data_generator_constant_current_create(length, net, current_value, duration);
@@ -79,8 +77,6 @@ TestStatus data_generator_constant_current_test() {
 
 	data_generator_destroy(generator);
 	network_destroy(net);
-	neuron_class_destroy(n_class);
-	synapse_class_destroy(s_class);
 	assert(memory_leak() == FALSE, "Memory leak");
 
 	return TEST_SUCCESS;
@@ -90,8 +86,6 @@ ERROR
 
 
 TestStatus data_generator_random_spikes_test() {
-	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
-	SynapseClass* s_class = synapse_class_create_default();
 	Network* net = NULL;
 	Layer* layer = NULL;
 	DataGenerator* generator = NULL;
@@ -107,7 +101,7 @@ TestStatus data_generator_random_spikes_test() {
 	float spike_percent = 0.5f;
 	BOOL spikes_from_data_gen = FALSE;
 
-	net = create_basic_network(n_class, s_class);
+	net = create_basic_network();
 
 	// make the generator
 	generator = data_generator_random_spikes_create(length, net, spike_percent, duration);
@@ -149,8 +143,6 @@ TestStatus data_generator_random_spikes_test() {
 
 	data_generator_destroy(generator);
 	network_destroy(net);
-	neuron_class_destroy(n_class);
-	synapse_class_destroy(s_class);
 	assert(memory_leak() == FALSE, "Memory leak");
 
 	return TEST_SUCCESS;

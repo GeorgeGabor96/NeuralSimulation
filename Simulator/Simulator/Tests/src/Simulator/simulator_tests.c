@@ -6,12 +6,15 @@
 
 
 TestStatus simulator_infer_test() {
-	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
-	SynapseClass* s_class = synapse_class_create_default();
-
 	// create net linear with 2 layers
-	Layer* layer_input = layer_create_fully_connected(100, n_class, s_class, "layer_input");
-	Layer* layer_output = layer_create_fully_connected(1, n_class, s_class, "layer_output");
+	Layer* layer_input = layer_create_fully_connected(100, 
+													neuron_class_create(LIF_NEURON), 
+													synapse_class_create_default(),
+													"layer_input");
+	Layer* layer_output = layer_create_fully_connected(1,
+													neuron_class_create(LIF_NEURON), 
+													synapse_class_create_default(),
+													"layer_output");
 	layer_add_input_layer(layer_output, layer_input);
 
 	Network* net = network_create();
@@ -38,8 +41,6 @@ TestStatus simulator_infer_test() {
 
 	os_rmdir(".\\simulator_visu");
 	simulator_destroy(simulator);
-	neuron_class_destroy(n_class);
-	synapse_class_destroy(s_class);
 	assert(memory_leak() == FALSE, "Memory leak");
 
 	return TEST_SUCCESS;
