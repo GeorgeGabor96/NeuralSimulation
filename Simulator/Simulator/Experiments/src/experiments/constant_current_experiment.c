@@ -5,10 +5,7 @@
 
 
 void constant_current_experiment() {
-	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
-	SynapseClass* s_class = synapse_class_create_default();
-
-	Network* net = network_3_L_3_3_3(n_class, s_class);
+	Network* net = network_3_L_3_3_3();
 	DataGenerator* constant_current = data_generator_constant_current_create(1, net, 15.0f, 100);
 	Layer* l1 = network_get_layer_by_idx(net, 0);
 	Layer* l2 = network_get_layer_by_idx(net, 1);
@@ -25,7 +22,4 @@ void constant_current_experiment() {
 	simulator_infer(simulator);
 
 	simulator_destroy(simulator);
-	neuron_class_destroy(n_class);
-	synapse_class_destroy(s_class);
-
 }
