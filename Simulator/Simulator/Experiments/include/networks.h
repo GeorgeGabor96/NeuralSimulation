@@ -3,7 +3,7 @@
 
 #include "Network.h"
 
-Network* network_3_L_3_3_3(NeuronClass* n_class, SynapseClass* s_class);
+Network* network_3_L_3_3_3();
 
 
 #endif // __NETWORKS_H__

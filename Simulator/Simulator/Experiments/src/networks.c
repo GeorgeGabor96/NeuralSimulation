@@ -1,10 +1,10 @@
 #include "../include/networks.h"
 
 
-Network* network_3_L_3_3_3(NeuronClass* n_class, SynapseClass* s_class) {
-	Layer* layer_1 = layer_create_fully_connected(3, n_class, s_class, "layer_1");
-	Layer* layer_2 = layer_create_fully_connected(3, n_class, s_class, "layer_2");
-	Layer* layer_3 = layer_create_fully_connected(3, n_class, s_class, "layer_3");
+Network* network_3_L_3_3_3() {
+	Layer* layer_1 = layer_create_fully_connected(3, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "layer_1");
+	Layer* layer_2 = layer_create_fully_connected(3, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "layer_2");
+	Layer* layer_3 = layer_create_fully_connected(3, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "layer_3");
 	layer_add_input_layer(layer_2, layer_1);
 	layer_add_input_layer(layer_3, layer_2);
 	

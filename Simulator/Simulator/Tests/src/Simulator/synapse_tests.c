@@ -33,7 +33,7 @@ TestStatus synapse_class_create_destroy_test() {
 	assert(synapse_class == NULL, "@synapse_class should be NULL for @simulation_step_ms == 0");
 
 	// call with @type = 2
-	synapse_class = synapse_class_create(rev_potential, tau_ms, delay, 2, simuation_time_ms);
+	synapse_class = synapse_class_create(rev_potential, tau_ms, delay, INVALID_SYNAPSE, simuation_time_ms);
 	assert(synapse_class == NULL, "@synapse_class should be NULL for @type = 2");
 	
 	// destroy with NULL

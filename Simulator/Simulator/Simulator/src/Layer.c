@@ -72,23 +72,23 @@ Status layer_init(
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
 	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
 	check(name != NULL, null_argument("name"));
-	
-	status = array_init(&(layer->neurons), n_neurons, n_neurons, sizeof(Neuron));
-	check(status == SUCCESS, "Couldn't init @layer->neurons");
-	for (i = 0; i < n_neurons; ++i) {
-		status = neuron_init(array_get(&(layer->neurons), i), neuron_class);
-		check(status == SUCCESS, "Failed to init neuron %d", i);
-	}
 
-	String* name_s = string_create(name);
-	check(string_is_valid(name_s) == TRUE, invalid_argument("name"));
 
 	layer->type = type;
 	layer->neuron_class = neuron_class;
 	layer->synapse_class = synapse_class;
+	String* name_s = string_create(name);
+	check(string_is_valid(name_s) == TRUE, invalid_argument("name"));
 	layer->name = name_s;
 	layer->input_names = array_create(1, 0, sizeof(String*));
 	check(array_is_valid(layer->input_names) == TRUE, invalid_argument("layer->input_names"));
+
+	status = array_init(&(layer->neurons), n_neurons, n_neurons, sizeof(Neuron));
+	check(status == SUCCESS, "Couldn't init @layer->neurons");
+	for (i = 0; i < n_neurons; ++i) {
+		neuron_init(array_get(&(layer->neurons), i), layer->neuron_class);
+		check(neuron_is_valid(array_get(&(layer->neurons), i)) == TRUE, "%s %d", invalid_argument("neuron"), i);
+	}
 
 	switch (type)
 	{
@@ -188,12 +188,15 @@ ERROR
 void layer_reset(Layer* layer) {
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	layer->type = LAYER_INVALID;
-	layer->neuron_class = NULL;
-	layer->synapse_class = NULL;
 	layer->link = NULL;
 	string_destroy(layer->name);
 	strings_destroy(layer->input_names);
 	array_reset(&(layer->neurons), neuron_reset);
+	// delete the classes only after the neurons are removed
+	neuron_class_destroy(layer->neuron_class);
+	layer->neuron_class = NULL;
+	synapse_class_destroy(layer->synapse_class);
+	layer->synapse_class = NULL;
 
 ERROR
 	return;

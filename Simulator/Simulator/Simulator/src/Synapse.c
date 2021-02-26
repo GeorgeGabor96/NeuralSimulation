@@ -70,8 +70,20 @@ SynapseClass* synapse_class_create_default() {
 }
 
 
+void synapse_class_reset(SynapseClass* synapse_class) {
+	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
+	synapse_class->delay = 0;
+	synapse_class->E = 0.0f;
+	synapse_class->tau_exp = 0.0f;
+	synapse_class->type = INVALID_SYNAPSE;
+ERROR
+	return;
+}
+
+
 void synapse_class_destroy(SynapseClass* synapse_class) {
 	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
+	synapse_class_reset(synapse_class);
 	free(synapse_class);
 
 ERROR

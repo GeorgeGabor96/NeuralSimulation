@@ -11,8 +11,8 @@
 * NeuronClass Functionality
 *************************************************************/
 
-typedef enum { LIF_NEURON = 0 } NeuronType;
-const char* neuron_type_C_string(type);
+typedef enum { INVALID_NEURON = 0, LIF_NEURON = 1 } NeuronType;
+const char* neuron_type_C_string(NeuronType type);
 
 
 typedef struct NeuronClass {
@@ -43,6 +43,7 @@ typedef struct NeuronClass {
 */
 Status neuron_class_is_valid(NeuronClass* neuron_class);
 NeuronClass* neuron_class_create(NeuronType type);
+void neuron_class_reset(NeuronClass* neuron_class);
 void neuron_class_destroy(NeuronClass* neuron_class);
 Status neuron_class_set_LIF_parameters(NeuronClass* neuron_class, float u_th, float u_rest, float r, float c);
 
