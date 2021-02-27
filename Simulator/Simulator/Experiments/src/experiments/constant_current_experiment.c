@@ -10,9 +10,9 @@ void constant_current_experiment() {
 	Layer* l1 = network_get_layer_by_idx(net, 0);
 	Layer* l2 = network_get_layer_by_idx(net, 1);
 	Layer* l3 = network_get_layer_by_idx(net, 2);
-	Callback* visu_1 = callback_visualize_layer_neurons_create(l1, ".\\constant_current_exp", 2000, 1500);
-	Callback* visu_2 = callback_visualize_layer_neurons_create(l2, ".\\constant_current_exp", 2000, 1500);
-	Callback* visu_3 = callback_visualize_layer_neurons_create(l3, ".\\constant_current_exp", 2000, 1500);
+	Callback* visu_1 = callback_visualize_layer_neurons_create(l1, ".\\constant_current_exp");
+	Callback* visu_2 = callback_visualize_layer_neurons_create(l2, ".\\constant_current_exp");
+	Callback* visu_3 = callback_visualize_layer_neurons_create(l3, ".\\constant_current_exp");
 
 	Simulator* simulator = simulator_create(constant_current, net);
 	simulator_add_callback(simulator, visu_1);

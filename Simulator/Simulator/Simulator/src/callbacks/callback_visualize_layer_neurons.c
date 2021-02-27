@@ -18,20 +18,15 @@ typedef struct C_Data {
 	Layer* layer;				// does not take ownership
 	Array voltages_per_neuron;	// contains an ArrayFloat for every neuron
 	Array spikes_per_neuron;	// contains an ArrayBool for every neuron
-	uint32_t steps;				// stores how many time the update method was called
-	uint32_t plot_width;		// the number of pixels for width 
-	uint32_t plot_height;		// the number of pixels for heigth
 } C_Data;
 
 
-Callback* callback_visualize_layer_neurons_create(Layer* layer, const char* output_folder, uint32_t plot_width, uint32_t plot_height) {
+Callback* callback_visualize_layer_neurons_create(Layer* layer, const char* output_folder) {
 	Callback* callback = NULL;
 	C_Data* data = NULL;
 	Status status = FAIL;
 
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
-	check(plot_width > 0, "@plot_width == 0");
-	check(plot_height > 0, "@plot_height == 0");
 
 	callback = (Callback*)calloc(1, sizeof(Callback), "callback_visualize_layer_neurons_create callback");
 	check_memory(callback);
@@ -52,10 +47,7 @@ Callback* callback_visualize_layer_neurons_create(Layer* layer, const char* outp
 	free(output_folder_s);
 	os_mkdir(data->output_folder.data);
 
-	data->steps = 0;
 	data->layer = layer;
-	data->plot_width = plot_width;
-	data->plot_height = plot_height;
 
 	callback->data = (void*)data;
 	callback->is_valid = callback_visualize_layer_neurons_is_valid;
@@ -81,9 +73,6 @@ void callback_visualize_layer_neurons_reset(Callback* callback) {
 	C_Data* data = (C_Data*)(callback->data);
 	string_reset(&(data->output_folder));
 	data->layer = NULL;
-	data->steps = 0;
-	data->plot_width = 0;
-	data->plot_height = 0;
 	array_of_arrays_reset(&(data->voltages_per_neuron));
 	array_of_arrays_reset(&(data->spikes_per_neuron));
 	free(callback->data);
@@ -158,7 +147,6 @@ void callback_visualize_layer_neurons_update(Callback* callback, Network* net) {
 	}
 	array_destroy(voltages, NULL);
 	array_destroy(spikes, NULL);
-	(data->steps)++;
 
 ERROR
 	return;
@@ -175,7 +163,6 @@ void callback_visualize_layer_neurons_run(Callback* callback, Network* net) {
 	String* data_name = NULL;
 	char file_name[128] = { 0 };
 	ArrayFloat* spikes_f = NULL;
-	Array* steps = array_arange_float(data->steps);
 
 	// create 2 binaries per neuron, one for voltages one for spikes
 	for (i = 0; i < data->layer->neurons.length; ++i) {
@@ -196,7 +183,6 @@ void callback_visualize_layer_neurons_run(Callback* callback, Network* net) {
 		string_destroy(file_path);
 		string_destroy(data_name);
 	}
-	array_destroy(steps, NULL);
 
 	// call the plotting script
 	os_plot_layers(string_get_C_string(&(data->output_folder)));

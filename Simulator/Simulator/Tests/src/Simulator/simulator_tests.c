@@ -28,7 +28,7 @@ TestStatus simulator_infer_test() {
 
 	// create callbacks
 	layer_output = *((Layer**)array_get(&(net->output_layers), 0));
-	Callback* callback = callback_visualize_layer_neurons_create(layer_output, ".\\simulator_visu", 600, 400);
+	Callback* callback = callback_visualize_layer_neurons_create(layer_output, ".\\simulator_visu");
 
 	// create the simulator
 	Simulator* simulator = simulator_create(generator, net);
