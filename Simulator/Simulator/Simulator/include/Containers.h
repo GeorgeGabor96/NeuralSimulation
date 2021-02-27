@@ -39,6 +39,7 @@ typedef Array ArrayFloat;
 typedef Array ArrayUint8;
 typedef Array ArrayUint16;
 typedef Array ArrayUint32;
+typedef Array String;
 
 
 #define ARRAY_EXPAND_RATE 10 // TODO: if this is too much consider using a doubleling or some value per array that you give in the create
@@ -83,6 +84,11 @@ ArrayBool* array_ones_bool(uint32_t length);
 Status array_of_arrays_init(Array* data, uint32_t length, size_t inner_element_size);
 Status array_of_arrays_reset(Array* data); // assumes primitives data types
 
+// dumping funtions
+void array_dump(Array* array, String* file_path, String* data_name, uint8_t type);
+void array_float_dump(Array* array, String* file_path, String* data_name);
+void array_bool_dump(Array* array, String* file_path, String* data_name);
+
 /*************************************************************
 * Stack Functionality
 *************************************************************/
@@ -107,7 +113,6 @@ void* stack_top(Stack* stack_p);
 *************************************************************/
 // string have at most 256 chars currently
 #define STRING_LIMIT 256
-typedef Array String;
 BOOL string_is_valid(String* string);
 Status string_init(String* string_p, char* c_string_p);
 String* string_create(char* c_string_p);

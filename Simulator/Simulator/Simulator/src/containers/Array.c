@@ -365,3 +365,39 @@ Status array_of_arrays_reset(Array* data) {
 ERROR
 	return FAIL;
 }
+
+
+void array_dump(Array* array, String* file_path, String* data_name, uint8_t type) {
+	check(array_is_valid(array), invalid_argument("array"));
+	check(string_is_valid(file_path), invalid_argument("file_path"));
+	check(string_is_valid(data_name), invalid_argument("data_name"));
+	FILE* fp = fopen(string_get_C_string(file_path), "w");
+	check(fp != NULL, "Couldn't open file %s for writting in binary mode. %s", string_get_C_string(file_path), null_argument("fp"));
+
+	// write the data_name, do not write the \0 at the end of the string
+	uint32_t length = data_name->length - 1;
+	fwrite(&length, sizeof(data_name->length), 1, fp);
+	fwrite(string_get_C_string(data_name), data_name->element_size, length, fp);
+
+	// write the elements of the array
+	fwrite(&(array->length), sizeof(array->length), 1, fp);
+	fwrite(&(array->element_size), sizeof(array->element_size), 1, fp);
+	fwrite(&type, sizeof(type), 1, fp);
+	fwrite(array->data, array->element_size, array->length, fp);
+	
+	fclose(fp);
+
+ERROR
+	return;
+}
+
+void array_float_dump(Array* array, String* file_path, String* data_name) {
+	uint8_t type = 0;
+	array_dump(array, file_path, data_name, type);
+}
+
+
+void array_bool_dump(Array* array, String* file_path, String* data_name) {
+	uint8_t type = 1;
+	array_dump(array, file_path, data_name, type);
+}
