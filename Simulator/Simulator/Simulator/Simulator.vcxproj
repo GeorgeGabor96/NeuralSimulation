@@ -150,23 +150,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Array.c" />
+    <ClCompile Include="src\containers\Array.c" />
     <ClCompile Include="src\callbacks\callback_visualize_layer_neurons.c" />
     <ClCompile Include="src\data\data_gen_constant_current.c" />
     <ClCompile Include="src\data\data_gen_random_spikes.c" />
     <ClCompile Include="src\Layer.c" />
-    <ClCompile Include="src\MemoryManagement.c" />
+    <ClCompile Include="src\utils\MemoryManagement.c" />
     <ClCompile Include="src\Network.c" />
     <ClCompile Include="src\Neuron.c" />
-    <ClCompile Include="src\os.c" />
+    <ClCompile Include="src\utils\os.c" />
     <ClCompile Include="src\plotting\pbPlots.c" />
     <ClCompile Include="src\plotting\plotting.c" />
     <ClCompile Include="src\plotting\supportLib.c" />
-    <ClCompile Include="src\Printing.c" />
-    <ClCompile Include="src\Queue.c" />
+    <ClCompile Include="src\containers\Printing.c" />
+    <ClCompile Include="src\containers\Queue.c" />
     <ClCompile Include="src\Simulator.c" />
-    <ClCompile Include="src\Stack.c" />
-    <ClCompile Include="src\String.c" />
+    <ClCompile Include="src\containers\Stack.c" />
+    <ClCompile Include="src\containers\String.c" />
     <ClCompile Include="src\Synapse.c" />
   </ItemGroup>
   <ItemGroup>
@@ -176,13 +176,13 @@
     <ClInclude Include="include\data\DataGen.h" />
     <ClInclude Include="include\data\data_gen_constant_current.h" />
     <ClInclude Include="include\data\data_gen_random_spikes.h" />
-    <ClInclude Include="include\debug.h" />
+    <ClInclude Include="include\utils\debug.h" />
     <ClInclude Include="include\Containers.h" />
     <ClInclude Include="include\Layer.h" />
-    <ClInclude Include="include\MemoryManagement.h" />
+    <ClInclude Include="include\utils\MemoryManagement.h" />
     <ClInclude Include="include\Network.h" />
     <ClInclude Include="include\Neuron.h" />
-    <ClInclude Include="include\os.h" />
+    <ClInclude Include="include\utils\os.h" />
     <ClInclude Include="include\plotting\pbPlots.h" />
     <ClInclude Include="include\plotting\plotting.h" />
     <ClInclude Include="include\plotting\supportLib.h" />

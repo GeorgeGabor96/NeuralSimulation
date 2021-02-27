@@ -2,7 +2,7 @@
 #define __LAYER_H__
 
 #include "config.h"
-#include "debug.h"
+#include "utils/debug.h"
 #include "Neuron.h"
 #include "Synapse.h"
 #include "Containers.h"

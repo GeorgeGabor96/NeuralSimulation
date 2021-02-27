@@ -1,7 +1,7 @@
 #include <math.h>
 
 #include "Synapse.h"
-#include "MemoryManagement.h"
+#include "utils/MemoryManagement.h"
 
 
 /*************************************************************

@@ -1,6 +1,6 @@
 #include "callbacks_tests.h"
 
-#include "os.h"
+#include "utils/os.h"
 #include "callbacks/callback.h"
 #include "callbacks/callback_visualize_layer_neurons.h"
 

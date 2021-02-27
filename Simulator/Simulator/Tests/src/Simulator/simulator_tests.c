@@ -2,7 +2,7 @@
 #include "Simulator.h"
 #include "callbacks/callback_visualize_layer_neurons.h"
 #include "data/data_gen_constant_current.h"
-#include "os.h"
+#include "utils/os.h"
 
 
 TestStatus simulator_infer_test() {

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "Containers.h"
-#include "debug.h"
+#include "utils/debug.h"
 
 
 Status stack_push(Stack* stack_p, void* data_p) {

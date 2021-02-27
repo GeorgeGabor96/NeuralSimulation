@@ -3,10 +3,6 @@
 
 #include "../testing.h"
 
-
-#include "MemoryManagement.h"
-
-
 TestStatus memory_management_general_test();
 TestStatus memory_manage_report_test();
 

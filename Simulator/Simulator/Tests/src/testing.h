@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "MemoryManagement.h"
+#include "utils/MemoryManagement.h"
 
 #define assert(test, message, ...) if (!(test)) { fprintf(stderr, "[ERROR] (%s:%d: errno: %s) " message "\n", __FILE__, __LINE__, errno_text(), ##__VA_ARGS__); errno=0; goto error; }
 #define FLOAT_PRECISION 0.001

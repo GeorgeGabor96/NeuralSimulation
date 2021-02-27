@@ -1,6 +1,5 @@
 #include "network_tests.h"
 #include "Network.h"
-#include "debug.h"
 
 
 TestStatus network_compile_general_use_case_test() {

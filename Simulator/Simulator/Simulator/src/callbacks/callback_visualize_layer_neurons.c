@@ -1,9 +1,9 @@
 #include "callbacks/callback_visualize_layer_neurons.h"
 
-#include "MemoryManagement.h"
+#include "utils/MemoryManagement.h"
 #include "Containers.h"
 #include "plotting/plotting.h"
-#include "os.h"
+#include "utils/os.h"
 
 
 BOOL callback_visualize_layer_neurons_is_valid(Callback* callback);

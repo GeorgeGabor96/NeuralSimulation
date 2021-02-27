@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
-#include "debug.h"
+#include "utils/debug.h"
 
 typedef uint8_t BOOL;
 #define TRUE 1ui8

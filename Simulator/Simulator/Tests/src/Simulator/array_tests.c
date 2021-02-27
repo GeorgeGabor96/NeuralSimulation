@@ -1,6 +1,5 @@
 #include "array_tests.h"
 #include "Containers.h"
-#include "MemoryManagement.h"
 
 
 TestStatus array_general_use_case_test() {

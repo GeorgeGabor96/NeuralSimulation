@@ -1,6 +1,6 @@
 #include "os_tests.h"
 
-#include "os.h"
+#include "utils/os.h"
 
 
 TestStatus os_mkdir_rmdir_test() {

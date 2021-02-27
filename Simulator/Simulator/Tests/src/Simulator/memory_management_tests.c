@@ -1,4 +1,5 @@
 #include "memory_management_tests.h"
+#include "utils/MemoryManagement.h"
 
 
 TestStatus memory_management_general_test() {

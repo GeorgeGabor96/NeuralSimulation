@@ -1,6 +1,6 @@
 #include "Containers.h"
-#include "debug.h"
-#include "MemoryManagement.h"
+#include "utils/debug.h"
+#include "utils/MemoryManagement.h"
 
 
 /*************************************************************

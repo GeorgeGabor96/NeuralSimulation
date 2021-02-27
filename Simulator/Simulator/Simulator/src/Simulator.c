@@ -1,5 +1,5 @@
 #include "Simulator.h"
-#include "MemoryManagement.h"
+#include "utils/MemoryManagement.h"
 
 
 BOOL simulator_is_valid(Simulator* sim) {
