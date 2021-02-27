@@ -2,8 +2,8 @@
 
 #include "utils/MemoryManagement.h"
 #include "Containers.h"
-#include "plotting/plotting.h"
 #include "utils/os.h"
+#include <time.h>
 
 
 BOOL callback_visualize_layer_neurons_is_valid(Callback* callback);
@@ -172,28 +172,34 @@ void callback_visualize_layer_neurons_run(Callback* callback, Network* net) {
 	ArrayFloat* voltages = NULL;
 	ArrayBool* spikes = NULL;
 	String* file_path = NULL;
+	String* data_name = NULL;
 	char file_name[128] = { 0 };
 	ArrayFloat* spikes_f = NULL;
 	Array* steps = array_arange_float(data->steps);
 
-	// create 2 plots per neuron, one for voltages one for spikes
+	// create 2 binaries per neuron, one for voltages one for spikes
 	for (i = 0; i < data->layer->neurons.length; ++i) {
+		
 		voltages = (ArrayFloat*)array_get(&(data->voltages_per_neuron), i);
-		sprintf(file_name, "Voltages_N%u.png", i);
+		sprintf(file_name, "voltages_N%u.bin", i);
 		file_path = string_path_join_string_and_C(&(data->output_folder), file_name);
-		plotting_scatter_plot_floats(steps, voltages, data->plot_width, data->plot_height, string_get_C_string(file_path));
+		data_name = string_create("voltage");
+		array_float_dump(voltages, file_path, data_name);
 		string_destroy(file_path);
+		string_destroy(data_name);
 
 		spikes = (ArrayBool*)array_get(&(data->spikes_per_neuron), i);
-		spikes_f = array_bool_to_float(spikes, FALSE);
-		sprintf(file_name, "Spikes_N%u.png", i);
+		sprintf(file_name, "spikes_N%u.bin", i);
 		file_path = string_path_join_string_and_C(&(data->output_folder), file_name);
-		plotting_scatter_plot_floats(steps, spikes_f, data->plot_width, data->plot_height, string_get_C_string(file_path));
+		data_name = string_create("spikes");
+		array_bool_dump(spikes, file_path, data_name);
 		string_destroy(file_path);
-		array_destroy(spikes_f, NULL);
+		string_destroy(data_name);
 	}
 	array_destroy(steps, NULL);
 
+	// call the plotting script
+	os_plot_layers(string_get_C_string(&(data->output_folder)));
 ERROR
 	return;
 }
