@@ -47,9 +47,10 @@ ERROR
 /*************************************************************
 * Neuron Type Functionality
 *************************************************************/
-const char* neuron_type_C_string(type) {
+const char* neuron_type_C_string(NeuronType type) {
 	const char* name = NULL;
-	if (type == LIF_NEURON) name = "LIF_NEURON";
+	if (type == INVALID_NEURON) name = "INVALID_NEURON";
+	else if (type == LIF_NEURON) name = "LIF_NEURON";
 	else name = "NEURON_UNKNOWN";
 	return name;
 }
@@ -58,13 +59,13 @@ const char* neuron_type_C_string(type) {
 /*************************************************************
 * UPDATE functions for neurons
 *************************************************************/
-static inline BOOL neuron_update(Neuron* neuron, float PSC) {
+static inline BOOL neuron_update(Neuron* neuron) {
 	BOOL spike = FALSE;
 	
 	switch (neuron->n_class->type)
 	{
 	case LIF_NEURON:
-		neuron->u = neuron->n_class->u_factor * neuron->u + neuron->n_class->free_factor + neuron->n_class->i_factor * PSC;
+		neuron->u = neuron->n_class->u_factor * neuron->u + neuron->n_class->free_factor + neuron->n_class->i_factor * neuron->PSC;
 		// check for spike
 		if (neuron->u >= neuron->n_class->u_th) {
 			neuron->u = neuron->n_class->u_rest;
@@ -197,6 +198,8 @@ Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
 
 	neuron->n_class = neuron_class;
 	neuron->u = neuron_class->u_rest;
+	neuron->PSC = 0.0f;
+	neuron->spike = FALSE;
 
 	return SUCCESS;
 
@@ -216,6 +219,9 @@ void neuron_reset(Neuron* neuron) {
 	array_reset(&(neuron->in_synapses_refs), synapse_destroy_2p);
 	array_reset(&(neuron->out_synapses_refs), NULL);
 	neuron->n_class = NULL;
+	neuron->PSC = 0.0f;
+	neuron->spike = FALSE;
+	neuron->u = 0.0f;
 
 ERROR
 	return;
@@ -277,24 +283,6 @@ ERROR
 	return status;
 }
 
-
-Status neuron_step(Neuron* neuron, uint32_t simulation_time) {
-	Status status = FAIL;
-	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
-
-	float PSC = neuron_compute_psc(neuron, simulation_time);
-	neuron->spike = neuron_update(neuron, PSC);
-	if (neuron->spike == TRUE) {
-		neuron_update_out_synapses(neuron, simulation_time);
-	}
-
-	status = SUCCESS;
-
-ERROR
-	return status;
-}
-
-
 void neuron_clear_state(Neuron* neuron) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 	neuron->spike = FALSE;
@@ -306,8 +294,25 @@ void neuron_clear_state(Neuron* neuron) {
 		synapse_clear_state(synapse);
 	}
 
+	ERROR
+		return;
+}
+
+
+Status neuron_step(Neuron* neuron, uint32_t simulation_time) {
+	Status status = FAIL;
+	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
+
+	neuron->PSC = neuron_compute_psc(neuron, simulation_time);
+	neuron->spike = neuron_update(neuron);
+	if (neuron->spike == TRUE) {
+		neuron_update_out_synapses(neuron, simulation_time);
+	}
+
+	status = SUCCESS;
+
 ERROR
-	return;
+	return status;
 }
 
 
@@ -327,7 +332,8 @@ ERROR
 Status neuron_step_inject_current(Neuron* neuron, float PSC, uint32_t simulation_time) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
-	neuron->spike = neuron_update(neuron, PSC);
+	neuron->PSC = PSC;
+	neuron->spike = neuron_update(neuron);
 	if (neuron->spike == TRUE) {
 		neuron_update_out_synapses(neuron, simulation_time);
 	}

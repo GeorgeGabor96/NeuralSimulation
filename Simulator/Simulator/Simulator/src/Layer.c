@@ -323,7 +323,7 @@ ArrayFloat* layer_get_voltages(Layer* layer) {
 	ArrayFloat* voltages = NULL;
 	Neuron* neuron = NULL;
 	uint32_t i = 0;
-	check(layer_is_valid(layer) == TRUE, "@layer is not valid");
+	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 
 	voltages = array_create(layer->neurons.length, 0, sizeof(float));
 	check(array_is_valid(voltages) == TRUE, invalid_argument("voltages"));
@@ -338,6 +338,26 @@ ArrayFloat* layer_get_voltages(Layer* layer) {
 	return voltages;
 ERROR
 	if (voltages != NULL) array_destroy(voltages, NULL);
+	return NULL;
+}
+
+ArrayFloat* layer_get_psc(Layer* layer) {
+	ArrayFloat* currents = NULL;
+	Neuron* neuron = NULL;
+	uint32_t i = 0;
+	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+	
+	currents = array_create(layer->neurons.length, 0, sizeof(float));
+	check(array_is_valid(currents) == TRUE, invalid_argument("currents"));
+	for (i = 0; i < layer->neurons.length; ++i) {
+		neuron = (Neuron*)array_get(&(layer->neurons), i);
+		check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
+		array_append(currents, &(neuron->PSC));
+	}
+
+	return currents;
+ERROR
+	if (currents != NULL) array_destroy(currents, NULL);
 	return NULL;
 }
 

@@ -57,6 +57,7 @@ typedef struct Neuron {
 	Array in_synapses_refs;	  // references to input synapses
 	Array out_synapses_refs;  // references to output synapses
 	float u;
+	float PSC;		 		  // the PSC value that determined the current @u and @spike values
 	BOOL spike;
 } Neuron;
 
@@ -83,14 +84,14 @@ Status neuron_add_in_synapse(Neuron* neuron, Synapse* synapse);
 // The ouput synapses are only kept as references
 Status neuron_add_out_synapse(Neuron* neuron, Synapse* synapse);
 
+// remove the spike of the neuron, resets its voltage and clears the state of its input synapses
+void neuron_clear_state(Neuron* neuron);
+
 /*
 This will collect the PSC from the input synpases, update the neuron state,
 and if a spike is generated, it will be propagated to the output synapses
 */
 Status neuron_step(Neuron* neuron, uint32_t simulation_time);
-
-// remove the spike of the neuron, resets its voltage and clears the state of its input synapses
-void neuron_clear_state(Neuron* neuron);
 
 /*
 * Similar to @neuron_step, but it only propagates a spike through the output synapses
