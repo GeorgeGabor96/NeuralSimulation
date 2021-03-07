@@ -107,5 +107,8 @@
     <ClCompile Include="src\utils\os.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\data\data_gen_with_step_between_neurons.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

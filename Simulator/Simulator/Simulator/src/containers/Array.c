@@ -371,7 +371,7 @@ void array_dump(Array* array, String* file_path, String* data_name, uint8_t type
 	check(array_is_valid(array), invalid_argument("array"));
 	check(string_is_valid(file_path), invalid_argument("file_path"));
 	check(string_is_valid(data_name), invalid_argument("data_name"));
-	FILE* fp = fopen(string_get_C_string(file_path), "w");
+	FILE* fp = fopen(string_get_C_string(file_path), "wb");
 	check(fp != NULL, "Couldn't open file %s for writting in binary mode. %s", string_get_C_string(file_path), null_argument("fp"));
 
 	// write the data_name, do not write the \0 at the end of the string
