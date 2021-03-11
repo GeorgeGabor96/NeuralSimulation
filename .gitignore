@@ -1,5 +1,4 @@
 *.opendb
 **/.vs
 **/bin
-**/*_exp*
 *.pyc

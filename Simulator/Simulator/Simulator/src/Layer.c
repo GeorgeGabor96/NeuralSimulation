@@ -261,10 +261,13 @@ Status layer_step_force_spikes(Layer* layer, ArrayBool* spikes, uint32_t time) {
 
 	for (i = 0; i < spikes->length; ++i) {
 		spike = *((BOOL*)array_get(spikes, i));
+		neuron = (Neuron*)array_get(&(layer->neurons), i);
+		check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 		if (spike == TRUE) {
-			neuron = (Neuron*)array_get(&(layer->neurons), i);
-			check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 			neuron_step_force_spike(neuron, time);
+		}
+		else {
+			neuron->spike = FALSE;
 		}
 	}
 

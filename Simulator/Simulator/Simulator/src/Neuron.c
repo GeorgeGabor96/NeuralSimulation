@@ -294,8 +294,8 @@ void neuron_clear_state(Neuron* neuron) {
 		synapse_clear_state(synapse);
 	}
 
-	ERROR
-		return;
+ERROR
+	return;
 }
 
 
@@ -320,6 +320,7 @@ Status neuron_step_force_spike(Neuron* neuron, uint32_t simulation_time) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
 	neuron->spike = TRUE;
+	neuron->u = neuron->n_class->u_rest;
 	neuron_update_out_synapses(neuron, simulation_time);
 
 	return SUCCESS;

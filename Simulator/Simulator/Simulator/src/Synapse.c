@@ -186,7 +186,7 @@ float synapse_compute_PSC(Synapse* synapse, float u) {
 		break;
 
 	case VOLTAGE_DEPENDENT_SYNAPSE:
-		I = synapse->w * synapse->g * (u - synapse->s_class->E);
+		I = - synapse->w * synapse->g * (u - synapse->s_class->E);
 		break;
 
 	default:

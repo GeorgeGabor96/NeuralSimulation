@@ -1,0 +1,12 @@
+common_path: d:/repositories/NeuralSimulation/Simulator/Simulator/Experiments/experiments_nice_plots
+title: l1_n3_tau10_l2_1n_tau20
+x_label: time
+y_label: voltage
+binaries:
+  - time_between_spikes_experiment/tau_l1_10_3_n_tau_l2_50_time_between_1/layer_out/voltages_N0.bin
+  - time_between_spikes_experiment/tau_l1_10_3_n_tau_l2_50_time_between_5/layer_out/voltages_N0.bin
+  - time_between_spikes_experiment/tau_l1_10_3_n_tau_l2_50_time_between_10/layer_out/voltages_N0.bin
+labels:
+  - time_between_1
+  - time_between_5
+  - time_between_10
