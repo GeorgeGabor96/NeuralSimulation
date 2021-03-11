@@ -40,9 +40,18 @@ typedef struct SynapseClass {
 Status synapse_class_is_valid(SynapseClass* synapse_class);
 
 /*
-Preconditions: @tau_ms > 0
-			   @simulation_step_ms > 0
-			   @type == CONDUCTANCE_SYNPASE || @type == VOLTAGE_DEPENDENT_SYNAPSE
+* Parameters: 
+* ----------
+* rev_potential -
+* tau_ms - time constant of the synapse (bigger will make the reduction in current slower)
+* delay - difference between time when a spike is processed and when it arrives
+* type - type of synapse, controls how current is computed
+* simulation_step_ms - the number of miliseconds the integration is made, cumulated that many miliseconds in the upate
+* 
+* 
+* Preconditions: @tau_ms > 0
+* 			   @simulation_step_ms > 0
+* 			   @type == CONDUCTANCE_SYNPASE || @type == VOLTAGE_DEPENDENT_SYNAPSE
 */
 SynapseClass* synapse_class_create(float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms);
 

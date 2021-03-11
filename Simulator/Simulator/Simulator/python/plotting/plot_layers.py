@@ -25,7 +25,8 @@ if __name__ == '__main__':
         file_name = file_name.replace('bin', 'png')
 
         line_plot(output_file=os.path.join(output_folder, file_name),
-                  y_data=sim_array['data'],
+                  y_data=[sim_array['data']],
+                  line_label=[sim_array['name']],
                   x_label='time',
                   y_label=sim_array['name'],
                   title=file_name.split('.')[0])
