@@ -7,6 +7,7 @@
 *************************************************************/
 Status neuron_class_is_valid(NeuronClass* neuron_class) {
 	check(neuron_class != NULL, null_argument("neuron_class"));
+	check(string_is_valid(&(neuron_class->name)) == TRUE, invalid_argument("neuron_class->name"));
 	// NOTE: if you add more types this check needs to be updated
 	check(neuron_class->type == LIF_NEURON, invalid_argument("type"));
 
@@ -112,13 +113,15 @@ static inline float neuron_compute_psc(Neuron* neuron, uint32_t simulation_time)
 * NeuronClass Functionality
 *************************************************************/
 
-NeuronClass* neuron_class_create(NeuronType type) {
+NeuronClass* neuron_class_create(const char* name, NeuronType type) {
 	NeuronClass* neuron_class = NULL;
 	check(type == LIF_NEURON, invalid_argument("type"));
-	
+
 	neuron_class = (NeuronClass*)malloc(sizeof(NeuronClass), "neuron_class_create");
 	check_memory(neuron_class);
 
+	Status status = string_init(&(neuron_class->name), name);
+	check(status == SUCCESS, "Couldn't init @neuron_class->name");
 	neuron_class->type = type;
 
 	switch (neuron_class->type)
@@ -134,12 +137,17 @@ NeuronClass* neuron_class_create(NeuronType type) {
 	return neuron_class;
 
 ERROR
+	if (neuron_class != NULL) {
+		if (string_is_valid(&(neuron_class->name)) == TRUE) string_reset(&(neuron_class->name));
+		free(neuron_class);
+	}
 	return NULL;
 }
 
 
 void neuron_class_reset(NeuronClass* neuron_class) {
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
+	string_reset(&(neuron_class->name));
 	neuron_class->free_factor = 0.0f;
 	neuron_class->i_factor = 0.0f;
 	neuron_class->u_factor = 0.0f;

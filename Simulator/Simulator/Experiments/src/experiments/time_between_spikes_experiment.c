@@ -7,18 +7,17 @@ void time_between_spikes_experiment() {
 	// create network
 	const char* result_path = ".\\experiments_nice_plots\\time_between_spikes_experiment\\tau_l1_10_5_n_tau_l2_20_time_between_20";
 
-	Layer* layer_input = layer_create_fully_connected(5,
-		neuron_class_create(LIF_NEURON),
-		synapse_class_create(0.0f, 10.0f, 1, CONDUCTANCE_SYNAPSE, 1),
-		"layer_in");
-
-	Layer* layer_output = layer_create_fully_connected(1,
-		neuron_class_create(LIF_NEURON),
-		synapse_class_create(0.0f, 20.0f, 1, CONDUCTANCE_SYNAPSE, 1),
-		"layer_out");
-	layer_add_input_layer(layer_output, layer_input);
-
 	Network* net = network_create();
+	network_add_neuron_class(net, neuron_class_create("LIF NEURON", LIF_NEURON));
+	network_add_synapse_class(net, synapse_class_create("SYN_20TAU", 0.0f, 20.0f, 1, CONDUCTANCE_SYNAPSE, 1));
+
+	NeuronClass* n_class = network_get_neuron_class(net, "LIF_NEURON");
+	SynapseClass* s_class = network_get_synapse_class(net, "SYN_20TAU");
+
+	Layer* layer_input = layer_create_fully_connected(5, n_class, "layer_in");
+	Layer* layer_output = layer_create_fully_connected(1, n_class, "layer_out");
+	layer_add_input_layer(layer_output, layer_input, s_class);
+
 	network_add_layer(net, layer_input, TRUE, TRUE, FALSE);
 	network_add_layer(net, layer_output, TRUE, FALSE, TRUE);
 	network_compile(net);

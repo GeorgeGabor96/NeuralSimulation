@@ -26,11 +26,13 @@ typedef Array NetworkOutputs; // array of NetworkValues
 void network_values_show(Array* values);
 
 typedef struct Network {
-	Array layers;			// will be added one by one, network has ownership
+	Array layers;			// keeps the layers, will be added one by one, network has ownership
 	Array output_layers;	// one or more, keeps references to @layers
 	Array input_layers;		// one or more, keeps references to @layers
 	Array input_names;		// names of the input layers, reference to @layers->name
 	Array output_names;		// names of the output layers, reference to @layers->name
+	Array synapse_classes;	// keeps the synaptic classes that should be used by synapses of this network, should be added one by one, network takes ownership
+	Array neuron_classes;	// keeps the neuron classes that should be used by neuron of this network, should be added one by one, network takes ownership
 	BOOL compiled;			// if the network has been compiled
 } Network;
 
@@ -66,6 +68,19 @@ Layer* network_get_layer_by_string(Network* network, String* name);
 Layer* network_get_layer_by_name(Network* network, char* name);
 uint32_t network_get_layer_idx_by_string(Network* network, String* name);
 uint32_t network_get_layer_idx_by_name(Network* network, char* name);
+
+/*
+* Adding and getting back Synapse and Neuron classes
+* The network takes owner ship by freeing the received memory and copying it into its internal storage, do not use the same pointer after adding a class
+* Retrieving is done using the name of the individual object class, the process is done liniary
+*/
+Status network_add_synapse_class(Network* network, SynapseClass* s_class);
+Status network_add_neuron_class(Network* network, NeuronClass* n_class);
+SynapseClass* network_get_synapse_class_by_string(Network* network, String* name);
+SynapseClass* network_get_synapse_class_by_name(Network* network, const char* s_name);
+NeuronClass* network_get_neuron_class_by_string(Network* network, String* name);
+NeuronClass* network_get_neuron_class_by_name(Network* network, const char* n_name);
+
 
 /*
 * Check that all the layers are valid and if there are missing layers

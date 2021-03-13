@@ -17,6 +17,7 @@ const char* synapse_type_C_string(SynapseType type);
 
 
 typedef struct SynapseClass {
+	String name;
 	float E; // reversal potential
 	float tau_exp; 
 	uint32_t delay; // all spikes are delayed
@@ -53,9 +54,9 @@ Status synapse_class_is_valid(SynapseClass* synapse_class);
 * 			   @simulation_step_ms > 0
 * 			   @type == CONDUCTANCE_SYNPASE || @type == VOLTAGE_DEPENDENT_SYNAPSE
 */
-SynapseClass* synapse_class_create(float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms);
+SynapseClass* synapse_class_create(const char* name, float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms);
 
-SynapseClass* synapse_class_create_default(); 
+SynapseClass* synapse_class_create_default(const char* name);
 void synapse_class_reset(SynapseClass* synapse_class);
 void synapse_class_destroy(SynapseClass* synapse_class);
 
