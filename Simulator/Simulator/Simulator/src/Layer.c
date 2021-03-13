@@ -9,7 +9,7 @@ BOOL layer_is_valid(Layer* layer) {
 	check(layer != NULL, null_argument("layer"));
 	check(layer_type_is_valid(layer->type) == TRUE, invalid_argument("layer->type"));
 	check(layer->link != NULL, "NULL value for @layer->link");
-	check(string_is_valid(&(layer->name)) == TRUE, invalid_argument("layer->name"));
+	check(string_is_valid(layer->name) == TRUE, invalid_argument("layer->name"));
 	check(array_is_valid(&(layer->inputs_data)) == TRUE, invalid_argument("layer->input_names"));
 	check(array_is_valid(&(layer->neurons)) == TRUE, invalid_argument("layer->neurons"));
 
@@ -80,8 +80,8 @@ Status layer_init(
 
 
 	layer->type = type;
-	status = string_init(&(layer->name), name);
-	check(status == SUCCESS, "Couldn't init @layer->name");
+	layer->name = string_create(name);
+	check(string_is_valid(layer->name), invalid_argument("layer->name"));
 	status = array_init(&(layer->inputs_data), 1, 0, sizeof(LayerInputData));
 	check(status == SUCCESS, "Couldn't init @layer->inputs_data");
 
@@ -161,8 +161,8 @@ Status layer_add_input_layer(Layer* layer, Layer* input, SynapseClass* s_class) 
 	check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
 
 	LayerInputData input_data = { 0 };
-	string_init(&(input_data.layer_name), string_get_C_string(&(input->name)));
-	string_init(&(input_data.syanpse_class_name), string_get_C_string(&(s_class->name)));
+	string_init(&(input_data.layer_name), string_get_C_string(input->name));
+	string_init(&(input_data.syanpse_class_name), string_get_C_string(s_class->name));
 
 	return array_append(&(layer->inputs_data), &input_data);
 ERROR
@@ -185,7 +185,7 @@ ERROR
 
 const char* layer_get_name(Layer* layer) {
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
-	return string_get_C_string(&(layer->name));
+	return string_get_C_string(layer->name);
 ERROR
 	return NULL;
 }
@@ -195,7 +195,8 @@ void layer_reset(Layer* layer) {
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	layer->type = LAYER_INVALID;
 	layer->link = NULL;
-	string_reset(&(layer->name));
+	string_destroy(layer->name);
+	layer->name = NULL;
 	array_reset(&(layer->inputs_data), layer_input_data_reset);
 	array_reset(&(layer->neurons), neuron_reset);
 	layer->is_input = FALSE;
@@ -415,7 +416,7 @@ void layer_summary(Layer* layer) {
 	Neuron* neuron = NULL;
 	LayerInputData* input_data = NULL;
 
-	printf("Name: %s\n", string_get_C_string(&(layer->name)));
+	printf("Name: %s\n", string_get_C_string(layer->name));
 	printf("Type: %s\n", layer_type_C_string(layer->type));
 	printf("Neurons %u of Type: %s\n", layer->neurons.length, neuron_type_C_string(((Neuron*)array_get(&(layer->neurons), 0))->n_class->type));
 	for (i = 0; i < layer->neurons.length; ++i) {

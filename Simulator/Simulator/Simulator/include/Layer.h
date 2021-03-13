@@ -39,7 +39,7 @@ The caller needs to handle to deallocation of @neuron_class and @synapse_class
 struct Layer {
 	LayerType type;
 	Layer_link link;			 // pointer to link function
-	String name;				 // array of char's
+	String* name;				 // array of char's
 	Array inputs_data;			 // vector of LayerInputData
 	Array neurons;				 // managed by the layer
 	BOOL is_input;				 // if the step function was called for this layer

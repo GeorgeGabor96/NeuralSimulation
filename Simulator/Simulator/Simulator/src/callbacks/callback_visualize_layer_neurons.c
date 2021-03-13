@@ -44,7 +44,7 @@ Callback* callback_visualize_layer_neurons_create(Layer* layer, const char* outp
 	check(status == SUCCESS, "status is %u", status);
 	
 	// create output folder
-	String* output_folder_s = string_path_join_C_and_string(output_folder, &(layer->name));
+	String* output_folder_s = string_path_join_C_and_string(output_folder, layer->name);
 	check(string_is_valid(output_folder_s) == TRUE, invalid_argument("output_folder_s"));
 	memcpy(&(data->output_folder), output_folder_s, sizeof(String));
 	free(output_folder_s);

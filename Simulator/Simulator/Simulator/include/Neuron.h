@@ -16,7 +16,7 @@ const char* neuron_type_C_string(NeuronType type);
 
 
 typedef struct NeuronClass {
-	String name;
+	String* name;
 	NeuronType type;
 	
 	// TODO: do we need a u_reset for when we have spikes??? ask Raul, watch video

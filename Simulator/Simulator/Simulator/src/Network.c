@@ -155,8 +155,7 @@ Status network_add_layer(Network* network, Layer* layer, BOOL should_free, BOOL 
 	if (is_input == TRUE) {
 		network_layer = (Layer*)array_get(&(network->layers), network->layers.length - 1);
 		check(layer_is_valid(network_layer) == TRUE, invalid_argument("network_layer"));
-		layer_name = &(network_layer->name); // need to give **
-		status = array_append(&(network->input_names), &layer_name);
+		status = array_append(&(network->input_names), &(network_layer->name));
 		check(status == SUCCESS, "Could not add input_layer");
 		network_layer->is_input = TRUE;
 	}
@@ -164,8 +163,7 @@ Status network_add_layer(Network* network, Layer* layer, BOOL should_free, BOOL 
 	if (is_output == TRUE) {
 		network_layer = (Layer*)array_get(&(network->layers), network->layers.length - 1);
 		check(layer_is_valid(network_layer) == TRUE, invalid_argument("network_layer"));
-		layer_name = &(network_layer->name); // need to give **
-		status = array_append(&(network->output_names), &layer_name);
+		status = array_append(&(network->output_names), &(network_layer->name));
 		check(status == SUCCESS, "Could not add output_layer");
 	}
 	return SUCCESS;
@@ -196,7 +194,7 @@ Layer* network_get_layer_by_string(Network* network, String* name) {
 	for (i = 0; i < network->layers.length; ++i) {
 		layer = (Layer*)array_get(&(network->layers), i);
 		check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
-		if (string_equal(&(layer->name), name) == TRUE) {
+		if (string_equal(layer->name, name) == TRUE) {
 			return layer;
 		}
 	}
@@ -222,7 +220,7 @@ uint32_t network_get_layer_idx_by_string(Network* network, String* name) {
 	for (i = 0; i < network->layers.length; ++i) {
 		layer = (Layer*)array_get(&(network->layers), i);
 		check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
-		if (string_equal(&(layer->name), name) == TRUE) {
+		if (string_equal(layer->name, name) == TRUE) {
 			return i;
 		}
 	}
@@ -251,12 +249,12 @@ Status network_add_synapse_class(Network* network, SynapseClass* s_class) {
 
 	for (i = 0; i < network->synapse_classes.length; ++i) {
 		inner_s_class = (SynapseClass*)array_get(&(network->synapse_classes), i);
-		if (string_equal(&(inner_s_class->name), &(s_class->name)) == TRUE) {
-			log_warning("Already a synapse class with name %s", string_get_C_string(&(s_class->name)));
+		if (string_equal(inner_s_class->name, s_class->name) == TRUE) {
+			log_warning("Already a synapse class with name %s", string_get_C_string(s_class->name));
 		}
 	}
 	status = array_append(&(network->synapse_classes), s_class);
-	check(status == SUCCESS, "Couldn't add synapse class %s", string_get_C_string(&(s_class->name)));
+	check(status == SUCCESS, "Couldn't add synapse class %s", string_get_C_string(s_class->name));
 	free(s_class); // take ownership
 	return SUCCESS;
 ERROR
@@ -274,13 +272,13 @@ Status network_add_neuron_class(Network* network, NeuronClass* n_class) {
 
 	for (i = 0; i < network->neuron_classes.length; ++i) {
 		inner_n_class = (NeuronClass*)array_get(&(network->neuron_classes), i);
-		if (string_equal(&(inner_n_class->name), &(n_class->name)) == TRUE) {
-			log_warning("Already a neuron class with name %s", string_get_C_string(&(n_class->name)));
+		if (string_equal(inner_n_class->name, n_class->name) == TRUE) {
+			log_warning("Already a neuron class with name %s", string_get_C_string(n_class->name));
 			return FAIL;
 		}
 	}
 	status = array_append(&(network->neuron_classes), n_class);
-	check(status == SUCCESS, "Couldn't add neuron class %s", string_get_C_string(&(n_class->name)));
+	check(status == SUCCESS, "Couldn't add neuron class %s", string_get_C_string(n_class->name));
 	free(n_class); // take ownership
 	return SUCCESS;
 ERROR
@@ -297,7 +295,7 @@ SynapseClass* network_get_synapse_class_by_string(Network* network, String* name
 
 	for (i = 0; i < network->synapse_classes.length; ++i) {
 		s_class = (SynapseClass*)array_get(&(network->synapse_classes), i);
-		if (string_equal(&(s_class->name), name) == TRUE) {
+		if (string_equal(s_class->name, name) == TRUE) {
 			return s_class;
 		}
 	}
@@ -325,7 +323,7 @@ NeuronClass* network_get_neuron_class_by_string(Network* network, String* name) 
 
 	for (i = 0; i < network->neuron_classes.length; ++i) {
 		n_class = (NeuronClass*)array_get(&(network->neuron_classes), i);
-		if (string_equal(&(n_class->name), name) == TRUE) {
+		if (string_equal(n_class->name, name) == TRUE) {
 			return n_class;
 		}
 	}
@@ -394,7 +392,7 @@ loop1:
 				layer_k = (Layer*)array_get(&(network->layers), k);
 
 				// check if layer k is input for layer i, where i < k
-				if (string_equal(&(layer_k->name), &(input_data->layer_name)) == TRUE) {
+				if (string_equal(layer_k->name, &(input_data->layer_name)) == TRUE) {
 					array_swap(&(network->layers), i, k);
 					// start over from the same index layer
 					goto loop1; // know is bad practice, but its easy

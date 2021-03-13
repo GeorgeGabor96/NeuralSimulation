@@ -20,7 +20,6 @@
 
 // TODO: some tests take time, mark them and set a flag to run them or not
 TestInfo tests[] = {
-	/*
 	// simulator
 	{ simulator_infer_test, "simulator_infer_test" },
 
@@ -35,18 +34,18 @@ TestInfo tests[] = {
 	// OS
 	{ os_mkdir_rmdir_test, "os_mkdir_rmdir_test" },
 	{ os_file_exits_test, "os_file_exits_test" },
-	*/
+
 	// NETWORK
 	{ network_summary_test, "network_summary_test" },
 	{ network_compile_general_use_case_test, "network_compile_general_use_case_test" },
 	{ network_step_test, "network_step_test" },
-	
+
 	// LAYER
 	{ layer_general_use_case_test, "layer_general_use_case_test" },
 	{ layer_memory_test_test, "layer_memory_test_test" },
 	{ layer_fully_connected_test, "layer_fully_connected_test" },
 	{ layer_fully_link_input_layer_test, "layer_fully_link_input_layer_test" },
-	
+
 	// NEURON
 	{ neuron_general_use_case_test, "neuron_general_use_case_test" },
 	{ neuron_memory_test, "neuron_memory_test" },

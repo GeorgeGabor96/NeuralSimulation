@@ -20,7 +20,7 @@ TestStatus layer_general_use_case_test() {
 		assert(neuron_is_valid(neuron) == TRUE, "neuron %u is invalid", i);
 	}
 	assert(layer->link == layer_link_fc, invalid_argument("layer->link"));
-	assert(string_equal_C_string(&(layer->name), l_name) == TRUE, "Should be equal");
+	assert(string_equal_C_string(layer->name, l_name) == TRUE, "Should be equal");
 
 	// test case 1: force spike on every neuron, make a step, and verify that no neuron has spiked
 	ArrayBool* spikes = array_create(layer->neurons.length, layer->neurons.length, sizeof(BOOL));

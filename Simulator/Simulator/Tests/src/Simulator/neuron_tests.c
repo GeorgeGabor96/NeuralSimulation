@@ -17,7 +17,7 @@ TestStatus neuron_class_general_use_case_test() {
 	n_class = neuron_class_create(name, n_type);
 	assert(n_class != NULL, "Should be able to create a @NeuronClass");
 	assert(n_class->type == n_type, "@n_class->type should be %d not %d", n_type, n_class->type);
-	assert(strcmp(string_get_C_string(&(n_class->name)), name) == 0, "@n_class->name should be %s not %s", name, string_get_C_string(&(n_class->name)));
+	assert(strcmp(string_get_C_string(n_class->name), name) == 0, "@n_class->name should be %s not %s", name, string_get_C_string(n_class->name));
 
 	// check LIF values
 	assert(n_class->u_th == LIF_U_TH, "@n_class->u_th should be %f not %f", LIF_U_TH, n_class->u_th);

@@ -17,7 +17,7 @@ const char* synapse_type_C_string(SynapseType type);
 
 
 typedef struct SynapseClass {
-	String name;
+	String* name;
 	float E; // reversal potential
 	float tau_exp; 
 	uint32_t delay; // all spikes are delayed

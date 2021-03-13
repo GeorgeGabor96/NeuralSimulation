@@ -9,7 +9,7 @@
 *************************************************************/
 Status synapse_class_is_valid(SynapseClass* synapse_class) {
 	check(synapse_class != NULL, null_argument("synapse_class"));
-	check(string_is_valid(&(synapse_class->name)) == TRUE, invalid_argument("synapse_class->name"));
+	check(string_is_valid(synapse_class->name) == TRUE, invalid_argument("synapse_class->name"));
 	// NOTE: If you add more types this check needs to be updated
 	check(synapse_class->type == CONDUCTANCE_SYNAPSE || synapse_class->type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("synapse_class->type"));
 
@@ -55,11 +55,11 @@ SynapseClass* synapse_class_create(const char* name, float rev_potential, float 
 	check(simulation_step_ms > 0.0, "@simulation_step_ms should be > 0");
 	check(type == CONDUCTANCE_SYNAPSE || type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("type"));
 
-	synapse_class = (SynapseClass*)malloc(sizeof(SynapseClass), "synapse_class_create");
+	synapse_class = (SynapseClass*)calloc(1, sizeof(SynapseClass), "synapse_class_create");
 	check_memory(synapse_class);
 
-	status = string_init(&(synapse_class->name), name);
-	check(status == SUCCESS, "Couldn't init @synapse_class->name");
+	synapse_class->name = string_create(name);
+	check(string_is_valid(synapse_class->name) == TRUE, invalid_argument("synapse_class->name"));
 	synapse_class->E = rev_potential;
 	synapse_class->tau_exp = (float)(exp(- (double)simulation_step_ms / tau_ms));
 	synapse_class->delay = delay;
@@ -68,7 +68,7 @@ SynapseClass* synapse_class_create(const char* name, float rev_potential, float 
 	return synapse_class;
 ERROR
 	if (synapse_class != NULL) {
-		if (string_is_valid(&(synapse_class->name)) == TRUE) string_reset(&(synapse_class->name));
+		if (synapse_class->name != NULL) string_destroy(synapse_class->name);
 		free(synapse_class);
 	}
 	return NULL;
@@ -82,7 +82,8 @@ SynapseClass* synapse_class_create_default(const char* name) {
 
 void synapse_class_reset(SynapseClass* synapse_class) {
 	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
-	string_reset(&(synapse_class->name));
+	string_destroy(synapse_class->name);
+	synapse_class->name = NULL;
 	synapse_class->delay = 0;
 	synapse_class->E = 0.0f;
 	synapse_class->tau_exp = 0.0f;

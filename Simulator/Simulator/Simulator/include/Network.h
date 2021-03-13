@@ -26,11 +26,13 @@ typedef Array NetworkOutputs; // array of NetworkValues
 void network_values_show(Array* values);
 
 typedef struct Network {
+	// TODO: layer can't keep the full name with them
 	Array layers;			// keeps the layers, will be added one by one, network has ownership
 	Array output_layers;	// one or more, keeps references to @layers
 	Array input_layers;		// one or more, keeps references to @layers
 	Array input_names;		// names of the input layers, reference to @layers->name
 	Array output_names;		// names of the output layers, reference to @layers->name
+	// TODO need to keep them as pointers to avoid bugs when resizing
 	Array synapse_classes;	// keeps the synaptic classes that should be used by synapses of this network, should be added one by one, network takes ownership
 	Array neuron_classes;	// keeps the neuron classes that should be used by neuron of this network, should be added one by one, network takes ownership
 	BOOL compiled;			// if the network has been compiled
