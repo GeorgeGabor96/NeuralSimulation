@@ -20,12 +20,13 @@ typedef enum { LAYER_INVALID = 0, LAYER_FULLY_CONNECTED = 1 } LayerType;
 const char* layer_type_C_string(LayerType type);
 
 
-// used by the network to know to link layers
+// used by the network to know to link layers, it keeps copies to names
 typedef struct LayerInputData {
-	String* layer_name;
-	String* syanpse_class_name;
+	String layer_name;
+	String syanpse_class_name;
 }LayerInputData;
 
+void layer_input_data_reset(LayerInputData* input_data);
 
 /*-------------------NOTE---------------------------
 After succesfull creation the layer has ownership over:
@@ -61,24 +62,24 @@ Status layer_init(
 	LayerType type,
 	uint32_t n_neurons,
 	NeuronClass* neuron_class,
-	char* name);
+	const char* name);
 
 Status layer_init_fully_connected(
 	Layer* layer,
 	uint32_t n_neurons,
 	NeuronClass* neuron_class,
-	char* name);
+	const char* name);
 
 Layer* layer_create(
 	LayerType type,
 	uint32_t n_neurons,
 	NeuronClass* neuron_class,
-	char* name);
+	const char* name);
 
 Layer* layer_create_fully_connected(
 	uint32_t n_neurons,
 	NeuronClass* neuron_class,
-	char* name);
+	const char* name);
 
 // stores that @input is an input layer for @layer, does not call @link
 Status layer_add_input_layer(Layer* layer, Layer* input, SynapseClass* s_class);

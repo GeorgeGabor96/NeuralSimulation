@@ -159,6 +159,16 @@ ERROR
 }
 
 
+BOOL string_equal_C_string(String* string, const char* c_string) {
+	String string_aux;
+	string_init(&string_aux, c_string);
+	BOOL res = string_equal(string, &string_aux);
+	string_reset(&string_aux);
+	return res;
+}
+
+
+
 // function for working with paths
 #define MAX_PATH_LENGTH 256
 

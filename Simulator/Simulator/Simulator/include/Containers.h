@@ -122,7 +122,9 @@ void string_reset(String* string_p);
 void string_destroy(String* string_p);
 Array* strings_create(const char** strings_pp, uint32_t cnt);
 void strings_destroy(Array* strings_p);
+
 BOOL string_equal(String* string1_p, String* string2_p);
+BOOL string_equal_C_string(String* string, const char* c_string);
 
 // function for working with paths, will create a new string with independent memory
 String* string_path_join_strings(String* string1, String* string2);

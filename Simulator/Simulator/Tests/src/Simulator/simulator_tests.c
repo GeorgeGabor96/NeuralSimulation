@@ -7,17 +7,18 @@
 
 TestStatus simulator_infer_test() {
 	// create net linear with 2 layers
-	Layer* layer_input = layer_create_fully_connected(100, 
-													neuron_class_create(LIF_NEURON), 
-													synapse_class_create_default(),
-													"layer_input");
-	Layer* layer_output = layer_create_fully_connected(1,
-													neuron_class_create(LIF_NEURON), 
-													synapse_class_create_default(),
-													"layer_output");
-	layer_add_input_layer(layer_output, layer_input);
-
+	const char* n_class_name = "TEST NEURON";
+	const char* s_class_name = "TEST SYNAPSE";
 	Network* net = network_create();
+	network_add_neuron_class(net, neuron_class_create(n_class_name, LIF_NEURON));
+	network_add_synapse_class(net, synapse_class_create_default(s_class_name));
+	NeuronClass* n_class = network_get_neuron_class_by_name(net, n_class_name);
+	SynapseClass* s_class = network_get_synapse_class_by_name(net, s_class_name);
+
+	Layer* layer_input = layer_create_fully_connected(100, n_class, "layer_input");
+	Layer* layer_output = layer_create_fully_connected(1, n_class, "layer_output");
+	layer_add_input_layer(layer_output, layer_input, s_class);
+
 	network_add_layer(net, layer_input, TRUE, TRUE, FALSE);
 	network_add_layer(net, layer_output, TRUE, FALSE, TRUE);
 	network_compile(net);

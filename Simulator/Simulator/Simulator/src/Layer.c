@@ -27,6 +27,15 @@ ERROR
 
 
 /*************************************************************
+* LAYER INPUT DATA TYPE FUNCTIONALITY
+*************************************************************/
+void layer_input_data_reset(LayerInputData* input_data) {
+	string_reset(&(input_data->layer_name));
+	string_reset(&(input_data->syanpse_class_name));
+}
+
+
+/*************************************************************
 * LAYER TYPE FUNCTIONALITY
 *************************************************************/
 const char* layer_type_C_string(LayerType type) {
@@ -58,7 +67,7 @@ Status layer_init(
 		LayerType type,
 		uint32_t n_neurons,
 		NeuronClass* neuron_class,
-		char* name) {
+		const char* name) {
 
 	Status status = FAIL;
 	uint32_t i = 0;
@@ -72,9 +81,9 @@ Status layer_init(
 
 	layer->type = type;
 	status = string_init(&(layer->name), name);
-	check(status == TRUE, "Couldn't init @layer->name");
+	check(status == SUCCESS, "Couldn't init @layer->name");
 	status = array_init(&(layer->inputs_data), 1, 0, sizeof(LayerInputData));
-	check(status == TRUE, "Couldn't init @layer->inputs_data");
+	check(status == SUCCESS, "Couldn't init @layer->inputs_data");
 
 	status = array_init(&(layer->neurons), n_neurons, n_neurons, sizeof(Neuron));
 	check(status == SUCCESS, "Couldn't init @layer->neurons");
@@ -102,8 +111,8 @@ ERROR
 			neuron_reset(array_get(&(layer->neurons), i));
 			--i;
 		}
-		array_reset(&(layer->neurons), NULL);
-		array_reset(&(layer->inputs_data), NULL);
+		if (array_is_valid(&(layer->neurons)) == TRUE) array_reset(&(layer->neurons), NULL);
+		if (array_is_valid(&(layer->inputs_data)) == TRUE) array_reset(&(layer->inputs_data), NULL);
 	}
 	return FAIL;
 }
@@ -113,7 +122,7 @@ Status layer_init_fully_connected(
 		Layer* layer, 
 		uint32_t n_neurons,
 		NeuronClass* neuron_class,
-		char* name) {
+		const char* name) {
 	return layer_init(layer, LAYER_FULLY_CONNECTED, n_neurons, neuron_class, name);
 }
 
@@ -122,9 +131,9 @@ Layer* layer_create(
 		LayerType type,
 		uint32_t n_neurons,
 		NeuronClass* neuron_class,
-		char* name) {
+		const char* name) {
 	Status status = FAIL;
-	Layer* layer = (Layer*)malloc(sizeof(Layer), "layer_create");
+	Layer* layer = (Layer*)calloc(1, sizeof(Layer), "layer_create");
 	check_memory(layer);
 
 	status = layer_init(layer, type, n_neurons, neuron_class, name);
@@ -141,7 +150,7 @@ ERROR
 Layer* layer_create_fully_connected(
 		uint32_t n_neurons,
 		NeuronClass* neuron_class,
-		char* name) {
+		const char* name) {
 	return layer_create(LAYER_FULLY_CONNECTED, n_neurons, neuron_class, name);
 }
 
@@ -152,8 +161,8 @@ Status layer_add_input_layer(Layer* layer, Layer* input, SynapseClass* s_class) 
 	check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
 
 	LayerInputData input_data = { 0 };
-	input_data.layer_name = &(input->name);
-	input_data.syanpse_class_name = &(s_class->name);
+	string_init(&(input_data.layer_name), string_get_C_string(&(input->name)));
+	string_init(&(input_data.syanpse_class_name), string_get_C_string(&(s_class->name)));
 
 	return array_append(&(layer->inputs_data), &input_data);
 ERROR
@@ -187,7 +196,7 @@ void layer_reset(Layer* layer) {
 	layer->type = LAYER_INVALID;
 	layer->link = NULL;
 	string_reset(&(layer->name));
-	array_destroy(&(layer->inputs_data), NULL); // layer does not own input data
+	array_reset(&(layer->inputs_data), layer_input_data_reset);
 	array_reset(&(layer->neurons), neuron_reset);
 	layer->is_input = FALSE;
 
@@ -416,7 +425,7 @@ void layer_summary(Layer* layer) {
 	printf("Input layers:");
 	for (i = 0; i < layer->inputs_data.length; ++i) {
 		input_data = (LayerInputData*)array_get(&(layer->inputs_data), i);
-		printf(" %s (%s)", string_get_C_string(input_data->layer_name), string_get_C_string(input_data->syanpse_class_name));
+		printf(" %s (%s)", string_get_C_string(&(input_data->layer_name)), string_get_C_string(&(input_data->syanpse_class_name)));
 	}
 	printf("\n");
 

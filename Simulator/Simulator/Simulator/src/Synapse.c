@@ -142,6 +142,8 @@ Synapse* synapse_create(SynapseClass* s_class, float w) {
 	Synapse* synapse = NULL;
 	Status status = FAIL;
 
+	check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
+
 	synapse = (Synapse*)malloc(sizeof(Synapse), "synapse_create");
 	check_memory(synapse);
 		
