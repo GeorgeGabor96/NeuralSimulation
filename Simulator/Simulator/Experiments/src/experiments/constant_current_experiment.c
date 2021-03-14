@@ -2,17 +2,21 @@
 #include "data/data_gen_constant_current.h"
 #include "callbacks/callback_visualize_layer_neurons.h"
 #include "../../include/networks.h"
+#include "../../include/config.h"
 
 
 void constant_current_experiment() {
+	char result_dir[256] = { 0 };
+	sprintf(result_dir, "%s\\constant_current_exp", result_base_folder);
+
 	Network* net = network_3_L_3_3_3();
 	DataGenerator* constant_current = data_generator_constant_current_create(1, net, 15.0f, 100);
 	Layer* l1 = network_get_layer_by_idx(net, 0);
 	Layer* l2 = network_get_layer_by_idx(net, 1);
 	Layer* l3 = network_get_layer_by_idx(net, 2);
-	Callback* visu_1 = callback_visualize_layer_neurons_create(l1, ".\\constant_current_exp");
-	Callback* visu_2 = callback_visualize_layer_neurons_create(l2, ".\\constant_current_exp");
-	Callback* visu_3 = callback_visualize_layer_neurons_create(l3, ".\\constant_current_exp");
+	Callback* visu_1 = callback_visualize_layer_neurons_create(l1, result_dir);
+	Callback* visu_2 = callback_visualize_layer_neurons_create(l2, result_dir);
+	Callback* visu_3 = callback_visualize_layer_neurons_create(l3, result_dir);
 
 	Simulator* simulator = simulator_create(constant_current, net);
 	simulator_add_callback(simulator, visu_1);
@@ -26,20 +30,21 @@ void constant_current_experiment() {
 
 void constant_current_learning_experiment() {
 	// create network
-	const char* result_path = ".\\experiments\\constant_current_learning_custom_synapses_inhibitie";
-
-	Layer* layer_input = layer_create_fully_connected(2, 
-								neuron_class_create(LIF_NEURON), 
-								synapse_class_create(0.0f, 20.0f, 1, CONDUCTANCE_SYNAPSE, 1), 
-								"layer_in");
-
-	Layer* layer_output = layer_create_fully_connected(1, 
-								neuron_class_create(LIF_NEURON),
-								synapse_class_create(-75.0f, 50.0f, 1, VOLTAGE_DEPENDENT_SYNAPSE, 1), 
-								"layer_out");
-	layer_add_input_layer(layer_output, layer_input);
+	char result_dir[256] = { 0 };
+	sprintf(result_dir, "%s\\constant_current_exp_learning", result_base_folder);
 
 	Network* net = network_create();
+	NeuronClass* n_class = neuron_class_create("TEST_N", LIF_NEURON);
+	SynapseClass* s_class_conductance = synapse_class_create("TEST_CONDUCTANCE", 0.0f, 20.0f, 1, CONDUCTANCE_SYNAPSE, 1);
+	SynapseClass* s_class_voltage = synapse_class_create("TEST_VOLTAGE", -75.0f, 50.0f, 1, VOLTAGE_DEPENDENT_SYNAPSE, 1);
+	network_add_neuron_class(net, n_class);
+	network_add_synapse_class(net, s_class_conductance);
+	network_add_synapse_class(net, s_class_voltage);
+
+	Layer* layer_input = layer_create_fully_connected(2, n_class, "layer_in");
+	Layer* layer_output = layer_create_fully_connected(1, n_class, "layer_out");
+	layer_add_input_layer(layer_output, layer_input, s_class_voltage);
+
 	network_add_layer(net, layer_input, TRUE, TRUE, FALSE);
 	network_add_layer(net, layer_output, TRUE, FALSE, TRUE);
 	network_compile(net);
@@ -51,8 +56,8 @@ void constant_current_learning_experiment() {
 	// create callbacks
 	layer_input = network_get_layer_by_name(net, "layer_in");
 	layer_output = network_get_layer_by_name(net, "layer_out");
-	Callback* c1 = callback_visualize_layer_neurons_create(layer_input, result_path);
-	Callback* c2 = callback_visualize_layer_neurons_create(layer_output, result_path);
+	Callback* c1 = callback_visualize_layer_neurons_create(layer_input, result_dir);
+	Callback* c2 = callback_visualize_layer_neurons_create(layer_output, result_dir);
 
 	// create simulator
 	Simulator* simulator = simulator_create(constant_current, net);

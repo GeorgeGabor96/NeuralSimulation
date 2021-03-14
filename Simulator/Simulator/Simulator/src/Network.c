@@ -416,7 +416,6 @@ loop1:
 	// save references of input layers in @network->input_layers
 	for (i = 0; i < network->input_names.length; ++i) {
 		layer_name = *((String**)array_get(&(network->input_names), i));
-		printf("%s\n", string_get_C_string(layer_name));
 		layer = network_get_layer_by_string(network, layer_name);
 		array_append(&(network->input_layers), &layer);
 	}
@@ -424,7 +423,6 @@ loop1:
 	// save references of output layers in @network->output_layers
 	for (i = 0; i < network->output_names.length; ++i) {
 		layer_name = *((String**)array_get(&(network->output_names), i));
-		printf("%s\n", string_get_C_string(layer_name));
 		layer = network_get_layer_by_string(network, layer_name);
 		array_append(&(network->output_layers), &layer);
 	}

@@ -1,18 +1,20 @@
 #include "Simulator.h"
 #include "data/data_gen_random_spikes.h"
 #include "callbacks/callback_visualize_layer_neurons.h"
+#include "../../include/config.h"
 
 
 void time_between_spikes_experiment() {
+	char result_path[256] = { 0 };
+	sprintf(result_path, "%s\\\\experiments_nice_plots\\time_between_spikes_experiment\\tau_l1_10_5_n_tau_l2_100_time_between_20", result_base_folder);
+
 	// create network
-	const char* result_path = ".\\experiments_nice_plots\\time_between_spikes_experiment\\tau_l1_10_5_n_tau_l2_20_time_between_20";
-
 	Network* net = network_create();
-	network_add_neuron_class(net, neuron_class_create("LIF NEURON", LIF_NEURON));
-	network_add_synapse_class(net, synapse_class_create("SYN_20TAU", 0.0f, 20.0f, 1, CONDUCTANCE_SYNAPSE, 1));
+	network_add_neuron_class(net, neuron_class_create("LIF_NEURON", LIF_NEURON));
+	network_add_synapse_class(net, synapse_class_create("SYN_20TAU", 0.0f, 100.0f, 1, CONDUCTANCE_SYNAPSE, 1));
 
-	NeuronClass* n_class = network_get_neuron_class(net, "LIF_NEURON");
-	SynapseClass* s_class = network_get_synapse_class(net, "SYN_20TAU");
+	NeuronClass* n_class = network_get_neuron_class_by_name(net, "LIF_NEURON");
+	SynapseClass* s_class = network_get_synapse_class_by_name(net, "SYN_20TAU");
 
 	Layer* layer_input = layer_create_fully_connected(5, n_class, "layer_in");
 	Layer* layer_output = layer_create_fully_connected(1, n_class, "layer_out");
