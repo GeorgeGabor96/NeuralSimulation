@@ -44,12 +44,12 @@ TestInfo tests[] = {
 	{ layer_general_use_case_test, "layer_general_use_case_test" },
 	{ layer_memory_test_test, "layer_memory_test_test" },
 	{ layer_fully_connected_test, "layer_fully_connected_test" },
-	{ layer_fully_new_interface, "layer_fully_new_interface" },
+	{ layer_fully_link_input_layer_test, "layer_fully_link_input_layer_test" },
 
 	// NEURON
 	{ neuron_general_use_case_test, "neuron_general_use_case_test" },
 	{ neuron_memory_test, "neuron_memory_test" },
-
+	
 	// SYNAPSE
 	{ synapse_class_create_destroy_test, "synapse_class_create_destroy_test" },
 	{ synapse_create_destroy_test, "synapse_create_destroy_test" },
@@ -58,7 +58,7 @@ TestInfo tests[] = {
 	{ synapse_compute_PSC_test, "synapse_compute_PSC_test" },
 	{ synapse_step_test, "synapse_step_test" },
 	{ synapse_class_memory_test, "synapse_class_memory_test" },
-
+	
 	// STACK
 	{ stack_general_use_case_test, "stack_general_use_case_test" },
 	{ stack_memory_test, "stack_memory_test" },
@@ -116,10 +116,10 @@ int main() {
 		}
 	}
 
-	log_info("Number of RUNNED tests: %d", number_tests_runned);
-	log_info("Number of SUCCESS tests: %d", number_tests_success);
-	log_info("Number of FAILED tests: %d", number_tests_failed);
-	log_info("Number of UNIMPLEMENTED tests: %d", number_tests_unimplemented);
+	log_info("Number of RUNNED tests: %u", number_tests_runned);
+	log_info("Number of SUCCESS tests: %u", number_tests_success);
+	log_info("Number of FAILED tests: %u", number_tests_failed);
+	log_info("Number of UNIMPLEMENTED tests: %u", number_tests_unimplemented);
 
 	return 0;
 }

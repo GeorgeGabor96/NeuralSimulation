@@ -14,35 +14,42 @@ TestStatus synapse_class_create_destroy_test() {
 	SynapseType s_type = CONDUCTANCE_SYNAPSE;
 	float simuation_time_ms = 1.0f;
 	float tau_exp = 0.5f;
+	const char* name = "SYN CLASS";
 
 	// call normal case
-	synapse_class = synapse_class_create(rev_potential, tau_ms, delay, s_type, simuation_time_ms);
+	synapse_class = synapse_class_create(name, rev_potential, tau_ms, delay, s_type, simuation_time_ms);
 	assert(synapse_class != NULL, "@synapse_class is NULL");
+	assert(strcmp(string_get_C_string(synapse_class->name), name) == 0, "@synapse_class->name should be %s not %s", name, string_get_C_string(synapse_class->name));
 	assert(synapse_class->E == rev_potential, "@synapse_class->E should be %f not %f", rev_potential, synapse_class->E);
 	assert(synapse_class->delay == delay, "@synapse_class->delay should be %u not %u", delay, synapse_class->delay);
 	assert(synapse_class->type == s_type, "@synapse_class->type should be %d not %d", s_type, synapse_class->type);
 	assert(float_test(synapse_class->tau_exp, tau_exp), "@synapse_class->tau_exp %f not close enough to %f", synapse_class->tau_exp, tau_exp);
 	synapse_class_destroy(synapse_class);
 
+	// call with @name == NULL
+	synapse_class = synapse_class_create(NULL, rev_potential, tau_ms, delay, s_type, simuation_time_ms);
+	assert(synapse_class == NULL, "@synapse_class should be NULL for @name = NULL");
+
 	// call with @tau_ms <= 0.0
-	synapse_class = synapse_class_create(rev_potential, 0.0f, delay, s_type, simuation_time_ms);
+	synapse_class = synapse_class_create(name, rev_potential, 0.0f, delay, s_type, simuation_time_ms);
 	assert(synapse_class == NULL, "@synapse_class should be NULL for @tau_ms = 0");
 
 	// call with @simulation_step_ms <= 0
-	synapse_class = synapse_class_create(rev_potential, tau_ms, delay, s_type, 0.0f);
+	synapse_class = synapse_class_create(name, rev_potential, tau_ms, delay, s_type, 0.0f);
 	assert(synapse_class == NULL, "@synapse_class should be NULL for @simulation_step_ms == 0");
 
-	// call with @type = 2
-	synapse_class = synapse_class_create(rev_potential, tau_ms, delay, INVALID_SYNAPSE, simuation_time_ms);
+	// call with @type = INVALID_SYNAPSE
+	synapse_class = synapse_class_create(name, rev_potential, tau_ms, delay, INVALID_SYNAPSE, simuation_time_ms);
 	assert(synapse_class == NULL, "@synapse_class should be NULL for @type = 2");
 	
 	// destroy with NULL
 	synapse_class_destroy(NULL);
 
 	assert(memory_leak() == FALSE, "Memory leak");
-	status = TEST_SUCCESS;
+	return TEST_SUCCESS;
 
 error:
+	if (synapse_class != NULL) synapse_class_destroy(synapse_class);
 	return status;
 }
 
@@ -52,7 +59,7 @@ TestStatus synapse_class_memory_test() {
 	SynapseClass* synapse_classes[1000] = { NULL };
 	uint32_t i = 0;
 
-	for (i = 0; i < 1000; ++i) synapse_classes[i] = synapse_class_create_default();
+	for (i = 0; i < 1000; ++i) synapse_classes[i] = synapse_class_create_default("SYN TEST");
 	for (i = 0; i < 1000; ++i) synapse_class_destroy(synapse_classes[i]);
 
 	assert(memory_leak() == FALSE, "Memory leak");
@@ -73,19 +80,19 @@ void synapse_class_set_default_values(SynapseType type, SynapseClass* s_class) {
 TestStatus synapse_create_destroy_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
-	SynapseClass s_class;
-	synapse_class_set_default_values(CONDUCTANCE_SYNAPSE, &s_class);
+	SynapseClass* s_class = synapse_class_create_default("TEST");
+	synapse_class_set_default_values(CONDUCTANCE_SYNAPSE, s_class);
 	float w = 1.0f;
 	Synapse* synapse = NULL;
 
 	// calls
-	synapse = synapse_create(&s_class, w);
+	synapse = synapse_create(s_class, w);
 	assert(synapse != NULL, "@synapse should not be NULL");
 	assert(queue_is_valid(&(synapse->spike_times)) == TRUE, invalid_argument("synapse->spike_times"));
 	assert(synapse->spike_times.array.max_length == SYNAPSE_INITIAL_SPIKE_CAPACITY, "@synapse->spike_times.array.max_length should be %u not %u", SYNAPSE_INITIAL_SPIKE_CAPACITY, synapse->spike_times.array.max_length);
 	assert(synapse->spike_times.array.length == 0, "@synapse->spike_times.array.length should be %u not %u", 0, synapse->spike_times.array.length);
 	assert(queue_is_empty(&(synapse->spike_times)), "@synapse->spike_times should be empty");
-	assert(synapse->s_class == &s_class, "@synapse->s_class should be %p not %p", &s_class, synapse->s_class);
+	assert(synapse->s_class == s_class, "@synapse->s_class should be %p not %p", s_class, synapse->s_class);
 	assert(synapse->w == w, "@synapse->w should be %f not %f", w, synapse->w);
 	assert(synapse->g == 0.0f, "@synapse->g should be 0");
 
@@ -94,6 +101,7 @@ TestStatus synapse_create_destroy_test() {
 	synapse_destroy(NULL);
 
 	synapse_destroy(synapse);
+	synapse_class_destroy(s_class);
 	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
@@ -105,15 +113,15 @@ error:
 
 TestStatus synapse_memory_test() {
 	TestStatus status = TEST_FAILED;
-	SynapseClass s_class;
-	synapse_class_set_default_values(CONDUCTANCE_SYNAPSE, &s_class);
+	SynapseClass* s_class = synapse_class_create_default("TEST");
+	synapse_class_set_default_values(CONDUCTANCE_SYNAPSE, s_class);
 	Synapse* synapses[1000] = { NULL };
 	uint32_t i = 0;
 	uint32_t j = 0;
 	uint32_t value = 0;
 
 	for (i = 0; i < 1000; ++i) {
-		synapses[i] = synapse_create(&s_class, 1.0f);
+		synapses[i] = synapse_create(s_class, 1.0f);
 		for (j = 0; j < 10000; ++j) {
 			synapse_add_spike_time(synapses[i], j);
 		}
@@ -131,6 +139,7 @@ TestStatus synapse_memory_test() {
 
 		synapse_destroy(synapses[i]);
 	}
+	synapse_class_destroy(s_class);
 	assert(memory_leak() == FALSE, "Memory leak");
 	status = TEST_SUCCESS;
 
@@ -139,15 +148,13 @@ error:
 }
 
 
-
 TestStatus synapse_add_spike_time_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
-	SynapseClass s_class;
-	s_class.type = CONDUCTANCE_SYNAPSE;
-	s_class.delay = 0u;
+	SynapseClass* s_class = synapse_class_create_default("TEST");
+	s_class->delay = 0u;
 	float w = 1.0f;
-	Synapse* synapse = synapse_create(&s_class, w);
+	Synapse* synapse = synapse_create(s_class, w);
 	Queue* spike_times = NULL;
 	uint32_t spike_time1 = 1;
 	uint32_t spike_time2 = 5;
@@ -175,9 +182,11 @@ TestStatus synapse_add_spike_time_test() {
 	// call with @s_calss == NULL
 	synapse->s_class = NULL;
 	assert(synapse_add_spike_time(synapse, 0) == FAIL, "Should fail for @synapse->s_class = NULL");
-	synapse->s_class = &s_class;
+	synapse->s_class = s_class;
 
 	synapse_destroy(synapse);
+	synapse_class_destroy(s_class);
+
 	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
@@ -190,26 +199,24 @@ error:
 TestStatus synapse_compute_PSC_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
-	SynapseClass s_class;
-	s_class.type = CONDUCTANCE_SYNAPSE;
-	s_class.E = 0.0f;
+	SynapseClass* s_class = synapse_class_create_default("TEST");
 	float w = 1.5f;
 	float u = 2.3f;
 	float I = 0.0f;
 	float g = 1.3f;
 	float synapse_I = 0.0f;
-	Synapse* synapse = synapse_create(&s_class, w);
+	Synapse* synapse = synapse_create(s_class, w);
 	//Queue* spike_times = synapse->spike_times;
 	// TEST CONDUCTANCE_SYNAPSE
-	s_class.type = CONDUCTANCE_SYNAPSE;
+	s_class->type = CONDUCTANCE_SYNAPSE;
 	synapse->g = g;
 	I = w * g;
 	synapse_I = synapse_compute_PSC(synapse, u);
 	assert(float_test(I, synapse_I), "Synapse PSC should be %f not %f", I, synapse_I);
 
 	// TEST VOLTAGE_DEPENDENT_SYNAPSE
-	s_class.type = VOLTAGE_DEPENDENT_SYNAPSE;
-	I = w * g * (u - s_class.E);
+	s_class->type = VOLTAGE_DEPENDENT_SYNAPSE;
+	I = - w * g * (u - s_class->E);
 	synapse_I = synapse_compute_PSC(synapse, u);
 	assert(float_test(I, synapse_I), "Synapse PSC should be %f not %f", I, synapse_I);
 
@@ -221,14 +228,15 @@ TestStatus synapse_compute_PSC_test() {
 
 	// call for @synapse->s_class = NULL
 	assert(synapse_compute_PSC(synapse, u) == 0.0f, "Should return 0.0 for @synapse->s_class = NULL");
-	synapse->s_class = &s_class;
+	synapse->s_class = s_class;
 
 	// call for undifined synapse type
-	s_class.type = 5;
+	s_class->type = 5;
 	assert(synapse_compute_PSC(synapse, u) == 0.0f, "Should return 0.0 for undifined @synapse->s_class->type");
 
-	s_class.type = CONDUCTANCE_SYNAPSE;
+	s_class->type = CONDUCTANCE_SYNAPSE;
 	synapse_destroy(synapse);
+	synapse_class_destroy(s_class);
 	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;
@@ -241,12 +249,9 @@ error:
 TestStatus synapse_step_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
-	SynapseClass s_class;
-	s_class.type = CONDUCTANCE_SYNAPSE;
-	s_class.delay = 1u;
-	s_class.tau_exp = 0.5f;
+	SynapseClass* s_class = synapse_class_create_default("TEST");
 
-	Synapse* synapse = synapse_create(&s_class, 0.0f);
+	Synapse* synapse = synapse_create(s_class, 0.0f);
 	//Queue* spike_times = synapse->spike_times;
 	uint32_t spike_time1 = 1;
 	uint32_t spike_time2 = 3;
@@ -305,9 +310,10 @@ TestStatus synapse_step_test() {
 
 	// call with @synapse->s_class = NULL
 	assert(synapse_step(synapse, simulation_time) == FAIL, "Should fail for @synapse->s_class = NULL");
-	synapse->s_class = &s_class;
+	synapse->s_class = s_class;
 
 	synapse_destroy(synapse);
+	synapse_class_destroy(s_class);
 	assert(memory_leak() == FALSE, "Memory leak");
 
 	status = TEST_SUCCESS;

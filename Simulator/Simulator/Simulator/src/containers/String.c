@@ -17,7 +17,8 @@ ERROR
 /*************************************************************
 * Helper Functions
 *************************************************************/
-static inline uint32_t safe_strlen(char* c_string_p) {
+// returns number of bytes without counting the \0
+static inline uint32_t safe_strlen(const char* c_string_p) {
 	uint32_t i = 0;
 	for (i = 0; i < STRING_LIMIT; ++i) {
 		if (c_string_p[i] == 0) {
@@ -32,15 +33,16 @@ static inline uint32_t safe_strlen(char* c_string_p) {
 * String Functionality
 *************************************************************/
 // UNTESTED
-Status string_init(String* string_p, char* c_string_p) {
+Status string_init(String* string_p, const char* c_string_p) {
 	Status status = FAIL;
 	check(string_p != NULL, null_argument("string_p"));
 	check(c_string_p != NULL, null_argument("c_string_p"));
 
 	uint32_t n_chars = safe_strlen(c_string_p);
+	check(n_chars > 0, "@c_string_p has length 0");
 	status = array_init(string_p, n_chars + 1, n_chars, sizeof(char));
 	check(status == SUCCESS, "array_init failed");
-	array_copy_data(string_p, c_string_p, 0, n_chars);
+	array_copy_data(string_p, (void*)c_string_p, 0, n_chars);
 
 	// didn't put end of string
 	char end_s = '\0';
@@ -51,7 +53,7 @@ ERROR
 }
 
 
-String* string_create(char* c_string_p) {
+String* string_create(const char* c_string_p) {
 	// make a blank string
 	String* string_p = (String*)malloc(sizeof(String), "string_create");
 	check_memory(string_p);
@@ -83,7 +85,7 @@ ERROR
 }
 
 
-Array* strings_create(char** strings_pp, uint32_t cnt) {
+Array* strings_create(const char** strings_pp, uint32_t cnt) {
 	uint32_t i = 0;
 	Array* safe_strings_p = NULL;
 	String* string_p = NULL;
@@ -116,7 +118,7 @@ ERROR
 }
 
 
-char* string_get_C_string(String* string) {
+const char* string_get_C_string(String* string) {
 	check(string_is_valid(string) == TRUE, invalid_argument("string"));
 	return string->data;
 ERROR
@@ -155,6 +157,16 @@ BOOL string_equal(String* string1_p, String* string2_p) {
 ERROR
 	return FALSE;
 }
+
+
+BOOL string_equal_C_string(String* string, const char* c_string) {
+	String string_aux;
+	string_init(&string_aux, c_string);
+	BOOL res = string_equal(string, &string_aux);
+	string_reset(&string_aux);
+	return res;
+}
+
 
 
 // function for working with paths

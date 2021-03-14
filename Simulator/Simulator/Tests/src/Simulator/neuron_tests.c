@@ -11,11 +11,13 @@ TestStatus neuron_class_general_use_case_test() {
 	float i_factor = 1.0f / LIF_C;
 	float free_factor = LIF_U_REST / (LIF_C * LIF_R);
 	NeuronClass* n_class = NULL;
+	const char* name = "TEST";
 
 	// call normal
-	n_class = neuron_class_create(n_type);
+	n_class = neuron_class_create(name, n_type);
 	assert(n_class != NULL, "Should be able to create a @NeuronClass");
 	assert(n_class->type == n_type, "@n_class->type should be %d not %d", n_type, n_class->type);
+	assert(strcmp(string_get_C_string(n_class->name), name) == 0, "@n_class->name should be %s not %s", name, string_get_C_string(n_class->name));
 
 	// check LIF values
 	assert(n_class->u_th == LIF_U_TH, "@n_class->u_th should be %f not %f", LIF_U_TH, n_class->u_th);
@@ -25,8 +27,9 @@ TestStatus neuron_class_general_use_case_test() {
 	assert(float_test(n_class->i_factor, i_factor), "@n_class->i_factor should be %f not %f", i_factor, n_class->i_factor);
 	assert(float_test(n_class->free_factor, free_factor), "@n_class->free_factor should be %f not %f", free_factor, n_class->free_factor);
 
-	// call with invalid @type
-	assert(neuron_class_create(5) == NULL, "Should not work for invalid @type");
+	// corner cases
+	assert(neuron_class_create(name, INVALID_NEURON) == NULL, "Should not work for invalid @type");
+	assert(neuron_class_create(NULL, LIF_NEURON) == NULL, "Should not work for invalid @name");
 	neuron_class_destroy(NULL);
 
 	neuron_class_destroy(n_class);
@@ -48,7 +51,7 @@ TestStatus neuron_class_memory_test() {
 
 	NeuronClass* neuron_classes[1000] = { NULL };
 	uint32_t i = 0;
-	for (i = 0; i < 1000; ++i) neuron_classes[i] = neuron_class_create(LIF_NEURON);
+	for (i = 0; i < 1000; ++i) neuron_classes[i] = neuron_class_create("TEST", LIF_NEURON);
 	for (i = 0; i < 1000; ++i) neuron_class_destroy(neuron_classes[i]);
 	assert(memory_leak() == FALSE, "Memory leak");
 
@@ -61,19 +64,17 @@ error:
 TestStatus neuron_general_use_case_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
-	NeuronClass n_class;
-	n_class.type = LIF_NEURON;
-	neuron_class_set_LIF_parameters(&n_class, LIF_U_TH, LIF_U_REST, LIF_R, LIF_C);
+	NeuronClass* n_class = neuron_class_create("TEST", LIF_NEURON);
 	Neuron* neuron = NULL;
 	
 	/*--------create neuron-------- */
-	neuron = neuron_create(&n_class);
+	neuron = neuron_create(n_class);
 	assert(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
-	assert(neuron->n_class == &n_class, "@neuron->n_class should be %p not %p", &n_class, neuron->n_class);
-	assert(neuron->u == n_class.u_rest, "@neuron->u should be %f not %f", n_class.u_rest, neuron->u);
+	assert(neuron->n_class == n_class, "@neuron->n_class should be %p not %p", n_class, neuron->n_class);
+	assert(neuron->u == n_class->u_rest, "@neuron->u should be %f not %f", n_class->u_rest, neuron->u);
 	
 	/*--------add input synapses--------*/
-	SynapseClass* s_class = synapse_class_create_default();
+	SynapseClass* s_class = synapse_class_create_default("TEST");
 	Synapse* sy_in_1 = synapse_create(s_class, 1.1f);
 	Synapse* sy_in_2 = synapse_create(s_class, 3.4f);
 	Synapse* sy = NULL;
@@ -179,6 +180,7 @@ TestStatus neuron_general_use_case_test() {
 	assert(neuron_step_inject_current(NULL, 1.0f, 10u) == FAIL, "Should fail for invalid @neuron");
 
 	neuron_destroy(neuron);
+	neuron_class_destroy(n_class);
 	synapse_destroy(sy_out_1);
 	synapse_destroy(sy_out_2);
 	synapse_class_destroy(s_class);
@@ -197,9 +199,9 @@ TestStatus neuron_memory_test() {
 	uint32_t i = 0;
 	uint32_t j = 0;
 	uint32_t k = 0;
-	NeuronClass* n_class = neuron_class_create(LIF_NEURON);
+	NeuronClass* n_class = neuron_class_create("TEST", LIF_NEURON);
 	Neuron* neurons[100] = { NULL };
-	SynapseClass* s_class = synapse_class_create_default();
+	SynapseClass* s_class = synapse_class_create_default("TEST");
 	Synapse* synapse = NULL;
 
 	clock_t start, end;
@@ -247,7 +249,7 @@ TestStatus neuron_memory_test() {
 	}
 	end = clock();
 	cpu_time_used = ((double)((size_t)end - start)) / CLOCKS_PER_SEC;
-	printf("%u %llf\n", i, cpu_time_used);
+	printf("%u %lf\n", i, cpu_time_used);
 	neuron_class_destroy(n_class);
 	synapse_class_destroy(s_class);
 	

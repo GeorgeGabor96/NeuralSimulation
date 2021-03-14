@@ -9,6 +9,7 @@
 *************************************************************/
 Status synapse_class_is_valid(SynapseClass* synapse_class) {
 	check(synapse_class != NULL, null_argument("synapse_class"));
+	check(string_is_valid(synapse_class->name) == TRUE, invalid_argument("synapse_class->name"));
 	// NOTE: If you add more types this check needs to be updated
 	check(synapse_class->type == CONDUCTANCE_SYNAPSE || synapse_class->type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("synapse_class->type"));
 
@@ -46,14 +47,19 @@ const char* synapse_type_C_string(SynapseType type) {
 /*************************************************************
 * SynapseClass Functionality
 *************************************************************/
-SynapseClass* synapse_class_create(float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms) {
+SynapseClass* synapse_class_create(const char* name, float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms) {
+	Status status = FAIL;
+	SynapseClass* synapse_class = NULL;
+	
 	check(tau_ms > 0.0, "@tau_ms should be > 0");
 	check(simulation_step_ms > 0.0, "@simulation_step_ms should be > 0");
 	check(type == CONDUCTANCE_SYNAPSE || type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("type"));
 
-	SynapseClass* synapse_class = (SynapseClass*)malloc(sizeof(SynapseClass), "synapse_class_create");
+	synapse_class = (SynapseClass*)calloc(1, sizeof(SynapseClass), "synapse_class_create");
 	check_memory(synapse_class);
 
+	synapse_class->name = string_create(name);
+	check(string_is_valid(synapse_class->name) == TRUE, invalid_argument("synapse_class->name"));
 	synapse_class->E = rev_potential;
 	synapse_class->tau_exp = (float)(exp(- (double)simulation_step_ms / tau_ms));
 	synapse_class->delay = delay;
@@ -61,17 +67,23 @@ SynapseClass* synapse_class_create(float rev_potential, float tau_ms, uint32_t d
 
 	return synapse_class;
 ERROR
+	if (synapse_class != NULL) {
+		if (synapse_class->name != NULL) string_destroy(synapse_class->name);
+		free(synapse_class);
+	}
 	return NULL;
 }
 
 
-SynapseClass* synapse_class_create_default() {
-	return synapse_class_create(SYNAPSE_REV_POTENTIAL_DF, SYNAPSE_TAU_MS_DF, SYNAPSE_DELAY_DF, SYNAPSE_TYPE_DF, SYNAPSE_SIMULATION_TIME_MS_DF);
+SynapseClass* synapse_class_create_default(const char* name) {
+	return synapse_class_create(name, SYNAPSE_REV_POTENTIAL_DF, SYNAPSE_TAU_MS_DF, SYNAPSE_DELAY_DF, SYNAPSE_TYPE_DF, SYNAPSE_SIMULATION_TIME_MS_DF);
 }
 
 
 void synapse_class_reset(SynapseClass* synapse_class) {
 	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
+	string_destroy(synapse_class->name);
+	synapse_class->name = NULL;
 	synapse_class->delay = 0;
 	synapse_class->E = 0.0f;
 	synapse_class->tau_exp = 0.0f;
@@ -88,6 +100,11 @@ void synapse_class_destroy(SynapseClass* synapse_class) {
 
 ERROR
 	return;
+}
+
+
+void synapse_class_ref_destroy(SynapseClass** synapse_class) {
+	synapse_class_destroy(*synapse_class);
 }
 
 
@@ -130,6 +147,8 @@ void synapse_destroy_2p(Synapse** synapse) {
 Synapse* synapse_create(SynapseClass* s_class, float w) {
 	Synapse* synapse = NULL;
 	Status status = FAIL;
+
+	check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
 
 	synapse = (Synapse*)malloc(sizeof(Synapse), "synapse_create");
 	check_memory(synapse);

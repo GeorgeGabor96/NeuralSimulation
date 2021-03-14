@@ -16,6 +16,7 @@ const char* neuron_type_C_string(NeuronType type);
 
 
 typedef struct NeuronClass {
+	String* name;
 	NeuronType type;
 	
 	// TODO: do we need a u_reset for when we have spikes??? ask Raul, watch video
@@ -42,9 +43,10 @@ typedef struct NeuronClass {
 2. neuron_class->type is a valid one
 */
 Status neuron_class_is_valid(NeuronClass* neuron_class);
-NeuronClass* neuron_class_create(NeuronType type);
+NeuronClass* neuron_class_create(const char* name, NeuronType type);
 void neuron_class_reset(NeuronClass* neuron_class);
 void neuron_class_destroy(NeuronClass* neuron_class);
+void neuron_class_ref_destroy(NeuronClass** neuron_class);
 Status neuron_class_set_LIF_parameters(NeuronClass* neuron_class, float u_th, float u_rest, float r, float c);
 
 

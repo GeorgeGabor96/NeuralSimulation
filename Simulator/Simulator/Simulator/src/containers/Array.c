@@ -69,8 +69,11 @@ void array_reset(Array* array, ElemReset reset) {
 			reset(elem);
 		}
 	}
-	array->length = 0;
 	free(array->data);
+	array->element_size = 0;
+	array->length = 0;
+	array->max_length = 0;
+	array->data = NULL;
 
 ERROR
 	return;

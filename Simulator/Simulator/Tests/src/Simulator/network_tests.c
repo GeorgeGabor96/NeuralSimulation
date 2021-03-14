@@ -9,21 +9,38 @@ TestStatus network_compile_general_use_case_test() {
 	Layer* layer = NULL;
 	uint32_t layer_idx = 0;
 	String* string = NULL;
+	const char* neuron_class_name = "LIF NEURON";
+	const char* synapse_class_name = "DEFAULT SYN";
+
+	/*----------create_network----------*/
+	Network* network = network_create();
+	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
+	
+	assert(network->neuron_classes.length == 0, "@network->neuron_classes.length should be 0 not %u", network->neuron_classes.length);
+	s_status = network_add_neuron_class(network, neuron_class_create(neuron_class_name, LIF_NEURON));
+	assert(s_status == SUCCESS, "@network_add_neuron_class failed");
+	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
+	assert(network->neuron_classes.length == 1, "@network->neuron_classes.length should be 1 not %u", network->neuron_classes.length);
+
+	assert(network->synapse_classes.length == 0, "@network->synapse_classes.length should be 0 not %u", network->synapse_classes.length);
+	s_status = network_add_synapse_class(network, synapse_class_create_default(synapse_class_name));
+	assert(s_status == SUCCESS, "@network_add_neuron_class failed");
+	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
+	assert(network->synapse_classes.length == 1, "@network->synapse_classes.length should be 1 not %u", network->synapse_classes.length);
+
+	NeuronClass* n_class = network_get_neuron_class_by_name(network, neuron_class_name);
+	SynapseClass* s_class = network_get_synapse_class_by_name(network, synapse_class_name);
 
 	// create a few layers
 	char* name1 = "layer_1";
 	char* name2 = "layer_2";
 	char* name3 = "layer_3";
-	Layer* l1 = layer_create_fully_connected(10, neuron_class_create(LIF_NEURON), synapse_class_create_default(), name1);
-	Layer* l2 = layer_create_fully_connected(100, neuron_class_create(LIF_NEURON), synapse_class_create_default(), name2);
-	Layer* l3 = layer_create_fully_connected(1, neuron_class_create(LIF_NEURON), synapse_class_create_default(), name3);
-	layer_add_input_layer(l2, l1);
-	layer_add_input_layer(l3, l1);
-	layer_add_input_layer(l3, l2);
-
-	/*----------create_network----------*/
-	Network* network = network_create();
-	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
+	Layer* l1 = layer_create_fully_connected(10, n_class, name1);
+	Layer* l2 = layer_create_fully_connected(100, n_class,  name2);
+	Layer* l3 = layer_create_fully_connected(1, n_class, name3);
+	layer_add_input_layer(l2, l1, s_class);
+	layer_add_input_layer(l3, l1, s_class);
+	layer_add_input_layer(l3, l2, s_class);
 	
 	/*----------network_add_layer----------*/
 	s_status = network_add_layer(network, l3, TRUE, FALSE, TRUE);
@@ -46,7 +63,7 @@ TestStatus network_compile_general_use_case_test() {
 	assert(network->layers.length == 3, "@network->layers.length is %u, not 3", network->layers.length);
 	assert(network->input_names.length == 1, "@network->input_names.length is %u, not 1", network->input_names.length);
 	assert(network->output_names.length == 1, "@network->output_names.length is %u, not 1", network->output_names.length);
-	
+
 	/*----------network_get_layer_by_idx----------*/
 	l3 = network_get_layer_by_idx(network, 0);
 	assert(layer_is_valid(l3) == TRUE, invalid_argument("l3"));
@@ -81,7 +98,7 @@ TestStatus network_compile_general_use_case_test() {
 	string = *((String**)array_get(&(network->output_names), 0));
 	assert(string_is_valid(string) == TRUE, invalid_argument("string"));
 	assert(strcmp(string_get_C_string(string), name3) == 0, invalid_argument("string"));
-
+	
 	/*----------network_compile----------*/
 	s_status = network_compile(network);
 	assert(s_status == SUCCESS, "could not compile @network");
@@ -157,17 +174,25 @@ TestStatus network_step_test() {
 	TestStatus status = TEST_FAILED;
 	Layer* layer = NULL;
 	uint32_t i = 0;
+	const char* neuron_class_name = "LIF NEURON";
+	const char* synapse_class_name = "DEFAULT SYN";
+
+	// create network
+	Network* network = network_create();
+	network_add_neuron_class(network, neuron_class_create(neuron_class_name, LIF_NEURON));
+	network_add_synapse_class(network, synapse_class_create_default(synapse_class_name));
+	NeuronClass* n_class = network_get_neuron_class_by_name(network, neuron_class_name);
+	SynapseClass* s_class = network_get_synapse_class_by_name(network, synapse_class_name);
 
 	// create a few layers
 	uint32_t input_neuron_length = 5;
-	Layer* layer1 = layer_create_fully_connected(input_neuron_length, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "layer1");
-	Layer* layer2 = layer_create_fully_connected(100, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "layer2");
-	Layer* layer3 = layer_create_fully_connected(10, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "layer3");
-	layer_add_input_layer(layer2, layer1);
-	layer_add_input_layer(layer3, layer2);
+	Layer* layer1 = layer_create_fully_connected(input_neuron_length, n_class, "layer1");
+	Layer* layer2 = layer_create_fully_connected(100, n_class, "layer2");
+	Layer* layer3 = layer_create_fully_connected(10, n_class, "layer3");
+	layer_add_input_layer(layer2, layer1, s_class);
+	layer_add_input_layer(layer3, layer2, s_class);
 
 	// add layers into a network
-	Network* network = network_create();
 	network_add_layer(network, layer1, TRUE, TRUE, FALSE);
 	network_add_layer(network, layer2, TRUE, FALSE, FALSE);
 	network_add_layer(network, layer3, TRUE, FALSE, TRUE);
@@ -209,25 +234,34 @@ error:
 
 
 TestStatus network_summary_test() {
-	Layer* l_input_1 = layer_create_fully_connected(10, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "l_input_1");
-	Layer* l_input_2 = layer_create_fully_connected(100, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "l_input_2");
-	Layer* l_inner_1 = layer_create_fully_connected(100, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "l_inner_1");
-	Layer* l_inner_2 = layer_create_fully_connected(100, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "l_inner_2");
-	Layer* l_output_1 = layer_create_fully_connected(100, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "l_output_1");
-	Layer* l_output_2 = layer_create_fully_connected(10, neuron_class_create(LIF_NEURON), synapse_class_create_default(), "l_output_2");
-	layer_add_input_layer(l_inner_1, l_input_1);
-	layer_add_input_layer(l_inner_1, l_input_2);
-	
-	layer_add_input_layer(l_inner_2, l_input_1);
-	layer_add_input_layer(l_inner_2, l_input_2);
-	layer_add_input_layer(l_inner_2, l_inner_1);
-
-	layer_add_input_layer(l_output_1, l_inner_2);
-	
-	layer_add_input_layer(l_output_2, l_inner_1);
-	layer_add_input_layer(l_output_2, l_inner_2);
+	const char* neuron_class_name = "LIF NEURON";
+	const char* synapse_class_name = "DEFAULT SYN";
 
 	Network* network = network_create();
+	network_add_neuron_class(network, neuron_class_create(neuron_class_name, LIF_NEURON));
+	network_add_synapse_class(network, synapse_class_create_default(synapse_class_name));
+	NeuronClass* n_class = network_get_neuron_class_by_name(network, neuron_class_name);
+	SynapseClass* s_class = network_get_synapse_class_by_name(network, synapse_class_name);
+	
+	Layer* l_input_1 = layer_create_fully_connected(10, n_class, "l_input_1");
+	Layer* l_input_2 = layer_create_fully_connected(100, n_class, "l_input_2");
+	Layer* l_inner_1 = layer_create_fully_connected(100, n_class, "l_inner_1");
+	Layer* l_inner_2 = layer_create_fully_connected(100, n_class, "l_inner_2");
+	Layer* l_output_1 = layer_create_fully_connected(100, n_class, "l_output_1");
+	Layer* l_output_2 = layer_create_fully_connected(10, n_class, "l_output_2");
+
+	layer_add_input_layer(l_inner_1, l_input_1, s_class);
+	layer_add_input_layer(l_inner_1, l_input_2, s_class);
+	
+	layer_add_input_layer(l_inner_2, l_input_1, s_class);
+	layer_add_input_layer(l_inner_2, l_input_2, s_class);
+	layer_add_input_layer(l_inner_2, l_inner_1, s_class);
+
+	layer_add_input_layer(l_output_1, l_inner_2, s_class);
+	
+	layer_add_input_layer(l_output_2, l_inner_1, s_class);
+	layer_add_input_layer(l_output_2, l_inner_2, s_class);
+
 	network_add_layer(network, l_input_1, TRUE, TRUE, FALSE);
 	network_add_layer(network, l_input_2, TRUE, TRUE, FALSE);
 	network_add_layer(network, l_inner_1, TRUE, FALSE, FALSE);

@@ -114,15 +114,17 @@ void* stack_top(Stack* stack_p);
 // string have at most 256 chars currently
 #define STRING_LIMIT 256
 BOOL string_is_valid(String* string);
-Status string_init(String* string_p, char* c_string_p);
-String* string_create(char* c_string_p);
-char* string_get_C_string(String* string);
+Status string_init(String* string_p, const char* c_string_p);
+String* string_create(const char* c_string_p);
+const char* string_get_C_string(String* string);
 String* string_copy(String* string);
 void string_reset(String* string_p);
 void string_destroy(String* string_p);
-Array* strings_create(char** strings_pp, uint32_t cnt);
+Array* strings_create(const char** strings_pp, uint32_t cnt);
 void strings_destroy(Array* strings_p);
+
 BOOL string_equal(String* string1_p, String* string2_p);
+BOOL string_equal_C_string(String* string, const char* c_string);
 
 // function for working with paths, will create a new string with independent memory
 String* string_path_join_strings(String* string1, String* string2);
