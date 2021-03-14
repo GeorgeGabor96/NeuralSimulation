@@ -7,8 +7,6 @@
 #include "Containers.h"
 
 
-// TO DO: so if we want non linear networks, need a way to reference a layer by name/index
-
 typedef enum { SPIKES = 0, CURRENT = 1, VOLTAGE = 2 } NetworkValueType;
 
 // Chestia este ca input-ul si output-ul unei retele practic este acelasi structura
@@ -32,7 +30,6 @@ typedef struct Network {
 	Array input_layers;		// one or more, keeps references to @layers
 	Array input_names;		// names of the input layers, reference to @layers->name
 	Array output_names;		// names of the output layers, reference to @layers->name
-	// TODO need to keep them as pointers to avoid bugs when resizing
 	Array synapse_classes;	// keeps references to synaptic classes that should be used by synapses of this network, should be added one by one, network takes ownership
 	Array neuron_classes;	// keeps references to the neuron classes that should be used by neurons of this network, should be added one by one, network takes ownership
 	BOOL compiled;			// if the network has been compiled
