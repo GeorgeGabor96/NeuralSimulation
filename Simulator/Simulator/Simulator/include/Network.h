@@ -33,8 +33,8 @@ typedef struct Network {
 	Array input_names;		// names of the input layers, reference to @layers->name
 	Array output_names;		// names of the output layers, reference to @layers->name
 	// TODO need to keep them as pointers to avoid bugs when resizing
-	Array synapse_classes;	// keeps the synaptic classes that should be used by synapses of this network, should be added one by one, network takes ownership
-	Array neuron_classes;	// keeps the neuron classes that should be used by neuron of this network, should be added one by one, network takes ownership
+	Array synapse_classes;	// keeps references to synaptic classes that should be used by synapses of this network, should be added one by one, network takes ownership
+	Array neuron_classes;	// keeps references to the neuron classes that should be used by neurons of this network, should be added one by one, network takes ownership
 	BOOL compiled;			// if the network has been compiled
 } Network;
 
@@ -73,7 +73,7 @@ uint32_t network_get_layer_idx_by_name(Network* network, char* name);
 
 /*
 * Adding and getting back Synapse and Neuron classes
-* The network takes owner ship by freeing the received memory and copying it into its internal storage, do not use the same pointer after adding a class
+* The network takes ownership by freeing the Synapses and NeuronClasses when it is destroy
 * Retrieving is done using the name of the individual object class, the process is done liniary
 */
 Status network_add_synapse_class(Network* network, SynapseClass* s_class);

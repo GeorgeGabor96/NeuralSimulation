@@ -161,12 +161,18 @@ ERROR
 	return;
 }
 
+
 void neuron_class_destroy(NeuronClass* neuron_class) {
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
 	neuron_class_reset(neuron_class);
 	free(neuron_class);
 ERROR
 	return;
+}
+
+
+void neuron_class_ref_destroy(NeuronClass** neuron_class) {
+	neuron_class_destroy(*neuron_class);
 }
 
 

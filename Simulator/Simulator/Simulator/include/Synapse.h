@@ -59,6 +59,7 @@ SynapseClass* synapse_class_create(const char* name, float rev_potential, float 
 SynapseClass* synapse_class_create_default(const char* name);
 void synapse_class_reset(SynapseClass* synapse_class);
 void synapse_class_destroy(SynapseClass* synapse_class);
+void synapse_class_ref_destroy(SynapseClass** synapse_class);
 
 
 /*************************************************************

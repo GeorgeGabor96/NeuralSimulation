@@ -103,6 +103,11 @@ ERROR
 }
 
 
+void synapse_class_ref_destroy(SynapseClass** synapse_class) {
+	synapse_class_destroy(*synapse_class);
+}
+
+
 /*************************************************************
 * Synapse Functionality
 *************************************************************/

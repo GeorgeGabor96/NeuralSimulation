@@ -61,12 +61,12 @@ BOOL network_is_valid(Network* network) {
 
 	// check each synaptic and neuron class
 	for (i = 0; i < network->synapse_classes.length; ++i) {
-		s_class = (SynapseClass*)array_get(&(network->synapse_classes), i);
-		check(synapse_class_is_valid(s_class), invalid_argument("s_class"));
+		s_class = (*(SynapseClass**)array_get(&(network->synapse_classes), i));
+		check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
 	}
 	for (i = 0; i < network->neuron_classes.length; ++i) {
-		n_class = (NeuronClass*)array_get(&(network->neuron_classes), i);
-		check(neuron_class_is_valid(n_class), invalid_argument("s_class"));
+		n_class = (*(NeuronClass**)array_get(&(network->neuron_classes), i));
+		check(neuron_class_is_valid(n_class) == TRUE, invalid_argument("n_class"));
 	}
 		
 	return TRUE;
@@ -94,9 +94,9 @@ Network* network_create() {
 	check(status == SUCCESS, "Couldn't init @network->input_names");
 	status = array_init(&(network->output_names), 1, 0, sizeof(String*));
 	check(status == SUCCESS, "Couldn't init @network->output_names");
-	status = array_init(&(network->synapse_classes), 1, 0, sizeof(SynapseClass));
+	status = array_init(&(network->synapse_classes), 1, 0, sizeof(SynapseClass*));
 	check(status == SUCCESS, "Couldn't init @network->synapse_classes");
-	status = array_init(&(network->neuron_classes), 1, 0, sizeof(NeuronClass));
+	status = array_init(&(network->neuron_classes), 1, 0, sizeof(NeuronClass*));
 	check(status == SUCCESS, "Couldn't init @network->neuron_classes");
 	network->compiled = FALSE;
 
@@ -128,8 +128,8 @@ void network_destroy(Network* network) {
 	array_reset(&(network->output_layers), NULL);
 	array_reset(&(network->input_names), NULL);
 	array_reset(&(network->output_names), NULL);
-	array_reset(&(network->synapse_classes), synapse_class_reset);
-	array_reset(&(network->neuron_classes), neuron_class_reset);
+	array_reset(&(network->synapse_classes), synapse_class_ref_destroy);
+	array_reset(&(network->neuron_classes), neuron_class_ref_destroy);
 	free(network);
 
 ERROR
@@ -248,14 +248,13 @@ Status network_add_synapse_class(Network* network, SynapseClass* s_class) {
 	check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
 
 	for (i = 0; i < network->synapse_classes.length; ++i) {
-		inner_s_class = (SynapseClass*)array_get(&(network->synapse_classes), i);
+		inner_s_class = (*(SynapseClass**)array_get(&(network->synapse_classes), i));
 		if (string_equal(inner_s_class->name, s_class->name) == TRUE) {
 			log_warning("Already a synapse class with name %s", string_get_C_string(s_class->name));
 		}
 	}
-	status = array_append(&(network->synapse_classes), s_class);
+	status = array_append(&(network->synapse_classes), &s_class);
 	check(status == SUCCESS, "Couldn't add synapse class %s", string_get_C_string(s_class->name));
-	free(s_class); // take ownership
 	return SUCCESS;
 ERROR
 	return FAIL;
@@ -271,15 +270,15 @@ Status network_add_neuron_class(Network* network, NeuronClass* n_class) {
 	check(neuron_class_is_valid(n_class) == TRUE, invalid_argument("n_class"));
 
 	for (i = 0; i < network->neuron_classes.length; ++i) {
-		inner_n_class = (NeuronClass*)array_get(&(network->neuron_classes), i);
+		inner_n_class = (*(NeuronClass**)array_get(&(network->neuron_classes), i));
 		if (string_equal(inner_n_class->name, n_class->name) == TRUE) {
 			log_warning("Already a neuron class with name %s", string_get_C_string(n_class->name));
 			return FAIL;
 		}
 	}
-	status = array_append(&(network->neuron_classes), n_class);
+	status = array_append(&(network->neuron_classes), &n_class);
 	check(status == SUCCESS, "Couldn't add neuron class %s", string_get_C_string(n_class->name));
-	free(n_class); // take ownership
+
 	return SUCCESS;
 ERROR
 	return FAIL;
@@ -294,7 +293,7 @@ SynapseClass* network_get_synapse_class_by_string(Network* network, String* name
 	check(network_is_valid(network) == TRUE, invalid_argument("network"));
 
 	for (i = 0; i < network->synapse_classes.length; ++i) {
-		s_class = (SynapseClass*)array_get(&(network->synapse_classes), i);
+		s_class = (*(SynapseClass**)array_get(&(network->synapse_classes), i));
 		if (string_equal(s_class->name, name) == TRUE) {
 			return s_class;
 		}
@@ -322,7 +321,7 @@ NeuronClass* network_get_neuron_class_by_string(Network* network, String* name) 
 	check(network_is_valid(network) == TRUE, invalid_argument("network"));
 
 	for (i = 0; i < network->neuron_classes.length; ++i) {
-		n_class = (NeuronClass*)array_get(&(network->neuron_classes), i);
+		n_class = (*(NeuronClass**)array_get(&(network->neuron_classes), i));
 		if (string_equal(n_class->name, name) == TRUE) {
 			return n_class;
 		}
