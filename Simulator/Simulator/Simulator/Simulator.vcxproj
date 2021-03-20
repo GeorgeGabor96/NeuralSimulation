@@ -151,7 +151,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\containers\Array.c" />
-    <ClCompile Include="src\callbacks\callback_visualize_layer_neurons.c" />
+    <ClCompile Include="src\callbacks\callback_dump_layer_neurons.c" />
     <ClCompile Include="src\data\data_gen_constant_current.c" />
     <ClCompile Include="src\data\data_gen_random_spikes.c" />
     <ClCompile Include="src\data\data_gen_with_step_between_neurons.c" />
@@ -169,7 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\callbacks\callback.h" />
-    <ClInclude Include="include\callbacks\callback_visualize_layer_neurons.h" />
+    <ClInclude Include="include\callbacks\callback_dump_layer_neurons.h" />
     <ClInclude Include="include\config.h" />
     <ClInclude Include="include\data\DataGen.h" />
     <ClInclude Include="include\data\data_gen_constant_current.h" />

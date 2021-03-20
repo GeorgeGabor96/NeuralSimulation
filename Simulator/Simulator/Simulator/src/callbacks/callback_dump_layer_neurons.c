@@ -1,4 +1,4 @@
-#include "callbacks/callback_visualize_layer_neurons.h"
+#include "callbacks/callback_dump_layer_neurons.h"
 
 #include "utils/MemoryManagement.h"
 #include "Containers.h"
@@ -6,11 +6,11 @@
 #include <time.h>
 
 
-BOOL callback_visualize_layer_neurons_is_valid(Callback* callback);
-void callback_visualize_layer_neurons_update(Callback* callback, Network* net);
-void callback_visualize_layer_neurons_run(Callback* callback, Network* net);
-void callback_visualize_layer_neurons_destroy(Callback* callback);
-void callback_visualize_layer_neurons_reset(Callback* callback);
+BOOL callback_dump_layer_neurons_is_valid(Callback* callback);
+void callback_dump_layer_neurons_update(Callback* callback, Network* net);
+void callback_dump_layer_neurons_run(Callback* callback, Network* net);
+void callback_dump_layer_neurons_destroy(Callback* callback);
+void callback_dump_layer_neurons_reset(Callback* callback);
 
 
 typedef struct C_Data {
@@ -19,20 +19,21 @@ typedef struct C_Data {
 	Array voltages_per_neuron;	// contains an ArrayFloat for every neuron
 	Array spikes_per_neuron;	// contains an ArrayBool for every neuron
 	Array psc_per_neuron;		// contains an ArrayFloat for every neuron
+	BOOL plot;					// if it should also plot the dumped arrays
 } C_Data;
 
 
-Callback* callback_visualize_layer_neurons_create(Layer* layer, const char* output_folder) {
+Callback* callback_dump_layer_neurons_create(Layer* layer, const char* output_folder, BOOL plot) {
 	Callback* callback = NULL;
 	C_Data* data = NULL;
 	Status status = FAIL;
 
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 
-	callback = (Callback*)calloc(1, sizeof(Callback), "callback_visualize_layer_neurons_create callback");
+	callback = (Callback*)calloc(1, sizeof(Callback), "callback_dump_layer_neurons_create callback");
 	check_memory(callback);
 
-	data = (C_Data*)malloc(sizeof(C_Data), "callback_visualize_layer_neurons_create data");
+	data = (C_Data*)malloc(sizeof(C_Data), "callback_dump_layer_neurons_create data");
 	check_memory(data);
 
 	// init the data
@@ -51,13 +52,14 @@ Callback* callback_visualize_layer_neurons_create(Layer* layer, const char* outp
 	os_mkdir(data->output_folder.data);
 
 	data->layer = layer;
+	data->plot = plot;
 
 	callback->data = (void*)data;
-	callback->is_valid = callback_visualize_layer_neurons_is_valid;
-	callback->update = callback_visualize_layer_neurons_update;
-	callback->run = callback_visualize_layer_neurons_run;
-	callback->destroy = callback_visualize_layer_neurons_destroy;
-	callback->reset = callback_visualize_layer_neurons_reset;
+	callback->is_valid = callback_dump_layer_neurons_is_valid;
+	callback->update = callback_dump_layer_neurons_update;
+	callback->run = callback_dump_layer_neurons_run;
+	callback->destroy = callback_dump_layer_neurons_destroy;
+	callback->reset = callback_dump_layer_neurons_reset;
 	return callback;
 
 ERROR
@@ -70,8 +72,8 @@ ERROR
 }
 
 
-void callback_visualize_layer_neurons_reset(Callback* callback) {
-	check(callback_visualize_layer_neurons_is_valid(callback) == TRUE, invalid_argument("callback"));
+void callback_dump_layer_neurons_reset(Callback* callback) {
+	check(callback_dump_layer_neurons_is_valid(callback) == TRUE, invalid_argument("callback"));
 	// free data
 	C_Data* data = (C_Data*)(callback->data);
 	string_reset(&(data->output_folder));
@@ -79,6 +81,7 @@ void callback_visualize_layer_neurons_reset(Callback* callback) {
 	array_of_arrays_reset(&(data->voltages_per_neuron));
 	array_of_arrays_reset(&(data->spikes_per_neuron));
 	array_of_arrays_reset(&(data->psc_per_neuron));
+	data->plot = FALSE;
 	free(callback->data);
 
 	// clear memory
@@ -93,9 +96,9 @@ ERROR
 }
 
 
-void callback_visualize_layer_neurons_destroy(Callback* callback) {
-	check(callback_visualize_layer_neurons_is_valid(callback) == TRUE, invalid_argument("callback"));
-	callback_visualize_layer_neurons_reset(callback);
+void callback_dump_layer_neurons_destroy(Callback* callback) {
+	check(callback_dump_layer_neurons_is_valid(callback) == TRUE, invalid_argument("callback"));
+	callback_dump_layer_neurons_reset(callback);
 	free(callback);
 
 ERROR
@@ -103,7 +106,7 @@ ERROR
 }
 
 
-BOOL callback_visualize_layer_neurons_is_valid(Callback* callback) {
+BOOL callback_dump_layer_neurons_is_valid(Callback* callback) {
 	check(callback != NULL, null_argument("callback"));
 	check(callback->data != NULL, null_argument("callback->data"));
 	check(callback->is_valid != NULL, null_argument("callback->is_valid"));
@@ -125,9 +128,9 @@ ERROR
 }
 
 
-void callback_visualize_layer_neurons_update(Callback* callback, Network* net) {
+void callback_dump_layer_neurons_update(Callback* callback, Network* net) {
 	(net);
-	check(callback_visualize_layer_neurons_is_valid(callback) == TRUE, invalid_argument("callback"));
+	check(callback_dump_layer_neurons_is_valid(callback) == TRUE, invalid_argument("callback"));
 	C_Data* data = (C_Data*)(callback->data);
 	uint32_t i = 0; 
 
@@ -165,9 +168,9 @@ ERROR
 	return;
 }
 
-void callback_visualize_layer_neurons_run(Callback* callback, Network* net) {
+void callback_dump_layer_neurons_run(Callback* callback, Network* net) {
 	(net);
-	check(callback_visualize_layer_neurons_is_valid(callback) == TRUE, invalid_argument("callback"));
+	check(callback_dump_layer_neurons_is_valid(callback) == TRUE, invalid_argument("callback"));
 	uint32_t i = 0;
 	C_Data* data = (C_Data*)(callback->data);
 	ArrayFloat* voltages = NULL;
@@ -205,8 +208,10 @@ void callback_visualize_layer_neurons_run(Callback* callback, Network* net) {
 		string_destroy(data_name);
 	}
 
-	// call the plotting script
-	os_plot_layers(string_get_C_string(&(data->output_folder)));
+	// call the plotting script if necessary
+	if (data->plot == TRUE)
+		os_plot_layers(string_get_C_string(&(data->output_folder)));
+
 ERROR
 	return;
 }
