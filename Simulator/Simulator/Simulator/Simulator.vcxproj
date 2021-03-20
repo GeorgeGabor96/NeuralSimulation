@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClCompile Include="src\containers\Array.c" />
     <ClCompile Include="src\callbacks\callback_dump_layer_neurons.c" />
+    <ClCompile Include="src\data\data_gen_common.c" />
     <ClCompile Include="src\data\data_gen_constant_current.c" />
     <ClCompile Include="src\data\data_gen_random_spikes.c" />
     <ClCompile Include="src\data\data_gen_with_step_between_neurons.c" />

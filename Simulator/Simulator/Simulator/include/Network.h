@@ -7,11 +7,9 @@
 #include "Containers.h"
 
 
-typedef enum { SPIKES = 0, CURRENT = 1, VOLTAGE = 2 } NetworkValueType;
+typedef enum { INVALID_NETWORK_VALUE = 0, SPIKES = 1, CURRENT = 2, VOLTAGE = 3 } NetworkValueType;
+const char* network_value_type_C_string(NetworkValueType type);
 
-// Chestia este ca input-ul si output-ul unei retele practic este acelasi structura
-// caci ca input trebuie un vector de arrays cu valori si un tip (spike sau current)
-// iar la output ai un vector de arrays cu valori si un tip (spike sau voltaj)
 
 // if I add a type to the array and the other structures, i could directly use an array, and i could also verify the type when i receive an array
 typedef struct NetworkValues {
@@ -22,6 +20,7 @@ typedef Array NetworkInputs; // array of NetworkValues
 typedef Array NetworkOutputs; // array of NetworkValues
 
 void network_values_show(Array* values);
+void network_values_destroy(Array* values);
 
 typedef struct Network {
 	// TODO: layer can't keep the full name with them

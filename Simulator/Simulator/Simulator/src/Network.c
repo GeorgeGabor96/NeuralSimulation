@@ -77,6 +77,20 @@ ERROR
 
 
 /*************************************************************
+* Network Valute Type Functionality
+*************************************************************/
+const char* network_value_type_C_string(NetworkValueType type) {
+	const char* name = NULL;
+
+	if (type == INVALID_NETWORK_VALUE) name = "INVALID_NETWORK_VALUE";
+	else if (type == SPIKES) name = "SPIKES";
+	else if (type == CURRENT) name = "CURRENT";
+	else if (type == VOLTAGE) name = "VOLTAGE";
+	else name = "UNKNOWN_NETWORK_VALUE";
+	return name;
+}
+
+/*************************************************************
 * NETWORK FUNCTIONALITY
 *************************************************************/
 Network* network_create() {
@@ -658,4 +672,21 @@ void network_values_show(Array* values) {
 			array_show(&(net_values->values), show_float);
 		}
 	}
+}
+
+
+void network_values_destroy(Array* values) {
+	check(array_is_valid(values) == TRUE, invalid_argument("values"));
+	uint32_t i = 0;
+	NetworkValues* net_vals = NULL;
+
+	for (i = 0; i < values->length; ++i) {
+		net_vals = (NetworkValues*)array_get(values, i);
+		net_vals->type = INVALID_NETWORK_VALUE;
+		array_reset(&(net_vals->values), NULL);
+	}
+	array_destroy(values, NULL);
+
+ERROR
+	return;
 }
