@@ -77,6 +77,20 @@ ERROR
 
 
 /*************************************************************
+* Network Valute Type Functionality
+*************************************************************/
+const char* network_value_type_C_string(NetworkValueType type) {
+	const char* name = NULL;
+
+	if (type == INVALID_NETWORK_VALUE) name = "INVALID_NETWORK_VALUE";
+	else if (type == SPIKES) name = "SPIKES";
+	else if (type == CURRENT) name = "CURRENT";
+	else if (type == VOLTAGE) name = "VOLTAGE";
+	else name = "UNKNOWN_NETWORK_VALUE";
+	return name;
+}
+
+/*************************************************************
 * NETWORK FUNCTIONALITY
 *************************************************************/
 Network* network_create() {
