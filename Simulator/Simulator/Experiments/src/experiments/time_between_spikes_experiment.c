@@ -6,7 +6,7 @@
 
 void time_between_spikes_experiment() {
 	char result_path[256] = { 0 };
-	sprintf(result_path, "%s\\\\experiments_nice_plots\\time_between_spikes_experiment\\check_if_works", result_base_folder);
+	sprintf(result_path, "%s\\\\experiments_nice_plots\\time_between_spikes_experiment\\tau_l1_10_5_n_tau_l2_100_time_between_20", result_base_folder);
 
 	// create network
 	Network* net = network_create();
