@@ -14,9 +14,9 @@ Network* network_3_L_3_3_3() {
 	layer_add_input_layer(layer_2, layer_1, s_class);
 	layer_add_input_layer(layer_3, layer_2, s_class);
 	
-	network_add_layer(net, layer_1, TRUE, TRUE, FALSE);
-	network_add_layer(net, layer_2, TRUE, FALSE, FALSE);
-	network_add_layer(net, layer_3, TRUE, FALSE, TRUE);
+	network_add_layer(net, layer_1, TRUE, FALSE);
+	network_add_layer(net, layer_2, FALSE, FALSE);
+	network_add_layer(net, layer_3, FALSE, TRUE);
 	network_compile(net);
 	network_summary(net);
 

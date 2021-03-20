@@ -138,7 +138,7 @@ ERROR
 
 
 // layer functionality
-Status network_add_layer(Network* network, Layer* layer, BOOL should_free, BOOL is_input, BOOL is_output) {
+Status network_add_layer_keep_valid(Network* network, Layer* layer, BOOL is_input, BOOL is_output) {
 	check(network_is_valid(network) == TRUE, invalid_argument("network"));
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 
@@ -146,11 +146,9 @@ Status network_add_layer(Network* network, Layer* layer, BOOL should_free, BOOL 
 	Status status = FAIL;
 	String* layer_name = NULL;
 	layer->is_input = FALSE;
-	
+
 	status = array_append(&(network->layers), layer);
 	check(status == SUCCESS, "Could not add layer");
-	// may need to remove the memory that contain the info about the layer, which we copied
-	if (should_free == TRUE) free(layer);
 
 	if (is_input == TRUE) {
 		network_layer = (Layer*)array_get(&(network->layers), network->layers.length - 1);
@@ -170,6 +168,12 @@ Status network_add_layer(Network* network, Layer* layer, BOOL should_free, BOOL 
 
 ERROR
 	return FAIL;
+}
+
+Status network_add_layer(Network* network, Layer* layer, BOOL is_input, BOOL is_output) {
+	Status status = network_add_layer_keep_valid(network, layer, is_input, is_output);
+	if (status == SUCCESS) free(layer);
+	return status;
 }
 
 

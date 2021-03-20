@@ -43,21 +43,21 @@ TestStatus network_compile_general_use_case_test() {
 	layer_add_input_layer(l3, l2, s_class);
 	
 	/*----------network_add_layer----------*/
-	s_status = network_add_layer(network, l3, TRUE, FALSE, TRUE);
+	s_status = network_add_layer(network, l3, FALSE, TRUE);
 	assert(s_status == SUCCESS, "Couldn't add @l3");
 	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
 	assert(network->layers.length == 1, "@network->layers.length is %u, not 1", network->layers.length);
 	assert(network->input_names.length == 0, "@network->input_names.length is %u, not 0", network->input_names.length);
 	assert(network->output_names.length == 1, "@network->output_names.length is %u, not 1", network->output_names.length);
 
-	s_status = network_add_layer(network, l2, TRUE, FALSE, FALSE);
+	s_status = network_add_layer(network, l2, FALSE, FALSE);
 	assert(s_status == SUCCESS, "Couldn't add @l2");
 	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
 	assert(network->layers.length == 2, "@network->layers.length is %u, not 2", network->layers.length);
 	assert(network->input_names.length == 0, "@network->input_names.length is %u, not 0", network->input_names.length);
 	assert(network->output_names.length == 1, "@network->output_names.length is %u, not 1", network->output_names.length);
 
-	s_status = network_add_layer(network, l1, TRUE, TRUE, FALSE);
+	s_status = network_add_layer(network, l1, TRUE, FALSE);
 	assert(s_status == SUCCESS, "Couldn't add l1");
 	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
 	assert(network->layers.length == 3, "@network->layers.length is %u, not 3", network->layers.length);
@@ -146,8 +146,8 @@ TestStatus network_compile_general_use_case_test() {
 	assert(layer_idx == 2, "@layer_idx is %u, not 2", layer_idx);
 
 	/*----------corner_cases----------*/
-	assert(network_add_layer(NULL, layer, FALSE, FALSE, FALSE) == FAIL, "Should fail for invalid @network");
-	assert(network_add_layer(network, NULL, FALSE, FALSE, FALSE) == FAIL, "Should fail for invalid @layer");
+	assert(network_add_layer(NULL, layer, FALSE, FALSE) == FAIL, "Should fail for invalid @network");
+	assert(network_add_layer(network, NULL, FALSE, FALSE) == FAIL, "Should fail for invalid @layer");
 
 	assert(network_get_layer_by_idx(NULL, 0) == NULL, "Should return NULL for invalid @network");
 	assert(network_get_layer_by_idx(network, 100) == NULL, "Should return NULL for invalid @layer_idx");
@@ -193,9 +193,9 @@ TestStatus network_step_test() {
 	layer_add_input_layer(layer3, layer2, s_class);
 
 	// add layers into a network
-	network_add_layer(network, layer1, TRUE, TRUE, FALSE);
-	network_add_layer(network, layer2, TRUE, FALSE, FALSE);
-	network_add_layer(network, layer3, TRUE, FALSE, TRUE);
+	network_add_layer(network, layer1, TRUE, FALSE);
+	network_add_layer(network, layer2, FALSE, FALSE);
+	network_add_layer(network, layer3, FALSE, TRUE);
 	assert(network->layers.length == 3, invalid_argument("network->layers.length"));
 	network_compile(network);
 	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
@@ -262,12 +262,12 @@ TestStatus network_summary_test() {
 	layer_add_input_layer(l_output_2, l_inner_1, s_class);
 	layer_add_input_layer(l_output_2, l_inner_2, s_class);
 
-	network_add_layer(network, l_input_1, TRUE, TRUE, FALSE);
-	network_add_layer(network, l_input_2, TRUE, TRUE, FALSE);
-	network_add_layer(network, l_inner_1, TRUE, FALSE, FALSE);
-	network_add_layer(network, l_inner_2, TRUE, FALSE, FALSE);
-	network_add_layer(network, l_output_1, TRUE, FALSE, TRUE);
-	network_add_layer(network, l_output_2, TRUE, FALSE, TRUE);
+	network_add_layer(network, l_input_1, TRUE, FALSE);
+	network_add_layer(network, l_input_2, TRUE, FALSE);
+	network_add_layer(network, l_inner_1, FALSE, FALSE);
+	network_add_layer(network, l_inner_2, FALSE, FALSE);
+	network_add_layer(network, l_output_1, FALSE, TRUE);
+	network_add_layer(network, l_output_2, FALSE, TRUE);
 
 	network_summary(network);
 	network_compile(network);

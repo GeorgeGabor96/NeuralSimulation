@@ -20,9 +20,9 @@ Network* create_basic_network() {
 	layer_add_input_layer(layer_out, layer_i1, s_class);
 	layer_add_input_layer(layer_out, layer_i2, s_class);
 
-	network_add_layer(net, layer_i1, TRUE, TRUE, FALSE);
-	network_add_layer(net, layer_i2, TRUE, TRUE, FALSE);
-	network_add_layer(net, layer_out, TRUE, FALSE, TRUE);
+	network_add_layer(net, layer_i1, TRUE, FALSE);
+	network_add_layer(net, layer_i2, TRUE, FALSE);
+	network_add_layer(net, layer_out, FALSE, TRUE);
 	network_compile(net);
 	network_summary(net);
 
@@ -60,6 +60,7 @@ TestStatus data_generator_constant_current_test() {
 
 		for (j = 0; j < element->duration; ++j) {
 			inputs = data_element_get_values(element, j);
+			assert(inputs != NULL, null_argument("inputs"));
 			assert(array_is_valid(inputs) == TRUE, invalid_argument("inputs"));
 			assert(inputs->length == net->input_layers.length, "number of inputs should be %u not %u", net->input_layers.length, inputs->length);
 
@@ -126,6 +127,7 @@ TestStatus data_generator_random_spikes_test() {
 
 		for (j = 0; j < element->duration; ++j) {
 			inputs = data_element_get_values(element, j);
+			assert(inputs != NULL, null_argument("inputs"));
 			assert(array_is_valid(inputs) == TRUE, invalid_argument("inputs"));
 			assert(inputs->length == net->input_layers.length, "number of inputs should be %u not %u", net->input_layers.length, inputs->length);
 
@@ -192,6 +194,7 @@ TestStatus data_generator_with_step_between_neurons() {
 
 		for (j = 0; j < element->duration; ++j) {
 			inputs = data_element_get_values(element, j);
+			assert(inputs != NULL, null_argument("inputs"));
 			assert(array_is_valid(inputs) == TRUE, invalid_argument("inputs"));
 			assert(inputs->length == net->input_layers.length, "number of inputs should be %u not %u", net->input_layers.length, inputs->length);
 

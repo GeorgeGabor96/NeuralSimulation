@@ -19,8 +19,8 @@ TestStatus simulator_infer_test() {
 	Layer* layer_output = layer_create_fully_connected(1, n_class, "layer_output");
 	layer_add_input_layer(layer_output, layer_input, s_class);
 
-	network_add_layer(net, layer_input, TRUE, TRUE, FALSE);
-	network_add_layer(net, layer_output, TRUE, FALSE, TRUE);
+	network_add_layer(net, layer_input, TRUE, FALSE);
+	network_add_layer(net, layer_output, FALSE, TRUE);
 	network_compile(net);
 	network_summary(net);
 
