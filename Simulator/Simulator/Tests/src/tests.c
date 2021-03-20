@@ -29,7 +29,7 @@ TestInfo tests[] = {
 	{ data_generator_with_step_between_neurons, "data_generator_with_step_between_neurons" },
 
 	// callbacks
-	{ callbacks_visualize_layer_neurons_test, "callbacks_visualize_layer_neurons_test" },
+	{ callbacks_dump_layer_neurons_test, "callbacks_dump_layer_neurons_test" },
 
 	// OS
 	{ os_mkdir_rmdir_test, "os_mkdir_rmdir_test" },
