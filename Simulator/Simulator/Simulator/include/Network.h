@@ -51,16 +51,21 @@ Network* network_create();
 void network_destroy(Network* network);
 
 /*
-* This will copy the content of the @layer structure (shallow copy).
-* The user need to decide if the memory location that holds the @layer structure is still nedeed
-*
-* Setting @should_free:
-* should_free -> does a free(layer)
-* 1. If the layer was on the stack then set @should_free = FALSE
-* 2. If the layer was on the heap and the @layer structure is still needed then set @should_free = FALSE
-* 3. If the layer was on the heap and the @layer structure is not needed anymore set @should_free = TRUE
+* This will copy the content of the @layer structure (shallow copy) and if everything works it will free (take ownership) the @layer pointer
+* 
+* Implemented using @network_add_layer_keep_valid
 */
-Status network_add_layer(Network* network, Layer* layer, BOOL should_free, BOOL is_input, BOOL is_output);
+Status network_add_layer(Network* network, Layer* layer, BOOL is_input, BOOL is_output);
+/*
+* Alternative to @network_add_layer when user wants to keep the @layer pointer valid
+* No free will be performend but the @network will still destroy the layer itself
+* 
+* Use Cases: when the original @layer was on the stack
+*			 if @layer was on the heap, probably its better to used @network_get_layer_... functions to get it back, instead of using this function
+*/
+Status network_add_layer_keep_valid(Network* network, Layer* layer, BOOL is_input, BOOL is_output);
+
+
 
 Layer* network_get_layer_by_idx(Network* network, uint32_t layer_idx);
 Layer* network_get_layer_by_string(Network* network, String* name);
