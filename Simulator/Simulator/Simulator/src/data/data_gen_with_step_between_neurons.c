@@ -5,14 +5,13 @@
 /*************************************************************
 * DATA ELEMENT FUNCTIONALITY
 *************************************************************/
-BOOL data_element_with_step_between_neurons_is_valid(DataElement* element);
-void data_element_with_step_between_neurons_destroy(DataElement* element);
-NetworkInputs* data_element_with_step_between_neurons_get_values(DataElement* element, uint32_t time);
-
-
 typedef struct DataElementData {
 	ArrayUint32 inputs_spikes_times;
 }DataElementData;
+
+BOOL data_element_with_step_between_data_is_valid(DataElementData* data);
+void data_element_with_step_between_data_destroy(DataElementData* data);
+NetworkInputs* data_element_with_step_between_neurons_get_values(DataElement* element, uint32_t time);
 
 
 // need the network be know how many inputs to generate and for each input how many currents to make
@@ -53,8 +52,8 @@ DataElement* data_element_with_step_between_neurons_create(Network* net, uint32_
 	check_memory(element);
 	element->duration = duration;
 	element->data = data;
-	element->is_valid = data_element_with_step_between_neurons_is_valid;
-	element->destroy = data_element_with_step_between_neurons_destroy;
+	element->data_is_valid = data_element_with_step_between_data_is_valid;
+	element->data_destroy = data_element_with_step_between_data_destroy;
 	element->get_values = data_element_with_step_between_neurons_get_values;
 	element->remove_values = data_element_base_remove_values;
 
@@ -74,10 +73,7 @@ ERROR
 }
 
 
-BOOL data_element_with_step_between_neurons_is_valid(DataElement* element) {
-	check(data_element_base_is_valid(element) == TRUE, invalid_argument("element"));
-
-	DataElementData* data = (DataElementData*)element->data;
+BOOL data_element_with_step_between_data_is_valid(DataElementData* data) {
 	check(array_is_valid(&(data->inputs_spikes_times)) == TRUE, invalid_argument("data->inputs_spikes_times"));
 	for (uint32_t i = 0; i < data->inputs_spikes_times.length; i++) 
 		check(array_is_valid(array_get(&(data->inputs_spikes_times), i)) == TRUE, "Array %u in @data->inputs_spikes_times is invalid", i);
@@ -88,25 +84,11 @@ ERROR
 }
 
 
-void data_element_with_step_between_neurons_destroy(DataElement* element) {
-	check(data_element_is_valid(element) == TRUE, invalid_argument("element"));
-
-	DataElementData* data = (DataElementData*)element->data;
-	
+void data_element_with_step_between_data_destroy(DataElementData* data) {
 	for (uint32_t i = 0; i < data->inputs_spikes_times.length; ++i)
 		array_reset(array_get(&(data->inputs_spikes_times), i), NULL);
 	array_reset(&(data->inputs_spikes_times), NULL);
 	free(data);
-
-	element->duration = 0;
-	element->data = NULL;
-	element->is_valid = NULL;
-	element->destroy = NULL;
-	element->get_values = NULL;
-	free(element);
-
-ERROR
-	return;
 }
 
 
@@ -158,15 +140,15 @@ ERROR
 /*************************************************************
 * DATA GENERATOR FUNCTIONALITY
 *************************************************************/
-BOOL data_generator_with_step_between_neurons_is_valid(DataGenerator* data);
-void data_generator_with_step_between_neurons_destroy(DataGenerator* data);
-DataElement* data_generator_with_step_between_neurons_get_elem(DataGenerator* data, uint32_t idx);
-
 typedef struct DataGeneratorData {
 	uint32_t step_between_neurons;
 	uint32_t duration;
 	Network* net;
 } DataGeneratorData;
+
+BOOL data_generator_with_step_between_neurons_data_is_valid(DataGeneratorData* data);
+void data_generator_with_step_between_neurons_data_destroy(DataGeneratorData* data);
+DataElement* data_generator_with_step_between_neurons_get_elem(DataGeneratorData* data, uint32_t idx);
 
 
 DataGenerator* data_generator_with_step_between_neurons_create(uint32_t n_examples, Network* net, uint32_t step_between_neurons, uint32_t duration) {
@@ -187,8 +169,8 @@ DataGenerator* data_generator_with_step_between_neurons_create(uint32_t n_exampl
 	check_memory(data_gen);
 	data_gen->length = n_examples;
 	data_gen->data = data;
-	data_gen->is_valid = data_generator_with_step_between_neurons_is_valid;
-	data_gen->destroy = data_generator_with_step_between_neurons_destroy;
+	data_gen->data_is_valid = data_generator_with_step_between_neurons_data_is_valid;
+	data_gen->data_destroy = data_generator_with_step_between_neurons_data_destroy;
 	data_gen->get_elem = data_generator_with_step_between_neurons_get_elem;
 
 	return data_gen;
@@ -201,15 +183,7 @@ ERROR
 }
 
 
-BOOL data_generator_with_step_between_neurons_is_valid(DataGenerator* data_gen) {
-	check(data_gen != NULL, null_argument("data_gen"));
-	check(data_gen->length > 0, "@data_gen->lenght == 0");
-	check(data_gen->data != NULL, null_argument("data_gen->data"));
-	check(data_gen->is_valid != NULL, null_argument("data_gen->is_valid"));
-	check(data_gen->destroy != NULL, null_argument("data_gen->destroy"));
-	check(data_gen->get_elem != NULL, null_argument("data_gen->get_elem"));
-
-	DataGeneratorData* data = data_gen->data;
+BOOL data_generator_with_step_between_neurons_data_is_valid(DataGeneratorData* data) {
 	check(data->duration > 0, "@data->duration == 0");
 	check(network_is_valid(data->net) == TRUE, invalid_argument("data->net"));
 	check(data->step_between_neurons > 0, "@data->step_between_neurons == 0");
@@ -219,31 +193,14 @@ ERROR
 	return FALSE;
 }
 
-void data_generator_with_step_between_neurons_destroy(DataGenerator* data_gen) {
-	check(data_generator_is_valid(data_gen) == TRUE, invalid_argument("data_gen"));
-	DataGeneratorData* data = (DataGeneratorData*)data_gen->data;
+void data_generator_with_step_between_neurons_data_destroy(DataGeneratorData* data) {
 	data->duration = 0;
 	data->net = NULL;
 	data->step_between_neurons = 0;
 	free(data);
-
-	data_gen->data = NULL;
-	data_gen->destroy = NULL;
-	data_gen->get_elem = NULL;
-	data_gen->is_valid = NULL;
-	data_gen->length = 0;
-	free(data_gen);
-
-ERROR
-	return;
 }
 
 
-DataElement* data_generator_with_step_between_neurons_get_elem(DataGenerator* data_gen, uint32_t idx) {
-	check(data_generator_is_valid(data_gen) == TRUE, invalid_argument("data_gen"));
-	check(data_gen->length > idx, "data_gen->length <= idx");  // should not go over the dataset
-	DataGeneratorData* data = (DataGeneratorData*)data_gen->data;
+DataElement* data_generator_with_step_between_neurons_get_elem(DataGeneratorData* data, uint32_t idx) {
 	return data_element_with_step_between_neurons_create(data->net, data->step_between_neurons, data->duration);
-ERROR
-	return NULL;
 }

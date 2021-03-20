@@ -19,22 +19,23 @@ typedef struct DataElement DataElement;
 * DATA GENERATOR FUNCTIONALITY
 *************************************************************/
 typedef void __DataGeneratorData;
-typedef BOOL(*__data_generator_is_valid)(DataGenerator* data);
-typedef void(*__data_generator_destroy)(DataGenerator* data);
-typedef DataElement* (*__data_generator_get_elem)(DataGenerator* data, uint32_t idx);
+typedef BOOL(*__data_generator_data_is_valid)(__DataGeneratorData* data);
+typedef void(*__data_generator_data_destroy)(__DataGeneratorData* data);
+typedef DataElement* (*__data_generator_get_elem)(__DataGeneratorData* data, uint32_t idx);
 
 // MAY NOT NEED THIS TO BE POLYMORPHIC
 struct DataGenerator {
 	uint32_t length;							// need to know the number of elements
 	__DataGeneratorData* data;					// for aditional information
-	__data_generator_is_valid is_valid;
-	__data_generator_destroy destroy;
+	__data_generator_data_is_valid data_is_valid;
+	__data_generator_data_destroy data_destroy;
 	__data_generator_get_elem get_elem;
 };
 
-#define data_generator_is_valid(data) ((data) != NULL && (data)->is_valid != NULL ? (data)->is_valid(data) : FALSE)
-#define data_generator_destroy(data) ((data) != NULL && (data)->destroy != NULL ? (data)->destroy(data) : 0)
-#define data_generator_get_element(data, idx) ((data) != NULL && (data)->get_elem != NULL ? (data)->get_elem(data, idx) : NULL)
+// common functionality
+BOOL data_generator_is_valid(DataGenerator* generator);
+void data_generator_destroy(DataGenerator* generator);
+DataElement* data_generator_get_element(DataGenerator* generator, uint32_t idx);
 
 
 /*************************************************************
@@ -64,6 +65,7 @@ typedef struct DataElement {
 // common functionality
 BOOL data_element_is_valid(DataElement* element);
 void data_element_destroy(DataElement* element);
+
 void data_element_base_remove_values(DataElement* element, NetworkInputs* inputs);
 
 
