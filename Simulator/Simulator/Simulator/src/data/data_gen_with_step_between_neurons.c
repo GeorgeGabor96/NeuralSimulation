@@ -8,7 +8,6 @@
 BOOL data_element_with_step_between_neurons_is_valid(DataElement* element);
 void data_element_with_step_between_neurons_destroy(DataElement* element);
 NetworkInputs* data_element_with_step_between_neurons_get_values(DataElement* element, uint32_t time);
-void data_element_with_step_between_neurons_remove_values(DataElement* element, NetworkInputs* inputs);
 
 
 typedef struct DataElementData {
@@ -57,7 +56,7 @@ DataElement* data_element_with_step_between_neurons_create(Network* net, uint32_
 	element->is_valid = data_element_with_step_between_neurons_is_valid;
 	element->destroy = data_element_with_step_between_neurons_destroy;
 	element->get_values = data_element_with_step_between_neurons_get_values;
-	element->remove_values = data_element_with_step_between_neurons_remove_values;
+	element->remove_values = data_element_base_remove_values;
 
 	return element;
 
@@ -76,12 +75,7 @@ ERROR
 
 
 BOOL data_element_with_step_between_neurons_is_valid(DataElement* element) {
-	check(element != NULL, null_argument("element"));
-	check(element->duration > 0, "@element->duration == 0");
-	check(element->data != NULL, null_argument("element->data"));
-	check(element->is_valid != NULL, null_argument("element->is_valid"));
-	check(element->destroy != NULL, null_argument("element->destroy"));
-	check(element->get_values != NULL, null_argument("element->get_values"));
+	check(data_element_base_is_valid(element) == TRUE, invalid_argument("element"));
 
 	DataElementData* data = (DataElementData*)element->data;
 	check(array_is_valid(&(data->inputs_spikes_times)) == TRUE, invalid_argument("data->inputs_spikes_times"));
@@ -156,26 +150,8 @@ NetworkInputs* data_element_with_step_between_neurons_get_values(DataElement* el
 
 ERROR
 	if (inputs != NULL)
-		data_element_with_step_between_neurons_remove_values(element, inputs);
+		element->remove_values(element, inputs);
 	return NULL;
-}
-
-// duplicate code
-void data_element_with_step_between_neurons_remove_values(DataElement* element, NetworkInputs* inputs) {
-	(element);
-	check(array_is_valid(inputs) == TRUE, invalid_argument("inputs"));
-	uint32_t i = 0;
-	NetworkValues* net_vals = NULL;
-
-	for (i = 0; i < inputs->length; ++i) {
-		net_vals = (NetworkValues*)array_get(inputs, i);
-		net_vals->type = 0;
-		array_reset(&(net_vals->values), NULL);
-	}
-	array_destroy(inputs, NULL);
-
-ERROR
-	return;
 }
 
 

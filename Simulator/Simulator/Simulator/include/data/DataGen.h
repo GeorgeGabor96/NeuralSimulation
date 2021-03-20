@@ -41,8 +41,8 @@ struct DataGenerator {
 * DATA ELEMENT FUNCTIONALITY
 *************************************************************/
 typedef void __DataElementData;
-typedef BOOL(*__data_element_is_valid)(DataElement* element);
-typedef void(*__data_element_destroy)(DataElement* element);
+typedef BOOL(*__data_element_data_is_valid)(__DataElementData* data);
+typedef void(*__data_element_data_destroy)(__DataElementData* element);
 
 // get the values for the network input
 typedef NetworkInputs* (*__data_element_get_values)(DataElement* element, uint32_t time);
@@ -51,15 +51,21 @@ typedef void(*__date_element_remove_values)(DataElement* element, NetworkInputs*
 typedef struct DataElement {
 	uint32_t duration;						// how much ms
 	__DataElementData* data;
-	__data_element_is_valid is_valid;
-	__data_element_destroy destroy;
+	__data_element_data_is_valid data_is_valid;
+	__data_element_data_destroy data_destroy;
 	__data_element_get_values get_values;
 	__date_element_remove_values remove_values;
 }DataElement;
 
-#define data_element_is_valid(element) ((element) != NULL && (element)->is_valid != NULL ? (element)->is_valid(element) : FALSE)
-#define data_element_destroy(element) ((element) != NULL && (element)->destroy != NULL ? (element)->destroy(element) : 0)
 #define data_element_get_values(element, t) ((element) != NULL && (element)->get_values != NULL ? (element)->get_values(element, t) : NULL)
 #define data_element_remove_values(element, values) ((element) != NULL && (element->remove_values) != NULL ? (element)->remove_values(element, values) : 0)
+
+
+// common functionality
+BOOL data_element_is_valid(DataElement* element);
+void data_element_destroy(DataElement* element);
+void data_element_base_remove_values(DataElement* element, NetworkInputs* inputs);
+
+
 
 #endif // __DATA_GEN_H__

@@ -110,5 +110,8 @@
     <ClCompile Include="src\callbacks\callback_dump_layer_neurons.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\data\data_gen_common.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

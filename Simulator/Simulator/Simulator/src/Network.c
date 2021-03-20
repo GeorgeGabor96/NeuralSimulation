@@ -659,3 +659,20 @@ void network_values_show(Array* values) {
 		}
 	}
 }
+
+
+void network_values_destroy(Array* values) {
+	check(array_is_valid(values) == TRUE, invalid_argument("values"));
+	uint32_t i = 0;
+	NetworkValues* net_vals = NULL;
+
+	for (i = 0; i < values->length; ++i) {
+		net_vals = (NetworkValues*)array_get(values, i);
+		net_vals->type = INVALID_NETWORK_VALUE;
+		array_reset(&(net_vals->values), NULL);
+	}
+	array_destroy(values, NULL);
+
+ERROR
+	return;
+}
