@@ -61,7 +61,7 @@ Status network_add_layer(Network* network, Layer* layer, BOOL is_input, BOOL is_
 * No free will be performend but the @network will still destroy the layer itself
 * 
 * Use Cases: when the original @layer was on the stack
-*			 if @layer was on the heap, probably its better to used @network_get_layer_... functions to get it back, instead of using this function
+*			 if @layer was on the heap, probably its better to use @network_get_layer_... functions to get it back, instead of using this function
 */
 Status network_add_layer_keep_valid(Network* network, Layer* layer, BOOL is_input, BOOL is_output);
 
