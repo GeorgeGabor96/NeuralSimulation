@@ -1,6 +1,6 @@
 #include "simulator_tests.h"
 #include "Simulator.h"
-#include "callbacks/callback_visualize_layer_neurons.h"
+#include "callbacks/callback_dump_layer_neurons.h"
 #include "data/data_gen_constant_current.h"
 #include "utils/os.h"
 
@@ -29,7 +29,7 @@ TestStatus simulator_infer_test() {
 
 	// create callbacks
 	layer_output = *((Layer**)array_get(&(net->output_layers), 0));
-	Callback* callback = callback_visualize_layer_neurons_create(layer_output, ".\\simulator_visu");
+	Callback* callback = callback_dump_layer_neurons_create(layer_output, ".\\simulator_visu", FALSE);
 
 	// create the simulator
 	Simulator* simulator = simulator_create(generator, net);

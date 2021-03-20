@@ -3,7 +3,7 @@
 
 #include "../testing.h"
 
-TestStatus callbacks_visualize_layer_neurons_test();
+TestStatus callbacks_dump_layer_neurons_test();
 
 
 #endif //__CALLBACK_TESTS__

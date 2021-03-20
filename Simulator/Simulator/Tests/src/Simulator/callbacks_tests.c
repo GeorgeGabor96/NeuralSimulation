@@ -2,12 +2,12 @@
 
 #include "utils/os.h"
 #include "callbacks/callback.h"
-#include "callbacks/callback_visualize_layer_neurons.h"
+#include "callbacks/callback_dump_layer_neurons.h"
 
-TestStatus callbacks_visualize_layer_neurons_test() {
+TestStatus callbacks_dump_layer_neurons_test() {
 	NeuronClass* n_class = neuron_class_create("TEST NEURON", LIF_NEURON);
 	Layer* layer = layer_create_fully_connected(10, n_class, "layer_visu");
-	Callback* callback_visu = callback_visualize_layer_neurons_create(layer, ".\\callback_visu");
+	Callback* callback_visu = callback_dump_layer_neurons_create(layer, ".\\callback_visu", FALSE);
 	ArrayFloat* constant_current = array_ones_float(10);
 	assert(callback_is_valid(callback_visu) == TRUE, invalid_argument("callback"));
 
