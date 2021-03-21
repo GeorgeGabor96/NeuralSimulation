@@ -1,5 +1,30 @@
 import numpy as np
+import os
 import matplotlib.pyplot as plt
+
+def reset_plot():
+    plt.clf()
+    plt.cla()
+    plt.close()
+
+
+class NetworkSpikesPlot:
+    def __init__(self, output_file):
+        reset_plot()
+        #plt.figure(figsize=(15, 10))
+        self.output_file = output_file
+
+    def plot_points(self, x_coord, y_coord):
+        plt.scatter(x_coord, y_coord, color='black', s=1)
+
+    def plot_line(self, x_coord, y_coord):
+        plt.plot(x_coord, y_coord, color='black')
+
+    def plot(self):
+        plt.axis('scaled')
+        os.makedirs(os.path.split(self.output_file)[0], exist_ok=True)
+        plt.savefig(self.output_file, dpi=100)
+        reset_plot()
 
 
 def line_plot(output_file, y_data, line_label, x_label, y_label, title):
@@ -46,6 +71,4 @@ def line_plot(output_file, y_data, line_label, x_label, y_label, title):
 
     plt.savefig(output_file, dpi=100)
 
-    plt.clf()
-    plt.cla()
-    plt.close()
+    reset_plot()

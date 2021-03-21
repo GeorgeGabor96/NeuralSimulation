@@ -1,0 +1,6 @@
+layers_folder: d:\repositories\Simulator\experiments\experiments_nice_plots\time_between_spikes_experiment\check
+title: check
+layers:
+  - layer_in
+  - layer_out
+binaries_prefix: spikes
