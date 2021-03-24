@@ -123,6 +123,7 @@ void simulator_infer(Simulator* sim) {
 
 		network_clear_state(sim->network);
 		for (time = 0; time < element->duration; ++time) {
+			printf("%u\r", time);
 			inputs = data_element_get_values(element, time);
 			check(array_is_valid(inputs) == TRUE, invalid_argument("inputs"));
 			
