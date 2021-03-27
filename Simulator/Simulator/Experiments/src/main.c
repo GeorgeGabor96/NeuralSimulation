@@ -4,7 +4,7 @@ const char* result_base_folder = "..\\..\\..\\..\\experiments";
 
 
 int main() {
-	time_between_spikes_experiment();
+	synfire_chain_random_spikes();
 
 	return 0;
 }

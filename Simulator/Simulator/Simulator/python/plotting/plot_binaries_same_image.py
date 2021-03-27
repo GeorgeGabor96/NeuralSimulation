@@ -1,10 +1,11 @@
 import argparse
-import yaml
+
 import os
 import sys
 sys.path.append(os.path.join(os.path.realpath(__file__).split('python')[0], 'python'))
 from utils.utils_simulator import parse_array_file
 from utils.utils_matplotlib import line_plot
+from utils.utils_config import parse_yaml_config
 
 
 def get_args():
@@ -14,12 +15,6 @@ def get_args():
     parser.add_argument('--output_file', type=str, required=True,
                         help='Path to the file that will contain the plot')
     return parser.parse_args()
-
-
-def parse_config(args):
-    with open(args.config_file, 'r') as fp:
-        config = yaml.load(fp, Loader=yaml.FullLoader)
-    return config
 
 
 def plot_binaries(args, config):
@@ -43,5 +38,5 @@ def plot_binaries(args, config):
 if __name__ == '__main__':
     args = get_args()
     os.makedirs(os.path.split(args.output_file)[0], exist_ok=True)
-    config = parse_config(args)
+    config = parse_yaml_config(args.config_file)
     plot_binaries(args, config)
