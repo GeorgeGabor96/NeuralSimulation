@@ -2,3 +2,5 @@
 **/.vs
 **/bin
 *.pyc
+**/.idea
+*.png

@@ -56,7 +56,7 @@ class NetworkSpikesPlotImproved:
         x_values = np.arange(start=0, stop=self.subplots[0]['subplot_data'].shape[1] + x_step, step=x_step)
         text_start_y = plot.shape[0] + 20
         text_start_x = text_space_width
-        plot = np.vstack((plot, np.zeros((100, plot.shape[1]))))
+        plot = np.vstack((plot, np.zeros((50, plot.shape[1]))))
         for i in range(x_values.shape[0]):
             cv.putText(plot, str(int(x_values[i])), (text_start_x, text_start_y), cv.FONT_HERSHEY_SIMPLEX, 0.5, (1, 1, 1), 1)
             text_start_x += int(x_step)
