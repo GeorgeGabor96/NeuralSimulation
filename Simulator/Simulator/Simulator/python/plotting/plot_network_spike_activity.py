@@ -1,6 +1,5 @@
 import argparse
 import numpy as np
-import yaml
 import os
 import sys
 from tqdm import tqdm
@@ -19,7 +18,17 @@ def get_args():
                         help='Path to the file that will contain the plot')
     return parser.parse_args()
 
+
 def get_spikes_binaries_for_layer(config):
+    '''
+    This will read all the the spike binary files for all the layers in the @layers variable in the config file
+
+    :param config: dict
+        the configuration
+
+    :return: list
+        @binaries_for_layer, each element has the @layer_name and the @binaries associated with it
+    '''
     binaries_for_layer = list()
 
     for layer_name in tqdm(config['layers']):
@@ -29,21 +38,48 @@ def get_spikes_binaries_for_layer(config):
         binaries = [f for f in os.listdir(layer_folder) if f.endswith('.bin')]
         spikes_binaries = [f for f in binaries if config['binaries_prefix'] in f]
         binaries_for_layer.append(dict(layer_name=layer_name, binaries=spikes_binaries))
-    # wnat to show output layers at the bottom (close the y = 0) and input layer at the top (y ~ infinity)
+    # to keep the plotting order as in the config, need to start plotting from the last layer to the first one
     binaries_for_layer.reverse()
     return binaries_for_layer
 
 
 def make_data_for_layer_and_lines(binaries_for_layer, config):
-    data_for_layer = []
-    lines = []
+    '''
+    For each layer it will determine all the spike coordinates in the plot
+    It will also create a set of lines that will split the layer points in the plot
+    And it will determine where on the y axis on the plot should the names of the layers be located
 
+    :param binaries_for_layer: list
+        output of @et_spikes_binaries_for_layer function
+
+    :param config: dict
+        the configuration
+
+    :return: 2 lists
+        @data_for_layer: list
+            each element keeps the @layer_name, the position o the @layer_name on the y axis, the x coordinates of
+            all the spikes of the layer, and the y coordinates for every spike in the layer
+        @lines: list
+            each element keeps 2 points, describing the ends of a line
+    '''
     neuron_y_coord = 1
 
-    # go over each layer
-    for layer in tqdm(binaries_for_layer):
+    # I know that every neuron ran for the same amount of time
+    # so take the first one and see
+    array_file = os.path.join(config['layers_folder'], binaries_for_layer[0]['layer_name'], binaries_for_layer[0]['binaries'][0])
+    neuron_data = parse_array_file(array_file)
+    n_times = neuron_data['data'].shape[0]
 
-        # go over each neuron in the layer
+    data_for_layer = []
+    lines = [dict(x_coord=[0, n_times], y_coord=[0, 0])]
+
+    for layer in tqdm(binaries_for_layer):
+        n_neurons = len(layer['binaries'])
+
+        # keep the x and y coordinates of a spike in 2 arrays
+        spike_x_coord = np.empty((0,))
+        spike_y_coord = np.empty((0,))
+
         for binary in layer['binaries']:
 
             # read data of the neuron
@@ -51,23 +87,37 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
             neuron_data = parse_array_file(array_file)
 
             # need to extract the times of the spikes
-            spike_x_coord = np.where(neuron_data['data'] == 1)[0]
-            spike_y_coord = np.ones(spike_x_coord.shape) * neuron_y_coord
-
-            data_for_layer.append(dict(layer_name=layer['layer_name'],
-                                       spike_x_coord=spike_x_coord,
-                                       spike_y_coord=spike_y_coord))
+            spike_times = np.where(neuron_data['data'] == 1)[0]
+            spike_x_coord = np.hstack((spike_x_coord, spike_times))
+            spike_y_coord = np.hstack((spike_y_coord, np.ones(spike_times.shape) * neuron_y_coord))
 
             neuron_y_coord += 1
 
+        data_for_layer.append(dict(layer_name=layer['layer_name'],
+                                   label_tick=int(neuron_y_coord - n_neurons / 2),
+                                   spike_x_coord=spike_x_coord,
+                                   spike_y_coord=spike_y_coord))
+
         # make the line
-        lines.append(dict(x_coord=[0, neuron_data['data'].shape[0]], y_coord=[neuron_y_coord, neuron_y_coord]))
+        lines.append(dict(x_coord=[0, n_times], y_coord=[neuron_y_coord, neuron_y_coord]))
         neuron_y_coord += 1
 
     return data_for_layer, lines
 
 
 def plot_data_and_lines(data_for_layer, lines, args):
+    '''
+    It uses @NetworkSpikesPlot to display the spike activity of every layer on a plot
+
+    :param data_for_layer: list
+        first output of @make_data_for_layer_and_lines function
+
+    :param lines: list
+        second output of @make_data_for_layer_and_lines function
+
+    :param args: script parameters
+
+    '''
     # create network plot object
     spikes_plotter = NetworkSpikesPlot(args.output_file)
 
@@ -77,7 +127,7 @@ def plot_data_and_lines(data_for_layer, lines, args):
 
     # plot the layers
     for layer in data_for_layer:
-        spikes_plotter.plot_points(layer['layer_name'], layer['spike_x_coord'], layer['spike_y_coord'])
+        spikes_plotter.plot_points(layer['layer_name'], layer['label_tick'], layer['spike_x_coord'], layer['spike_y_coord'])
 
     spikes_plotter.plot()
 
@@ -91,6 +141,5 @@ if __name__ == '__main__':
 
     # make data for each layer, also need the separation lines
     data_for_layer, lines = make_data_for_layer_and_lines(binaries_for_layer, config)
-
 
     plot_data_and_lines(data_for_layer, lines, args)
