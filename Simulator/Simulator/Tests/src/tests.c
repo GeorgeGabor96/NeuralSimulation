@@ -24,6 +24,7 @@ TestInfo tests[] = {
 	{ simulator_infer_test, "simulator_infer_test" },
 
 	// data generators
+	{ data_generator_spike_pulses, "data_generator_spike_pulses" },
 	{ data_generator_constant_current_test, "data_generator_constant_current_test" },
 	{ data_generator_random_spikes_test, "data_generator_random_spikes_test" },
 	{ data_generator_with_step_between_neurons, "data_generator_with_step_between_neurons" },

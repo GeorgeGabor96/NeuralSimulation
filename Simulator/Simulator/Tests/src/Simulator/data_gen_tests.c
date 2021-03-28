@@ -137,7 +137,6 @@ TestStatus data_generator_random_spikes_test() {
 	uint32_t length = 10;
 	uint32_t duration = 20;
 	float spike_percent = 0.5f;
-	BOOL spikes_from_data_gen = FALSE;
 
 	// make the generator
 	net = create_basic_network();
@@ -154,7 +153,6 @@ TestStatus data_generator_with_step_between_neurons() {
 	uint32_t length = 10;
 	uint32_t duration = 20;
 	uint32_t time_between_spikes = 20;
-	BOOL spikes_from_data_gen = FALSE;
 
 	// make the generator
 	net = create_basic_network();
@@ -162,3 +160,18 @@ TestStatus data_generator_with_step_between_neurons() {
 
 	return data_generator_template_test(net, generator, SPIKES, data_generator_random_spikes_values_is_valid, length, duration);
 }
+
+
+// Spike pulses
+TestStatus data_generator_spike_pulses() {
+	Network* net = NULL;
+	DataGenerator* generator = NULL;
+	uint32_t length = 10;
+	uint32_t duration = 30;
+
+	net = create_basic_network();
+	generator = data_generator_spike_pulses_create(length, net, 1, 10, 10, 0.02f, 0.2f, duration);
+
+	return data_generator_template_test(net, generator, SPIKES, data_generator_random_spikes_values_is_valid, length, duration);
+}
+
