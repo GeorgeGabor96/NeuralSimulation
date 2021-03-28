@@ -74,7 +74,6 @@ DataElement* data_element_spike_pulses_create(
 
 BOOL data_element_spike_pulses_data_is_valid(DataElementData* data) {
 	check(network_is_valid(data->net) == TRUE, invalid_argument("net"));
-	check(data->first_pulse_timestamp < duration, "@first_pulse_timestamp >= @duration, should be lower, or else no pulses");
 	check(data->between_pulses_duration > 0, "@between_pulses_duration == 0");
 	check(data->pulse_duration > 0, "@pulse_duration == 0");
 	check(data->between_pulses_spike_frequency >= 0.0f, "@between_pulses_spike_frequency < 0.0f");
@@ -263,7 +262,6 @@ BOOL data_generator_spike_pulses_is_valid(DataGeneratorData* data) {
 	check(data->duration > 0, "@data->duration == 0");
 	check(network_is_valid(data->net) == TRUE, invalid_argument("net"));
 	check(data->duration > 0, "@duration == 0");
-	check(data->first_pulse_timestamp < duration, "@first_pulse_timestamp >= @duration, should be lower, or else no pulses");
 	check(data->between_pulses_duration > 0, "@between_pulses_duration == 0");
 	check(data->pulse_duration > 0, "@pulse_duration == 0");
 	check(data->between_pulses_spike_frequency >= 0.0f, "@between_pulses_spike_frequency < 0.0f");
