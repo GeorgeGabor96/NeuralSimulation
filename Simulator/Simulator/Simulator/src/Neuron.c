@@ -9,7 +9,7 @@ Status neuron_class_is_valid(NeuronClass* neuron_class) {
 	check(neuron_class != NULL, null_argument("neuron_class"));
 	check(string_is_valid(neuron_class->name) == TRUE, invalid_argument("neuron_class->name"));
 	// NOTE: if you add more types this check needs to be updated
-	check(neuron_class->type == LIF_NEURON, invalid_argument("type"));
+	check(neuron_class->type == LIF_NEURON || neuron_class->type == LIF_REFRACTORY_NEURON, invalid_argument("type"));
 
 	return TRUE;
 
@@ -52,6 +52,7 @@ const char* neuron_type_C_string(NeuronType type) {
 	const char* name = NULL;
 	if (type == INVALID_NEURON) name = "INVALID_NEURON";
 	else if (type == LIF_NEURON) name = "LIF_NEURON";
+	else if (type == LIF_REFRACTORY_NEURON) name = "LIF_REFRACTORY_NEURON";
 	else name = "NEURON_UNKNOWN";
 	return name;
 }
@@ -60,7 +61,7 @@ const char* neuron_type_C_string(NeuronType type) {
 /*************************************************************
 * UPDATE functions for neurons
 *************************************************************/
-static inline BOOL neuron_update(Neuron* neuron) {
+static inline BOOL neuron_update(Neuron* neuron, uint32_t time) {
 	BOOL spike = FALSE;
 	
 	switch (neuron->n_class->type)
@@ -72,6 +73,22 @@ static inline BOOL neuron_update(Neuron* neuron) {
 			neuron->u = neuron->n_class->u_rest;
 			spike = TRUE;
 		}
+		break;
+	case LIF_REFRACTORY_NEURON:
+		// don't do anything if in refractory time
+		if (time - neuron->last_spike_time <= neuron->n_class->refractory_time) {
+			neuron->u = neuron->n_class->u_rest;
+			spike = FALSE;
+		}
+		else {
+			neuron->u = neuron->n_class->u_factor * neuron->u + neuron->n_class->free_factor + neuron->n_class->i_factor * neuron->PSC;
+			if (neuron->u >= neuron->n_class->u_th) {
+				neuron->u = neuron->n_class->u_rest;
+				neuron->last_spike_time = time;		// update last spike time
+				spike = TRUE;
+			}
+		}
+		break;
 	default:
 		break;
 	}
@@ -115,7 +132,7 @@ static inline float neuron_compute_psc(Neuron* neuron, uint32_t simulation_time)
 
 NeuronClass* neuron_class_create(const char* name, NeuronType type) {
 	NeuronClass* neuron_class = NULL;
-	check(type == LIF_NEURON, invalid_argument("type"));
+	check(type == LIF_NEURON || type == LIF_REFRACTORY_NEURON, invalid_argument("type"));
 
 	neuron_class = (NeuronClass*)calloc(1, sizeof(NeuronClass), "neuron_class_create");
 	check_memory(neuron_class);
@@ -128,6 +145,9 @@ NeuronClass* neuron_class_create(const char* name, NeuronType type) {
 	{
 	case LIF_NEURON:
 		neuron_class_set_LIF_parameters(neuron_class, LIF_U_TH, LIF_U_REST, LIF_R, LIF_C);
+		break;
+	case LIF_REFRACTORY_NEURON:
+		neuron_class_set_LIF_refractor_parameters(neuron_class, LIF_U_TH, LIF_U_REST, LIF_R, LIF_C, LIF_REFRACT);
 		break;
 	default:
 		log_error("Unkown neuron type");
@@ -156,6 +176,8 @@ void neuron_class_reset(NeuronClass* neuron_class) {
 	neuron_class->type = INVALID_NEURON;
 	neuron_class->u_rest = 0.0f;
 	neuron_class->u_th = 0.0f;
+
+	neuron_class->refractory_time = 0;
 		
 ERROR
 	return;
@@ -194,11 +216,23 @@ ERROR
 }
 
 
+Status neuron_class_set_LIF_refractor_parameters(NeuronClass* neuron_class, float u_th, float u_rest, float r, float c, uint32_t refract_time) {
+	Status status = FAIL;
+	
+	status = neuron_class_set_LIF_parameters(neuron_class, u_th, u_rest, r, c);
+	check(status == SUCCESS, "Couldn't set LIF parameters");
+	neuron_class->refractory_time = refract_time;
+	
+ERROR
+	return status;
+}
+
+
+
 /*************************************************************
 * Neuron Functionality
 *************************************************************/
 
-// TODO: maybe we can allocate from start the amount of input, output synapses we need -> more efficient use of memory
 Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
 	Status status = FAIL;
 	// the neuron can be invalid
@@ -214,6 +248,7 @@ Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
 	neuron->n_class = neuron_class;
 	neuron->u = neuron_class->u_rest;
 	neuron->PSC = 0.0f;
+	neuron->last_spike_time = 0;
 	neuron->spike = FALSE;
 
 	return SUCCESS;
@@ -237,6 +272,7 @@ void neuron_reset(Neuron* neuron) {
 	neuron->PSC = 0.0f;
 	neuron->spike = FALSE;
 	neuron->u = 0.0f;
+	neuron->last_spike_time = 0;
 
 ERROR
 	return;
@@ -319,7 +355,7 @@ Status neuron_step(Neuron* neuron, uint32_t simulation_time) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
 	neuron->PSC = neuron_compute_psc(neuron, simulation_time);
-	neuron->spike = neuron_update(neuron);
+	neuron->spike = neuron_update(neuron, simulation_time);
 	if (neuron->spike == TRUE) {
 		neuron_update_out_synapses(neuron, simulation_time);
 	}
@@ -349,7 +385,7 @@ Status neuron_step_inject_current(Neuron* neuron, float PSC, uint32_t simulation
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
 	neuron->PSC = PSC;
-	neuron->spike = neuron_update(neuron);
+	neuron->spike = neuron_update(neuron, simulation_time);
 	if (neuron->spike == TRUE) {
 		neuron_update_out_synapses(neuron, simulation_time);
 	}

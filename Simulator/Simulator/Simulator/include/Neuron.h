@@ -11,7 +11,7 @@
 * NeuronClass Functionality
 *************************************************************/
 
-typedef enum { INVALID_NEURON = 0, LIF_NEURON = 1 } NeuronType;
+typedef enum { INVALID_NEURON = 0, LIF_NEURON = 1, LIF_REFRACTORY_NEURON = 2} NeuronType;
 const char* neuron_type_C_string(NeuronType type);
 
 
@@ -30,6 +30,9 @@ typedef struct NeuronClass {
 	float u_factor;		// = 1 - 1 / (r * c)
 	float i_factor;		// = 1 / c
 	float free_factor;	// = u_rest / (r * c)
+
+	// LIF neuron with Refractory
+	uint32_t refractory_time;	
 } NeuronClass;
 
 // default values
@@ -37,6 +40,7 @@ typedef struct NeuronClass {
 #define LIF_U_REST	-65.0f 
 #define LIF_R		10.0f
 #define LIF_C		1.0f
+#define LIF_REFRACT (uint32_t)5
 
 /*
 1. neuron_class != NULL
@@ -48,6 +52,7 @@ void neuron_class_reset(NeuronClass* neuron_class);
 void neuron_class_destroy(NeuronClass* neuron_class);
 void neuron_class_ref_destroy(NeuronClass** neuron_class);
 Status neuron_class_set_LIF_parameters(NeuronClass* neuron_class, float u_th, float u_rest, float r, float c);
+Status neuron_class_set_LIF_refractor_parameters(NeuronClass* neuron_class, float u_th, float u_rest, float r, float c, uint32_t refract_time);
 
 
 /*************************************************************
@@ -60,7 +65,9 @@ typedef struct Neuron {
 	Array out_synapses_refs;  // references to output synapses
 	float u;
 	float PSC;		 		  // the PSC value that determined the current @u and @spike values
+	uint32_t last_spike_time;	// for neurons with refractory period
 	BOOL spike;
+
 } Neuron;
 
 

@@ -48,6 +48,7 @@ TestInfo tests[] = {
 	{ layer_fully_link_input_layer_test, "layer_fully_link_input_layer_test" },
 
 	// NEURON
+	{ neuron_LIF_refractor_general_test, "neuron_LIF_refractor_general_test" },
 	{ neuron_general_use_case_test, "neuron_general_use_case_test" },
 	{ neuron_memory_test, "neuron_memory_test" },
 	
