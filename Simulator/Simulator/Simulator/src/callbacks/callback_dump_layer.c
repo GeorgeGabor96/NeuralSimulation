@@ -1,4 +1,4 @@
-#include "callbacks/callback_dump_layer_neurons.h"
+#include "callbacks/callback_dump.h"
 
 #include "utils/MemoryManagement.h"
 #include "Containers.h"
