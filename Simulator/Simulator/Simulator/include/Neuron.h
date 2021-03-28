@@ -67,7 +67,6 @@ typedef struct Neuron {
 	float PSC;		 		  // the PSC value that determined the current @u and @spike values
 	uint32_t last_spike_time;	// for neurons with refractory period
 	BOOL spike;
-
 } Neuron;
 
 
