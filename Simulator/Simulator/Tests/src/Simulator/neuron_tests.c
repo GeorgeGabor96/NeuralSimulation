@@ -258,3 +258,45 @@ TestStatus neuron_memory_test() {
 error:
 	return status;
 }
+
+
+TestStatus neuron_LIF_refractor_general_test() {
+	TestStatus status = TEST_FAILED;
+
+	NeuronClass* n_class = neuron_class_create("LIF_REFRACTOR_TEST", LIF_REFRACTORY_NEURON);
+	check(neuron_class_is_valid(n_class) == TRUE, invalid_argument("n_class"));
+	check(n_class->type == LIF_REFRACTORY_NEURON, "@n_class->type should be %u, not %u", LIF_REFRACTORY_NEURON, n_class->type);
+	Neuron* neuron = neuron_create(n_class);
+	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
+
+	// force high current in the neuron to get a spike
+	uint32_t start_time = 10;
+	neuron_step_inject_current(neuron, 100.0f, start_time);
+	check(neuron->spike == TRUE, "@neuron->spike should be TRUE");
+	check(neuron->last_spike_time == start_time, "@neuron->last_spike_time should be %u, not %u", start_time, neuron->last_spike_time);
+	check(neuron->u == neuron->n_class->u_rest, invalid_argument("neuron->u"));
+
+	// inject high current for time == refractory time and should not produce any spikes
+	for (uint32_t i = 1; i <= neuron->n_class->refractory_time; ++i) {
+		neuron_step_inject_current(neuron, 100.0f, start_time + i);
+		check(neuron->spike == FALSE, "@neuron->spike should be FALSE");
+		check(neuron->last_spike_time == start_time, "@neuron->last_spike_time should be %u, not %u", start_time, neuron->last_spike_time);
+		check(neuron->u == neuron->n_class->u_rest, invalid_argument("neuron->u"));
+	}
+
+	// now we should get a spike
+	uint32_t next_spike_time = neuron->n_class->refractory_time + 1;
+	neuron_step_inject_current(neuron, 100.0f, next_spike_time);
+	check(neuron->spike == TRUE, "@neuron->spike should be TRUE");
+	check(neuron->last_spike_time == next_spike_time, "@neuron->last_spike_time should be %u, not %u", next_spike_time, neuron->last_spike_time);
+	check(neuron->u == neuron->n_class->u_rest, invalid_argument("neuron->u"));
+
+	neuron_destroy(neuron);
+	neuron_class_destroy(n_class);
+
+	assert(memory_leak() == FALSE, "Memory leak");
+	status = TEST_SUCCESS;
+
+ERROR
+	return status;
+}
