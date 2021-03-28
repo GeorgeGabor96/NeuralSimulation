@@ -204,8 +204,14 @@ TestStatus layer_fully_connected_test() {
 	assert(layer_is_valid(layer_middle) == TRUE, invalid_argument("layer_middle"));
 	assert(layer_is_valid(layer_output) == TRUE, invalid_argument("layer_output"));
 
-	layer_middle->link(layer_middle, layer_input, s_class);
-	layer_output->link(layer_output, layer_middle, s_class);
+	LayerInputDataLink link_data = { 0 };
+	link_data.input_layer = layer_input;
+	link_data.s_class = s_class;
+	link_data.connectivity = 1.0f;
+	layer_middle->link(layer_middle, &link_data);
+	
+	link_data.input_layer = layer_middle;
+	layer_output->link(layer_output, &link_data);
 
 	uint32_t i = 0;
 	uint32_t j = 0;
@@ -302,9 +308,9 @@ TestStatus layer_fully_link_input_layer_test() {
 	Layer* l1 = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, "layer1");
 	Layer* l2 = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, "layer2");
 	Layer* l3 = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, "layer3");
-	layer_link_input_layer(l2, l1, s_class);
-	layer_link_input_layer(l3, l2, s_class);
-	layer_link_input_layer(l3, l1, s_class);
+	layer_link_input_layer(l2, l1, s_class, 1.0f);
+	layer_link_input_layer(l3, l2, s_class, 1.0f);
+	layer_link_input_layer(l3, l1, s_class, 1.0f);
 
 	start = clock();
 	for (uint32_t i = 0; i < 100; ++i) {

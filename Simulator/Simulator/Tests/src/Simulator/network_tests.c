@@ -38,9 +38,9 @@ TestStatus network_compile_general_use_case_test() {
 	Layer* l1 = layer_create_fully_connected(10, n_class, name1);
 	Layer* l2 = layer_create_fully_connected(100, n_class,  name2);
 	Layer* l3 = layer_create_fully_connected(1, n_class, name3);
-	layer_add_input_layer(l2, l1, s_class);
-	layer_add_input_layer(l3, l1, s_class);
-	layer_add_input_layer(l3, l2, s_class);
+	layer_add_input_layer(l2, l1, s_class, 1.0f);
+	layer_add_input_layer(l3, l1, s_class, 1.0f);
+	layer_add_input_layer(l3, l2, s_class, 1.0f);
 	
 	/*----------network_add_layer----------*/
 	s_status = network_add_layer(network, l3, FALSE, TRUE);
@@ -189,8 +189,8 @@ TestStatus network_step_test() {
 	Layer* layer1 = layer_create_fully_connected(input_neuron_length, n_class, "layer1");
 	Layer* layer2 = layer_create_fully_connected(100, n_class, "layer2");
 	Layer* layer3 = layer_create_fully_connected(10, n_class, "layer3");
-	layer_add_input_layer(layer2, layer1, s_class);
-	layer_add_input_layer(layer3, layer2, s_class);
+	layer_add_input_layer(layer2, layer1, s_class, 1.0f);
+	layer_add_input_layer(layer3, layer2, s_class, 1.0f);
 
 	// add layers into a network
 	network_add_layer(network, layer1, TRUE, FALSE);
@@ -250,17 +250,17 @@ TestStatus network_summary_test() {
 	Layer* l_output_1 = layer_create_fully_connected(100, n_class, "l_output_1");
 	Layer* l_output_2 = layer_create_fully_connected(10, n_class, "l_output_2");
 
-	layer_add_input_layer(l_inner_1, l_input_1, s_class);
-	layer_add_input_layer(l_inner_1, l_input_2, s_class);
+	layer_add_input_layer(l_inner_1, l_input_1, s_class, 1.0f);
+	layer_add_input_layer(l_inner_1, l_input_2, s_class, 1.0f);
 	
-	layer_add_input_layer(l_inner_2, l_input_1, s_class);
-	layer_add_input_layer(l_inner_2, l_input_2, s_class);
-	layer_add_input_layer(l_inner_2, l_inner_1, s_class);
+	layer_add_input_layer(l_inner_2, l_input_1, s_class, 1.0f);
+	layer_add_input_layer(l_inner_2, l_input_2, s_class, 1.0f);
+	layer_add_input_layer(l_inner_2, l_inner_1, s_class, 1.0f);
 
-	layer_add_input_layer(l_output_1, l_inner_2, s_class);
+	layer_add_input_layer(l_output_1, l_inner_2, s_class, 1.0f);
 	
-	layer_add_input_layer(l_output_2, l_inner_1, s_class);
-	layer_add_input_layer(l_output_2, l_inner_2, s_class);
+	layer_add_input_layer(l_output_2, l_inner_1, s_class, 1.0f);
+	layer_add_input_layer(l_output_2, l_inner_2, s_class, 1.0f);
 
 	network_add_layer(network, l_input_1, TRUE, FALSE);
 	network_add_layer(network, l_input_2, TRUE, FALSE);

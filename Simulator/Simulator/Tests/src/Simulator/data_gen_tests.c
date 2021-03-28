@@ -17,8 +17,8 @@ Network* create_basic_network() {
 	Layer* layer_i1 = layer_create_fully_connected(10, n_class, "layer_i1");
 	Layer* layer_i2 = layer_create_fully_connected(20, n_class, "layer_i2");
 	Layer* layer_out = layer_create_fully_connected(1, n_class, "layer_out");
-	layer_add_input_layer(layer_out, layer_i1, s_class);
-	layer_add_input_layer(layer_out, layer_i2, s_class);
+	layer_add_input_layer(layer_out, layer_i1, s_class, 1.0f);
+	layer_add_input_layer(layer_out, layer_i2, s_class, 1.0f);
 
 	network_add_layer(net, layer_i1, TRUE, FALSE);
 	network_add_layer(net, layer_i2, TRUE, FALSE);

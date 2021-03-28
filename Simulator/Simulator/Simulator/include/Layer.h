@@ -11,9 +11,12 @@
 struct Layer;
 typedef struct Layer Layer;
 
+struct LayerInputDataLink;
+typedef struct LayerInputDataLink LayerInputDataLink;
+
 typedef Status (*Layer_step)(Layer*, uint32_t);
 typedef Status(*Layer_backward)(Layer*, uint32_t);
-typedef Status(*Layer_link)(Layer* layer, Layer* input_layer, SynapseClass* s_class);
+typedef Status(*Layer_link)(Layer* layer, LayerInputDataLink* link_data);
 
 // Need a type of the layer, this will define how synapses are connected between neurons
 typedef enum { LAYER_INVALID = 0, LAYER_FULLY_CONNECTED = 1 } LayerType;
@@ -24,9 +27,19 @@ const char* layer_type_C_string(LayerType type);
 typedef struct LayerInputData {
 	String layer_name;
 	String syanpse_class_name;
+	float connectivity;			// between 0 and 1. How much are the neurons in the layers connected
 }LayerInputData;
 
 void layer_input_data_reset(LayerInputData* input_data);
+
+struct LayerInputDataLink {
+	Layer* input_layer;
+	SynapseClass* s_class;
+	float connectivity;
+};
+
+BOOL layer_input_data_link_is_valid(LayerInputDataLink* link_data);
+
 
 /*-------------------NOTE---------------------------
 After succesfull creation the layer has ownership over:
@@ -82,10 +95,10 @@ Layer* layer_create_fully_connected(
 	const char* name);
 
 // stores that @input is an input layer for @layer, does not call @link
-Status layer_add_input_layer(Layer* layer, Layer* input, SynapseClass* s_class);
+Status layer_add_input_layer(Layer* layer, Layer* input, SynapseClass* s_class, float connectivity);
 
 // stores that @input is an input layer for @layer, does call @link
-Status layer_link_input_layer(Layer* layer, Layer* input, SynapseClass* s_class);
+Status layer_link_input_layer(Layer* layer, Layer* input, SynapseClass* s_class, float connectivity);
 
 const char* layer_get_name(Layer* layer);
 
@@ -116,6 +129,6 @@ void layer_summary(Layer* layer);
 size_t layer_get_weights_number(Layer* layer);
 
 // LINK functions
-Status layer_link_fc(Layer* layer, Layer* input_layer, SynapseClass* s_class);
+Status layer_link_fc(Layer* layer, LayerInputDataLink* link_data);
 
 #endif // __LAYER_H__

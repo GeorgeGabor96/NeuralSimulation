@@ -378,6 +378,7 @@ Status network_compile(Network* network) {
 	LayerInputData* input_data = NULL;
 	SynapseClass* s_class = NULL;
 	String* layer_name = NULL;
+	LayerInputDataLink linking_data = { 0 };
 
 	// check every layer is valid
 	for (i = 0; i < network->layers.length; ++i) {
@@ -425,8 +426,11 @@ loop1:
 
 		for (j = 0; j < layer->inputs_data.length; ++j) {
 			input_data = (LayerInputData*)array_get(&(layer->inputs_data), j);
-			input_layer = network_get_layer_by_string(network, &(input_data->layer_name));
-			status = layer->link(layer, input_layer, network_get_synapse_class_by_string(network, &(input_data->syanpse_class_name)));
+			linking_data.input_layer = network_get_layer_by_string(network, &(input_data->layer_name));
+			linking_data.s_class = network_get_synapse_class_by_string(network, &(input_data->syanpse_class_name));
+			linking_data.connectivity = input_data->connectivity;
+
+			status = layer->link(layer, &linking_data);
 			check(status == SUCCESS, "Could not link layers");
 		}
 	}
