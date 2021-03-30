@@ -2,7 +2,8 @@
 
 #include "utils/os.h"
 #include "callbacks/callback.h"
-#include "callbacks/callback_dump_layer_neurons.h"
+#include "callbacks/callback_dump.h"
+
 
 TestStatus callbacks_dump_layer_neurons_test() {
 	NeuronClass* n_class = neuron_class_create("TEST NEURON", LIF_NEURON);

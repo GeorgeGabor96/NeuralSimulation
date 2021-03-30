@@ -46,6 +46,7 @@ ERROR
 
 
 BOOL data_element_constant_current_data_is_valid(DataElementData* data) {
+	check(data != NULL, null_argument("data"));
 	check(network_is_valid(data->net) == TRUE, invalid_argument("data->net"));
 
 	return TRUE;

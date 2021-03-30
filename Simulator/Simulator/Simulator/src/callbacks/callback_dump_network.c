@@ -4,16 +4,15 @@
 #include "Containers.h"
 
 
-BOOL callback_dump_network_is_valid(Callback* callback);
-void callback_dump_network_update(Callback* callback, Network* net);
-void callback_dump_network_run(Callback* callback, Network* net);
-void callback_dump_network_reset(Callback* callback);
-void callback_dump_network_destroy(Callback* callback);
-
-
 typedef struct C_Data {
 	Array callbacks_layers;
 } C_Data;
+
+
+BOOL callback_dump_network_data_is_valid(C_Data* data);
+void callback_dump_network_data_destroy(C_Data* data);
+void callback_dump_network_data_update(C_Data* data, Network* net);
+void callback_dump_network_data_run(C_Data* data, Network* net);
 
 
 Callback* callback_dump_network_create(Network* net, const char* output_folder) {
@@ -41,11 +40,10 @@ Callback* callback_dump_network_create(Network* net, const char* output_folder) 
 	callback = (Callback*)calloc(1, sizeof(Callback), "callback_dump_network_create  callback");
 	check_memory(callback);
 	callback->data = data;
-	callback->is_valid = callback_dump_network_is_valid;
-	callback->update = callback_dump_network_update;
-	callback->run = callback_dump_network_run;
-	callback->reset = callback_dump_network_reset;
-	callback->destroy = callback_dump_network_destroy;
+	callback->data_is_valid = callback_dump_network_data_is_valid;
+	callback->data_destroy = callback_dump_network_data_destroy;
+	callback->data_update = callback_dump_network_data_update;
+	callback->data_run = callback_dump_network_data_run;
 
 	return callback;
 
@@ -54,7 +52,7 @@ ERROR
 	if (data != NULL) {
 		for (i = 0; i < data->callbacks_layers.length; ++i) {
 			callback = (Callback*)array_get(&(data->callbacks_layers), i);
-			callback->reset(callback);
+			callback_reset(callback);
 		}
 		free(data);
 	}
@@ -63,14 +61,12 @@ ERROR
 }
 
 
-BOOL callback_dump_network_is_valid(Callback* callback) {
-	// TO DO: refactor
-	Callback* layer_callback = NULL;
-	C_Data* data = (C_Data*)(callback->data);
+BOOL callback_dump_network_data_is_valid(C_Data* data) {
 	check(array_is_valid(&(data->callbacks_layers)) == TRUE, invalid_argument("data->callbacks_layers"));
+	Callback* callback = NULL;
 	for (uint32_t i = 0; i < data->callbacks_layers.length; ++i) {
-		layer_callback = (Callback*)array_get(&(data->callbacks_layers), i);
-		check(layer_callback->is_valid(layer_callback) == TRUE, invalid_argument("layer_callback"));
+		callback = (Callback*)array_get(&(data->callbacks_layers), i);
+		check(callback_is_valid(callback) == TRUE, invalid_argument("callback"));
 	}
 	return TRUE;
 
@@ -79,63 +75,50 @@ ERROR
 }
 
 
-void callback_dump_network_update(Callback* callback, Network* net) {
-	check(callback_dump_network_is_valid(callback) == TRUE, invalid_argument("callback"));
-	C_Data* data = (C_Data*)(callback->data);
-	Callback* layer_callback = NULL;
+void callback_dump_network_data_destroy(C_Data* data) {
+	check(callback_dump_network_data_is_valid(data) == TRUE, invalid_argument("data"));
 	uint32_t i = 0;
+	Callback* callback = NULL;
 
 	for (i = 0; i < data->callbacks_layers.length; ++i) {
-		layer_callback = (Callback*)array_get(&(data->callbacks_layers), i);
-		layer_callback->update(layer_callback, net);
-	}
-
-ERROR
-	return;
-}
-
-
-void callback_dump_network_run(Callback* callback, Network* net) {
-	check(callback_dump_network_is_valid(callback) == TRUE, invalid_argument("callback"));
-	C_Data* data = (C_Data*)(callback->data);
-	Callback* layer_callback = NULL;
-	uint32_t i = 0;
-
-	for (i = 0; i < data->callbacks_layers.length; ++i) {
-		layer_callback = (Callback*)array_get(&(data->callbacks_layers), i);
-		layer_callback->run(layer_callback, net);
-	}
-
-ERROR
-	return;
-}
-
-
-void callback_dump_network_reset(Callback* callback) {
-	check(callback_dump_network_is_valid(callback) == TRUE, invalid_argument("callback"));
-	C_Data* data = (C_Data*)(callback->data);
-	uint32_t i = 0;
-	Callback* layer_callback = NULL;
-	
-	for (i = 0; i < data->callbacks_layers.length; ++i) {
-		layer_callback = (Callback*)array_get(&(data->callbacks_layers), i);
-		layer_callback->reset(layer_callback);
+		callback = (Callback*)array_get(&(data->callbacks_layers), i);
+		callback_reset(callback);
 	}
 	array_reset(&(data->callbacks_layers), NULL);
 	free(data);
 
-	// clera memory refactor
+ERROR
+	return;
+}
+
+
+void callback_dump_network_data_update(C_Data* data, Network* net) {
+	check(callback_dump_network_data_is_valid(data) == TRUE, invalid_argument("data"));
+	Callback* callback = NULL;
+	uint32_t i = 0;
+
+	for (i = 0; i < data->callbacks_layers.length; ++i) {
+		callback = (Callback*)array_get(&(data->callbacks_layers), i);
+		callback_update(callback, net);
+	}
 
 ERROR
 	return;
 }
 
 
-void callback_dump_network_destroy(Callback* callback) {
-	check(callback_dump_network_is_valid(callback) == TRUE, invalid_argument("callback"));
-	callback_dump_network_reset(callback);
-	free(callback);
+void callback_dump_network_data_run(C_Data* data, Network* net) {
+	check(callback_dump_network_data_is_valid(data) == TRUE, invalid_argument("data"));
+	Callback* callback = NULL;
+	uint32_t i = 0;
+
+	for (i = 0; i < data->callbacks_layers.length; ++i) {
+		callback = (Callback*)array_get(&(data->callbacks_layers), i);
+		callback_run(callback, net);
+	}
 
 ERROR
 	return;
 }
+
+

@@ -1,7 +1,7 @@
 #include "../../include/config.h"
 #include "Simulator.h"
 #include "data/data_gen_random_spikes.h"
-#include "callbacks/callback_dump_layer_neurons.h"
+#include "callbacks/callback_dump.h"
 
 
 void synfire_chain_random_spikes() {
