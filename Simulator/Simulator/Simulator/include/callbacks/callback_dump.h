@@ -20,4 +20,15 @@ Parameters:
 */
 Callback* callback_dump_layer_neurons_create(Layer* layer, const char* output_folder, BOOL plot);
 
+
+/*
+Similar to @callback_dump_layer_neurons_create, but it will dump every layer in the network
+But it will not call any python script
+
+Parameters:
+@network - pointer to a @netoerk object from which to take the layers
+@output_folder - path to a folder where to put the dumps, it will creat a folder for each layer
+*/
+Callback* callback_dump_network_create(Network* net, const char* output_folder);
+
 #endif
