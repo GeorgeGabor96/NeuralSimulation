@@ -6,7 +6,7 @@
 
 void synfire_chain_random_spikes() {
 	char result_path[256] = { 0 };
-	sprintf(result_path, "%s\\\\experiments_nice_plots\\synfire_chain\\pulse_spikes\\60n_ext_40n_inh_0_5_coonectivity_refrac_5_PSC_0_14_100ms", result_base_folder);
+	sprintf(result_path, "%s\\\\test_dump_net_callback", result_base_folder);
 
 	// create network
 	Network* net = network_create();
@@ -133,39 +133,11 @@ void synfire_chain_random_spikes() {
 	DataGenerator* data_gen = data_generator_spike_pulses_create(1, net, 10, 200, 10, 0.0f, 0.2f, 100);
 
 	// create callbacks
-	layer1 = network_get_layer_by_name(net, "layer1");
-	layer2 = network_get_layer_by_name(net, "layer2");
-	layer3 = network_get_layer_by_name(net, "layer3");
-	layer4 = network_get_layer_by_name(net, "layer4");
-	layer5 = network_get_layer_by_name(net, "layer5");
-	layer6 = network_get_layer_by_name(net, "layer6");
-	layer7 = network_get_layer_by_name(net, "layer7");
-	layer8 = network_get_layer_by_name(net, "layer8");
-	layer9 = network_get_layer_by_name(net, "layer9");
-	layer10 = network_get_layer_by_name(net, "layer10");
-	Callback* dump_layer1 = callback_dump_layer_neurons_create(layer1, result_path, FALSE);
-	Callback* dump_layer2 = callback_dump_layer_neurons_create(layer2, result_path, FALSE);
-	Callback* dump_layer3 = callback_dump_layer_neurons_create(layer3, result_path, FALSE);
-	Callback* dump_layer4 = callback_dump_layer_neurons_create(layer4, result_path, FALSE);
-	Callback* dump_layer5 = callback_dump_layer_neurons_create(layer5, result_path, FALSE);
-	Callback* dump_layer6 = callback_dump_layer_neurons_create(layer6, result_path, FALSE);
-	Callback* dump_layer7 = callback_dump_layer_neurons_create(layer7, result_path, FALSE);
-	Callback* dump_layer8 = callback_dump_layer_neurons_create(layer8, result_path, FALSE);
-	Callback* dump_layer9 = callback_dump_layer_neurons_create(layer9, result_path, FALSE);
-	Callback* dump_layer10 = callback_dump_layer_neurons_create(layer10, result_path, FALSE);
+	Callback* network_dump = callback_dump_network_create(net, result_path);
 
 	// create simulator and run it
 	Simulator* simulator = simulator_create(data_gen, net);
-	simulator_add_callback(simulator, dump_layer1);
-	simulator_add_callback(simulator, dump_layer2);
-	simulator_add_callback(simulator, dump_layer3);
-	simulator_add_callback(simulator, dump_layer4);
-	simulator_add_callback(simulator, dump_layer5);
-	simulator_add_callback(simulator, dump_layer6);
-	simulator_add_callback(simulator, dump_layer7);
-	simulator_add_callback(simulator, dump_layer8);
-	simulator_add_callback(simulator, dump_layer9);
-	simulator_add_callback(simulator, dump_layer10);
+	simulator_add_callback(simulator, network_dump);
 	simulator_infer(simulator);
 
 	// cleanup
