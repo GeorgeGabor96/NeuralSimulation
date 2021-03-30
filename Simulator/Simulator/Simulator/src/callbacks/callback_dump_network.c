@@ -80,11 +80,7 @@ void callback_dump_network_data_destroy(C_Data* data) {
 	uint32_t i = 0;
 	Callback* callback = NULL;
 
-	for (i = 0; i < data->callbacks_layers.length; ++i) {
-		callback = (Callback*)array_get(&(data->callbacks_layers), i);
-		callback_reset(callback);
-	}
-	array_reset(&(data->callbacks_layers), NULL);
+	array_reset(&(data->callbacks_layers), callback_reset);
 	free(data);
 
 ERROR
