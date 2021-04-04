@@ -1,6 +1,14 @@
-layers_folder: d:\repositories\Simulator\experiments\experiments_nice_plots\time_between_spikes_experiment\check
-title: check
+layers_folder: d:\repositories\Simulator\experiments\synfire_chain\10l_50s_inhi_50s_exci\
+title: 10l_20s_inhi_0_5_tau_80s_exci_0_5_tau
 layers:
-  - layer_in
-  - layer_out
+  - layer1
+  - layer2
+  - layer3
+  - layer4
+  - layer5
+  - layer6
+  - layer7
+  - layer8
+  - layer9
+  - layer10
 binaries_prefix: spikes

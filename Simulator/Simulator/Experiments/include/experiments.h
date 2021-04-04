@@ -11,5 +11,7 @@ void time_between_spikes_experiment();
 
 // synfire chians
 void synfire_chain_random_spikes();
+void synfire_chain_evolution();
+
 
 #endif // __EXPERIMENTS_H__

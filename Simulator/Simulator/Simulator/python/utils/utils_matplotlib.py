@@ -10,10 +10,11 @@ def reset_plot():
 
 
 class NetworkSpikesPlot:
-    def __init__(self, output_file):
+    def __init__(self, output_file, title):
         reset_plot()
         plt.figure(figsize=(15, 10))
         self.output_file = output_file
+        self.title = title
         self.xlabel = 'Time (ms)'
         self.ylabel = 'Layers'
 
@@ -33,6 +34,8 @@ class NetworkSpikesPlot:
 
         plt.ylabel(self.ylabel)
         plt.yticks(ticks=self.y_ticks, labels=self.layer_names)
+
+        plt.title(self.title)
 
         plt.axis('tight')
         os.makedirs(os.path.split(self.output_file)[0], exist_ok=True)
