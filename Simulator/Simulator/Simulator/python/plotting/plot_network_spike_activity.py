@@ -14,8 +14,6 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_file', type=str, required=True,
                         help='Path to the config file for the plot')
-    parser.add_argument('--output_file', type=str, required=True,
-                        help='Path to the file that will contain the plot')
     return parser.parse_args()
 
 
@@ -105,7 +103,7 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
     return data_for_layer, lines
 
 
-def plot_data_and_lines(data_for_layer, lines, args):
+def plot_data_and_lines(data_for_layer, lines, config):
     '''
     It uses @NetworkSpikesPlot to display the spike activity of every layer on a plot
 
@@ -119,7 +117,7 @@ def plot_data_and_lines(data_for_layer, lines, args):
 
     '''
     # create network plot object
-    spikes_plotter = NetworkSpikesPlot(args.output_file)
+    spikes_plotter = NetworkSpikesPlot(os.path.join(config['layers_folder'], 'network.png'), config['title'])
 
     # plot the lines
     for line in lines:
@@ -142,4 +140,4 @@ if __name__ == '__main__':
     # make data for each layer, also need the separation lines
     data_for_layer, lines = make_data_for_layer_and_lines(binaries_for_layer, config)
 
-    plot_data_and_lines(data_for_layer, lines, args)
+    plot_data_and_lines(data_for_layer, lines, config)
