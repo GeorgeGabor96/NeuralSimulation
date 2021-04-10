@@ -53,7 +53,8 @@ void neuron_class_destroy(NeuronClass* neuron_class);
 void neuron_class_ref_destroy(NeuronClass** neuron_class);
 Status neuron_class_set_LIF_parameters(NeuronClass* neuron_class, float u_th, float u_rest, float r, float c);
 Status neuron_class_set_LIF_refractor_parameters(NeuronClass* neuron_class, float u_th, float u_rest, float r, float c, uint32_t refract_time);
-
+size_t neuron_class_get_min_byte_size(NeuronClass* n_class);
+size_t neuron_class_ref_get_min_byte_size(NeuronClass** n_class);
 
 /*************************************************************
 * Neuron Functionality

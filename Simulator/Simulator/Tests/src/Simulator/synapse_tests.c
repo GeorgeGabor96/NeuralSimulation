@@ -69,6 +69,22 @@ error:
 }
 
 
+TestStatus synapse_class_get_min_byte_size_test() {
+	TestStatus status = TEST_FAILED;
+	SynapseClass* s_class = synapse_class_create_default("DEFAULT_S");
+	size_t s_class_min_byte_size = synapse_class_get_min_byte_size(s_class);
+	size_t s_class_real_min_byte_size = sizeof(SynapseClass) + string_get_min_byte_size(s_class->name);
+	assert(s_class_min_byte_size == s_class_real_min_byte_size, "Synapse class size should be %llu, not %llu", s_class_real_min_byte_size, s_class_min_byte_size);
+	synapse_class_destroy(s_class);
+
+	assert(memory_leak() == FALSE, "Memory leak");
+	status = TEST_SUCCESS;
+error:
+	return status;
+}
+
+
+
 void synapse_class_set_default_values(SynapseType type, SynapseClass* s_class) {
 	s_class->E = 0.0f;
 	s_class->tau_exp = 0.5f;

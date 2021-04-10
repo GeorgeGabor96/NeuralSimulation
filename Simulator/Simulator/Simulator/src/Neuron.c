@@ -228,6 +228,24 @@ ERROR
 }
 
 
+size_t neuron_class_get_min_byte_size(NeuronClass* n_class) {
+	check(neuron_class_is_valid(n_class) == TRUE, invalid_argument("n_class"));
+	size_t n_class_min_byte_size = sizeof(NeuronClass);
+	n_class_min_byte_size += string_get_min_byte_size(n_class->name);
+	return n_class_min_byte_size;
+ERROR
+	return 0;
+}
+
+
+size_t neuron_class_ref_get_min_byte_size(NeuronClass** n_class) {
+	check(neuron_class_is_valid(*n_class) == TRUE, invalid_argument("n_class"));
+	return sizeof(NeuronClass*) + neuron_class_get_min_byte_size(*n_class);
+ERROR
+	return 0;
+}
+
+
 /*************************************************************
 * Neuron Functionality
 *************************************************************/

@@ -42,6 +42,7 @@ TestInfo tests[] = {
 	{ network_summary_test, "network_summary_test" },
 	{ network_compile_general_use_case_test, "network_compile_general_use_case_test" },
 	{ network_step_test, "network_step_test" },
+	{ network_get_min_byte_size_test, "network_get_min_byte_size_test" },
 
 	// LAYER
 	{ layer_general_use_case_test, "layer_general_use_case_test" },
@@ -50,16 +51,24 @@ TestInfo tests[] = {
 	{ layer_fully_link_input_layer_test, "layer_fully_link_input_layer_test" },
 	{ layer_get_min_byte_size_test, "layer_get_min_byte_size_test" },
 
+	// NEURON CLASS
+	{ neuron_class_general_use_case_test, "neuron_class_general_use_case_test" },
+	{ neuron_class_memory_test, "neuron_class_memory_test" },
+	{ neuron_class_get_min_byte_size_test, "neuron_class_get_min_byte_size_test" },
+
 	// NEURON
 	{ neuron_LIF_refractor_general_test, "neuron_LIF_refractor_general_test" },
 	{ neuron_general_use_case_test, "neuron_general_use_case_test" },
 	{ neuron_memory_test, "neuron_memory_test" },
 	{ neuron_get_min_byte_size_test, "neuron_get_min_byte_size_test" },
 	
-	// SYNAPSE
+	// SYNAPSE CLASS
 	{ synapse_class_create_destroy_test, "synapse_class_create_destroy_test" },
-	{ synapse_create_destroy_test, "synapse_create_destroy_test" },
 	{ synapse_class_memory_test, "synapse_class_memory_test" },
+	{ synapse_class_get_min_byte_size_test, "synapse_class_get_min_byte_size_test" },
+
+	// SYNAPSE
+	{ synapse_create_destroy_test, "synapse_create_destroy_test" },
 	{ synapse_add_spike_time_test, "synapse_add_spike_time_test" },
 	{ synapse_compute_PSC_test, "synapse_compute_PSC_test" },
 	{ synapse_step_test, "synapse_step_test" },

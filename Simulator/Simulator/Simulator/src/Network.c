@@ -164,16 +164,14 @@ ERROR
 size_t network_get_min_byte_size(Network* network) {
 	check(network_is_valid(network) == TRUE, invalid_argument("network"));
 
-	size_t byte_size = 0;
-	byte_size += array_get_min_byte_size(&(network->layers), NULL);
-	byte_size += array_get_min_byte_size(&(network->input_layers), NULL);
-	byte_size += array_get_min_byte_size(&(network->output_layers), NULL);
-	byte_size += array_get_min_byte_size(&(network->input_names), NULL);
-	byte_size += array_get_min_byte_size(&(network->output_names), NULL);
-	byte_size += array_get_min_byte_size(&(network->synapse_classes), NULL);
-	byte_size += array_get_min_byte_size(&(network->neuron_classes), NULL);
-	byte_size += sizeof(network->compiled);
-	byte_size += sizeof(network->memory_optimized);
+	size_t byte_size = sizeof(Network);
+	byte_size += array_data_get_min_byte_size(&(network->layers), layer_get_min_byte_size);
+	byte_size += array_data_get_min_byte_size(&(network->input_layers), NULL);
+	byte_size += array_data_get_min_byte_size(&(network->output_layers), NULL);
+	byte_size += array_data_get_min_byte_size(&(network->input_names), NULL);
+	byte_size += array_data_get_min_byte_size(&(network->output_names), NULL);
+	byte_size += array_data_get_min_byte_size(&(network->synapse_classes), synapse_class_ref_get_min_byte_size);
+	byte_size += array_data_get_min_byte_size(&(network->neuron_classes), neuron_class_ref_get_min_byte_size);
 	return byte_size;
 
 ERROR

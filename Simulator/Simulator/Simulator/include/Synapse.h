@@ -60,6 +60,8 @@ SynapseClass* synapse_class_create_default(const char* name);
 void synapse_class_reset(SynapseClass* synapse_class);
 void synapse_class_destroy(SynapseClass* synapse_class);
 void synapse_class_ref_destroy(SynapseClass** synapse_class);
+size_t synapse_class_get_min_byte_size(SynapseClass* synapse_class);
+size_t synapse_class_ref_get_min_byte_size(SynapseClass** synapse_class);
 
 
 /*************************************************************

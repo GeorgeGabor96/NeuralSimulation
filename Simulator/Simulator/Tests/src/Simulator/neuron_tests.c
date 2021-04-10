@@ -61,6 +61,23 @@ error:
 }
 
 
+TestStatus neuron_class_get_min_byte_size_test() {
+	TestStatus status = TEST_FAILED;
+
+	NeuronClass* n_class = neuron_class_create("DEFAULT_N", LIF_NEURON);
+	size_t n_class_min_byte_size = neuron_class_get_min_byte_size(n_class);
+	size_t n_class_real_min_byte_size = sizeof(NeuronClass) + string_get_min_byte_size(n_class->name);
+	assert(n_class_min_byte_size == n_class_real_min_byte_size, "Neuron Class byte size should be %llu, not %llu", n_class_real_min_byte_size, n_class_min_byte_size);
+
+	neuron_class_destroy(n_class);
+
+	assert(memory_leak() == FALSE, "Memory leak");
+	status = TEST_SUCCESS;
+error:
+	return status;
+}
+
+
 TestStatus neuron_general_use_case_test() {
 	// setup
 	TestStatus status = TEST_FAILED;

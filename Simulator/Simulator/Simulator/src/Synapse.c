@@ -108,6 +108,24 @@ void synapse_class_ref_destroy(SynapseClass** synapse_class) {
 }
 
 
+size_t synapse_class_get_min_byte_size(SynapseClass* s_class) {
+	check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
+	size_t s_class_min_byte_size = sizeof(SynapseClass);
+	s_class_min_byte_size += string_get_min_byte_size(s_class->name);
+	return s_class_min_byte_size;
+ERROR
+	return 0;
+}
+
+
+size_t synapse_class_ref_get_min_byte_size(SynapseClass** s_class) {
+	check(synapse_class_is_valid(*s_class) == TRUE, invalid_argument("s_class"));
+	return sizeof(SynapseClass*) + synapse_class_get_min_byte_size(*s_class);
+ERROR
+	return 0;
+}
+
+
 /*************************************************************
 * Synapse Functionality
 *************************************************************/
