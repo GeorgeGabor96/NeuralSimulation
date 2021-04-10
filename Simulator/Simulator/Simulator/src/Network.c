@@ -148,6 +148,7 @@ void network_destroy(Network* network) {
 		array_reset(&(network->neuron_classes), neuron_class_ref_destroy);
 		network->compiled = FALSE;
 		network->memory_optimized = FALSE;
+		memset(network, 0, sizeof(Network));
 		free(network);
 	}
 	else {
@@ -726,15 +727,96 @@ ERROR
 }
 
 
-Network* network_optimize_memory_placement(Network* network) {
-	check(network_is_valid(network) == TRUE, invalid_argument("network"));
+Network* network_optimize_memory_placement(Network* net) {
+	check(network_is_valid(net) == TRUE, invalid_argument("net"));
+	check(net->memory_optimized == FALSE, "Network memory placement already optimized");
+	check(net->compiled == TRUE, "Cannot optimize network memory placement if it is not compiled");
 
 	// allocate a continuous block of memory that will hold everything regarding the network
-	size_t network_byte_size = network_get_min_byte_size(network);
-	Network* network_opt = (Network*)calloc(1, network_byte_size, "network_optimize_memory_placement");
+	size_t network_byte_size = network_get_min_byte_size(net);
+	uint8_t* block = (uint8_t*)calloc(1, network_byte_size, "network_optimize_memory_placement");
+	uint32_t i = 0;
+	uint32_t j = 0;
+
+	// copy network data
+	memcpy(block, net, sizeof(Network));
+	Network* net_opt = (Network*)block;
+	block += sizeof(Network);	// move pointer
+
+	// copy synapse class data
+	net_opt->synapse_classes.data = block;
+	// copy the pointers
+	memcpy(block, net->synapse_classes.data, sizeof(SynapseClass*) * net->synapse_classes.length);
+	block += sizeof(SynapseClass*) * net->synapse_classes.length;
+	net_opt->synapse_classes.max_length = net_opt->synapse_classes.length;
+	for (i = 0; i < net->synapse_classes.length; ++i) {
+		SynapseClass* s_class = (*(SynapseClass**)array_get(&(net->synapse_classes), i));
+		// overwrite the pointer in the new network to the location where the synapse class will be put
+		array_set(&(net_opt->synapse_classes), i, &block);
+		// copy the synapse class
+		block = synapse_class_copy_to_memory(s_class, block);
+	}
+
+	// copy neuron class data
+	net_opt->neuron_classes.data = block;
+	memcpy(block, net->neuron_classes.data, sizeof(NeuronClass*) * net->neuron_classes.length);
+	block += sizeof(NeuronClass*) * net->neuron_classes.length;
+	net_opt->neuron_classes.max_length = net_opt->neuron_classes.length;
+	for (i = 0; i < net->neuron_classes.length; ++i) {
+		NeuronClass* n_class = (*(NeuronClass**)array_get(&(net->neuron_classes), i));
+		// overwrite the pointer in the new network to the location where the neuron class will be put
+		array_set(&(net_opt->neuron_classes), i, &block);
+		block = neuron_class_copy_to_memory(n_class, block);
+	}
+
+	// copy layer data
+	net_opt->layers.data = block;
+	memcpy(block, net->layers.data, sizeof(Layer) * net->layers.length);
+	block += sizeof(Layer) * net->layers.length;
+	for (i = 0; i < net->layers.length; ++i) {
+		Layer* layer_net = (Layer*)array_get(&(net->layers), i);
+		Layer* layer_net_opt = (Layer*)array_get(&(net_opt->layers), i);
+
+		// the info in the layers structure was already copied, need to copy sub field
+		// copy the name
+		layer_net_opt->name = block;
+		block = string_copy_to_memory(layer_net->name, block);
+
+		// copy the inputs_data
+
+		// copy the neurons
+		memcpy(layer_net_opt->neurons.data, layer_net->neurons.data, sizeof(Neuron) * layer_net->neurons.length);
+		block += sizeof(Neuron) * layer_net->neurons.length;
+		layer_net_opt->neurons.max_length = layer_net_opt->neurons.length;
+
+		for (j = 0; j < layer_net->neurons.length; ++j) {
+			Neuron* neuron_net = (Neuron*)array_get(&(layer_net->neurons), j);
+			Neuron* neuron_net_opt = (Neuron*)array_get(&(layer_net_opt->neurons), j);
+
+			// update the neuron class
+			NeuronClass* n_class_net = (NeuronClass*)neuron_net->n_class;
+			NeuronClass* n_class_net_opt = network_get_neuron_class_by_string(net_opt, n_class_net->name);
+			neuron_net_opt->n_class = n_class_net_opt;
+
+			// update @in_synapses_refs
+			size_t in_synapse_refs_size = sizeof(Synapse*) * neuron_net->in_synapses_refs.length;
+			memcpy(block, neuron_net->in_synapses_refs.data, in_synapse_refs_size);
+			block += in_synapse_refs_size;
+
+			// copy each synapse
+
+			// HOW THE FUCK DO I LINK THE OUT_SYNAPSE_REFS???????
+		}
 
 
-	return network_opt;
+
+	}
+
+	// check that everything is perfect
+	//size_t bytes_used = (size_t)block - (size_t)net_opt;
+	//check(bytes_used == network_byte_size, "@bytes_used is %llu, @network requires %llu", bytes_used, network_byte_size);
+	network_destroy(net);
+	return net_opt;
 
 ERROR
 	return NULL;

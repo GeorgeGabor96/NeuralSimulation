@@ -126,6 +126,21 @@ ERROR
 }
 
 
+uint8_t* synapse_class_copy_to_memory(SynapseClass* s_class, uint8_t* block) {
+	check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
+	memcpy(block, s_class, sizeof(SynapseClass));
+	SynapseClass* new_s_class = (SynapseClass*)block;
+	block += sizeof(SynapseClass);
+
+	new_s_class->name = (String*)block;
+	block = string_copy_to_memory(s_class->name, block);
+	return block;
+ERROR
+	return NULL;
+}
+
+
+
 /*************************************************************
 * Synapse Functionality
 *************************************************************/

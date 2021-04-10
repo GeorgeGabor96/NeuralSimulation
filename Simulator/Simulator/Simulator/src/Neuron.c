@@ -246,6 +246,20 @@ ERROR
 }
 
 
+uint8_t* neuron_class_copy_to_memory(NeuronClass* n_class, uint8_t* block) {
+	check(neuron_class_is_valid(n_class) == TRUE, invalid_argument("n_class"));
+	memcpy(block, n_class, sizeof(NeuronClass));
+	NeuronClass* new_n_class = (NeuronClass*)block;
+	block += sizeof(NeuronClass);
+
+	new_n_class->name = (String*)block;
+	block = string_copy_to_memory(n_class->name, block);
+	return block;
+ERROR
+	return NULL;
+}
+
+
 /*************************************************************
 * Neuron Functionality
 *************************************************************/

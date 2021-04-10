@@ -341,3 +341,32 @@ TestStatus network_get_min_byte_size_test() {
 ERROR
 	return TEST_FAILED;
 }
+
+
+TestStatus network_optimize_memory_placement_test() {
+	Network* net = network_create();
+	network_add_neuron_class(net, neuron_class_create("NEURON_T", LIF_NEURON));
+	network_add_synapse_class(net, synapse_class_create_default("SYNAPSE_T"));
+	NeuronClass* n_class = network_get_neuron_class_by_name(net, "NEURON_T");
+	SynapseClass* s_class = network_get_synapse_class_by_name(net, "SYNAPSE_T");
+
+	Layer* l1 = layer_create_fully_connected(100, n_class, "l1");
+	Layer* l2 = layer_create_fully_connected(50, n_class, "l2");
+	Layer* l3 = layer_create_fully_connected(200, n_class, "l3");
+	layer_add_input_layer(l2, l1, s_class, 1.0f);
+	layer_add_input_layer(l3, l2, s_class, 1.0f);
+	network_add_layer(net, l1, TRUE, FALSE);
+	network_add_layer(net, l2, FALSE, FALSE);
+	network_add_layer(net, l3, FALSE, TRUE);
+	network_compile(net);
+
+	Network* net_opt = network_optimize_memory_placement(net);
+	
+	n_class = network_get_neuron_class_by_name(net_opt, "NEURON_T");
+	s_class = network_get_synapse_class_by_name(net_opt, "SYNAPSE_T");
+
+	assert(memory_leak() == FALSE, "Memory leak");
+	return TEST_SUCCESS;
+ERROR
+	return TEST_FAILED;
+}

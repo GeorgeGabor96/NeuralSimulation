@@ -21,6 +21,8 @@
 // TODO: some tests take time, mark them and set a flag to run them or not
 TestInfo tests[] = {
 
+	{ network_optimize_memory_placement_test, "network_optimize_memory_placement_test" },
+
 	// simulator
 	{ simulator_infer_test, "simulator_infer_test" },
 

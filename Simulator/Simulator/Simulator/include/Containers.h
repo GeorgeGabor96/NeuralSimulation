@@ -139,6 +139,8 @@ String* string_path_join_strings(String* string1, String* string2);
 String* string_path_join_string_and_C(String* string1, const char* string2);
 String* string_path_join_C_and_string(const char* string1, String* string2);
 
+uint8_t* string_copy_to_memory(String* string, uint8_t* block);
+
 #define string_get_min_byte_size(s) array_get_min_byte_size(s, NULL)
 
 /*************************************************************
