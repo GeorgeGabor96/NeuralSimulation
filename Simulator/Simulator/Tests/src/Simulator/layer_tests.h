@@ -9,5 +9,6 @@ TestStatus layer_memory_test_test();
 TestStatus layer_fully_connected_test();
 
 TestStatus layer_fully_link_input_layer_test();
+TestStatus layer_get_min_byte_size_test();
 
 #endif // __LAYER_TESTS__

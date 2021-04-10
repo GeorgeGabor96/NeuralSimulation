@@ -335,3 +335,25 @@ TestStatus layer_fully_link_input_layer_test() {
 error:
 	return status;
 }
+
+
+TestStatus layer_get_min_byte_size_test() {
+	TestStatus status = TEST_FAILED;
+
+	NeuronClass* n_class = neuron_class_create("DEFAULT_N", LIF_NEURON);
+	Layer* layer = layer_create_fully_connected(100, n_class, "layer");
+	size_t layer_min_byte_size = layer_get_min_byte_size(layer);
+	size_t layer_real_min_byte_size = sizeof(Layer) +
+		(sizeof(String) + layer->name->length) +
+		0 +
+		100 * neuron_get_min_byte_size((Neuron*)array_get(&(layer->neurons), 0));
+	assert(layer_min_byte_size == layer_real_min_byte_size, "Layer min size should be %llu, not %llu", layer_real_min_byte_size, layer_min_byte_size);
+
+	layer_destroy(layer);
+	neuron_class_destroy(n_class);
+
+	assert(memory_leak() == FALSE, "memory_leak");
+	status = TEST_SUCCESS;
+error:
+	return status;
+}

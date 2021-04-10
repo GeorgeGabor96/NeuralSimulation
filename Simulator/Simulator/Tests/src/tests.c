@@ -48,6 +48,7 @@ TestInfo tests[] = {
 	{ layer_memory_test_test, "layer_memory_test_test" },
 	{ layer_fully_connected_test, "layer_fully_connected_test" },
 	{ layer_fully_link_input_layer_test, "layer_fully_link_input_layer_test" },
+	{ layer_get_min_byte_size_test, "layer_get_min_byte_size_test" },
 
 	// NEURON
 	{ neuron_LIF_refractor_general_test, "neuron_LIF_refractor_general_test" },

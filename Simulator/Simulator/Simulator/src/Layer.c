@@ -479,7 +479,7 @@ size_t layer_get_min_byte_size(Layer* layer) {
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 
 	size_t layer_byte_size = sizeof(Layer);
-	//layer_byte_size += array_get_byte_size(&(layer->name), NULL);
+	layer_byte_size += string_get_min_byte_size(layer->name);
 	layer_byte_size += array_data_get_min_byte_size(&(layer->inputs_data), NULL);
 	layer_byte_size += array_data_get_min_byte_size(&(layer->neurons), neuron_get_min_byte_size);
 	return layer_byte_size;
