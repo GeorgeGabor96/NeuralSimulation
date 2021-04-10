@@ -259,3 +259,14 @@ ERROR
 	return;
 }
 
+
+size_t synapse_get_min_byte_size(Synapse* synapse) {
+	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
+	size_t synapse_byte_size = sizeof(Synapse);
+	// I know that for the queue of the synapse I need at most @delay + 1 entries
+	synapse_byte_size += ((size_t)(synapse->s_class->delay) + 1) * sizeof(uint32_t);
+	return synapse_byte_size;
+
+ERROR
+	return 0;
+}

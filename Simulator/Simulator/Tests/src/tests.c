@@ -20,6 +20,7 @@
 
 // TODO: some tests take time, mark them and set a flag to run them or not
 TestInfo tests[] = {
+
 	// simulator
 	{ simulator_infer_test, "simulator_infer_test" },
 
@@ -61,7 +62,8 @@ TestInfo tests[] = {
 	{ synapse_compute_PSC_test, "synapse_compute_PSC_test" },
 	{ synapse_step_test, "synapse_step_test" },
 	{ synapse_class_memory_test, "synapse_class_memory_test" },
-	
+	{ synapse_get_min_byte_size_test, "synapse_get_min_byte_size_test" },
+
 	// STACK
 	{ stack_general_use_case_test, "stack_general_use_case_test" },
 	{ stack_memory_test, "stack_memory_test" },
@@ -79,6 +81,7 @@ TestInfo tests[] = {
 	{ array_copy_data_test, "array_copy_data_test" },
 	{ array_swap_test, "array_swap_test" },
 	{ array_memory_test, "array_memory_test" },
+	{ array_get_byte_min_size_test, "array_get_byte_min_size_test" },
 
 	// MEMORY MANAGEMENT
 	{ memory_management_general_test, "memory_management_general_test" },

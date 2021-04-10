@@ -23,16 +23,24 @@ void network_values_show(Array* values);
 void network_values_destroy(Array* values);
 
 typedef struct Network {
-	// TODO: layer can't keep the full name with them
 	Array layers;			// keeps the layers, will be added one by one, network has ownership
-	Array output_layers;	// one or more, keeps references to @layers
 	Array input_layers;		// one or more, keeps references to @layers
+	Array output_layers;	// one or more, keeps references to @layers
 	Array input_names;		// names of the input layers, reference to @layers->name
 	Array output_names;		// names of the output layers, reference to @layers->name
 	Array synapse_classes;	// keeps references to synaptic classes that should be used by synapses of this network, should be added one by one, network takes ownership
 	Array neuron_classes;	// keeps references to the neuron classes that should be used by neurons of this network, should be added one by one, network takes ownership
 	BOOL compiled;			// if the network has been compiled
+	BOOL memory_optimized;	// if this network is result of the @network_optimize_memory_placement function 
 } Network;
+
+/************************************************************************
+*								NOTES
+* keep references to synapse classes and neuron classes instead 
+* of keeping them dirrectly int the arrays because the resising of the 
+* arrays can cause nasty bugs if people are not aware of this
+* 
+************************************************************************/
 
 
 /* 
@@ -48,6 +56,8 @@ BOOL network_is_valid(Network* network);
 
 Network* network_create();
 void network_destroy(Network* network);
+
+size_t network_get_min_byte_size(Network* network);
 
 /*
 * This will copy the content of the @layer structure (shallow copy) and if everything works it will free (take ownership) the @layer pointer
@@ -101,12 +111,20 @@ NetworkOutputs* network_get_outputs(Network* network, NetworkValueType type);
 // Resets all the neurons and synapses to default and initial values also removes all spikes generated
 void network_clear_state(Network* network);
 
-// TODO: maybe is easier to be specific
-// TODO: get output by index???
 Array* network_get_output_spikes(Network* network);
 Array* network_get_output_voltages(Network* network);
 Array* network_get_layer_spikes(Network* network, uint32_t i);
 Array* network_get_layer_voltages(Network* network, uint32_t i);
+
+// Optimization
+/*
+* Will copy all the information about the network into a continuously allocated block of memory to reduce cache misses
+* It will invalidate the received network
+* 
+* NOTE: This assumes that the network will not be changed anymore, because it will keep the network in the samllest memory block posible
+*		adding things will break this
+*/
+Network* network_optimize_memory_placement(Network* network);
 
 
 #endif // __NETWORK_H__

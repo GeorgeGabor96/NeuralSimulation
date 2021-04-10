@@ -113,6 +113,7 @@ Network* network_create() {
 	status = array_init(&(network->neuron_classes), 1, 0, sizeof(NeuronClass*));
 	check(status == SUCCESS, "Couldn't init @network->neuron_classes");
 	network->compiled = FALSE;
+	network->memory_optimized = FALSE;
 
 	return network;
 
@@ -137,18 +138,48 @@ void network_destroy(Network* network) {
 	uint32_t i = 0;
 	Layer* layer = NULL;
 
-	array_reset(&(network->layers), layer_reset);
-	array_reset(&(network->input_layers), NULL);
-	array_reset(&(network->output_layers), NULL);
-	array_reset(&(network->input_names), NULL);
-	array_reset(&(network->output_names), NULL);
-	array_reset(&(network->synapse_classes), synapse_class_ref_destroy);
-	array_reset(&(network->neuron_classes), neuron_class_ref_destroy);
-	free(network);
+	if (network->memory_optimized == FALSE) {
+		array_reset(&(network->layers), layer_reset);
+		array_reset(&(network->input_layers), NULL);
+		array_reset(&(network->output_layers), NULL);
+		array_reset(&(network->input_names), NULL);
+		array_reset(&(network->output_names), NULL);
+		array_reset(&(network->synapse_classes), synapse_class_ref_destroy);
+		array_reset(&(network->neuron_classes), neuron_class_ref_destroy);
+		network->compiled = FALSE;
+		network->memory_optimized = FALSE;
+		free(network);
+	}
+	else {
+		// need to know the actual size of the network, to set everything to 0
+		//memset(network, 0, );
+		free(network);
+	}
 
 ERROR
 	return;
 }
+
+
+size_t network_get_min_byte_size(Network* network) {
+	check(network_is_valid(network) == TRUE, invalid_argument("network"));
+
+	size_t byte_size = 0;
+	byte_size += array_get_min_byte_size(&(network->layers), NULL);
+	byte_size += array_get_min_byte_size(&(network->input_layers), NULL);
+	byte_size += array_get_min_byte_size(&(network->output_layers), NULL);
+	byte_size += array_get_min_byte_size(&(network->input_names), NULL);
+	byte_size += array_get_min_byte_size(&(network->output_names), NULL);
+	byte_size += array_get_min_byte_size(&(network->synapse_classes), NULL);
+	byte_size += array_get_min_byte_size(&(network->neuron_classes), NULL);
+	byte_size += sizeof(network->compiled);
+	byte_size += sizeof(network->memory_optimized);
+	return byte_size;
+
+ERROR
+	return 0;
+}
+
 
 
 // layer functionality
@@ -273,6 +304,7 @@ Status network_add_synapse_class(Network* network, SynapseClass* s_class) {
 	}
 	status = array_append(&(network->synapse_classes), &s_class);
 	check(status == SUCCESS, "Couldn't add synapse class %s", string_get_C_string(s_class->name));
+
 	return SUCCESS;
 ERROR
 	return FAIL;
@@ -693,4 +725,19 @@ void network_values_destroy(Array* values) {
 
 ERROR
 	return;
+}
+
+
+Network* network_optimize_memory_placement(Network* network) {
+	check(network_is_valid(network) == TRUE, invalid_argument("network"));
+
+	// allocate a continuous block of memory that will hold everything regarding the network
+	size_t network_byte_size = network_get_min_byte_size(network);
+	Network* network_opt = (Network*)calloc(1, network_byte_size, "network_optimize_memory_placement");
+
+
+	return network_opt;
+
+ERROR
+	return NULL;
 }

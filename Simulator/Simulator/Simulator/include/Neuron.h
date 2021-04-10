@@ -61,7 +61,7 @@ Status neuron_class_set_LIF_refractor_parameters(NeuronClass* neuron_class, floa
 
 typedef struct Neuron {
 	NeuronClass* n_class;
-	Array in_synapses_refs;	  // references to input synapses
+	Array in_synapses_refs;	  // references to input synapses, has ownership
 	Array out_synapses_refs;  // references to output synapses
 	float u;
 	float PSC;		 		  // the PSC value that determined the current @u and @spike values
@@ -113,5 +113,6 @@ Status neuron_step_force_spike(Neuron* neuron, uint32_t simulation_time);
 */
 Status neuron_step_inject_current(Neuron* neuron, float PSC, uint32_t simulation_time);
 
+size_t neuron_get_min_byte_size(Neuron* neuron);
 
 #endif // __NEURON_H__

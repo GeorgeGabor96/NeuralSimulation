@@ -101,5 +101,7 @@ Status synapse_step(Synapse* synapse, uint32_t simulation_time);
 // empties the queue of spikes and resets the conductance
 void synapse_clear_state(Synapse* synapse);
 
+size_t synapse_get_min_byte_size(Synapse* synapse);
+
 
 #endif  // __SYNAPSE_H__

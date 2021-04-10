@@ -321,3 +321,24 @@ TestStatus synapse_step_test() {
 error:
 	return status;
 }
+
+
+TestStatus synapse_get_min_byte_size_test() {
+	TestStatus status = TEST_FAILED;
+
+	SynapseClass* s_class = synapse_class_create_default("DEFAULT_SYN");
+	Synapse* synapse = synapse_create(s_class, 1.0f);
+
+	size_t synapse_min_byte_size = synapse_get_min_byte_size(synapse);
+	size_t synapse_real_byte_size = sizeof(Synapse) + sizeof(uint32_t) * ((size_t)(s_class->delay) + 1);
+	assert(synapse_min_byte_size == synapse_real_byte_size, "Synapse size should be %llu, not %llu", synapse_real_byte_size, synapse_min_byte_size);
+
+	synapse_destroy(synapse);
+	synapse_class_destroy(s_class);
+
+	assert(memory_leak() == FALSE, "Memory leak");
+	status = TEST_SUCCESS;
+
+error:
+	return status;
+}
