@@ -270,3 +270,7 @@ size_t synapse_get_min_byte_size(Synapse* synapse) {
 ERROR
 	return 0;
 }
+
+size_t synapse_ref_get_min_byte_size(Synapse** synapse) {
+	return sizeof(Synapse*) + synapse_get_min_byte_size(*synapse);
+}

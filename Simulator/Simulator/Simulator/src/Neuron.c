@@ -399,7 +399,7 @@ ERROR
 size_t neuron_get_min_byte_size(Neuron* neuron) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 	size_t neuron_byte_size = sizeof(Neuron);
-	neuron_byte_size += array_data_get_min_byte_size(&(neuron->in_synapses_refs), synapse_get_min_byte_size);
+	neuron_byte_size += array_data_get_min_byte_size(&(neuron->in_synapses_refs), synapse_ref_get_min_byte_size);
 	neuron_byte_size += array_data_get_min_byte_size(&(neuron->out_synapses_refs), NULL);
 	return neuron_byte_size;
 

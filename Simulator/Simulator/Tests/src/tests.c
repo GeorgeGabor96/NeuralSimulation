@@ -53,6 +53,7 @@ TestInfo tests[] = {
 	{ neuron_LIF_refractor_general_test, "neuron_LIF_refractor_general_test" },
 	{ neuron_general_use_case_test, "neuron_general_use_case_test" },
 	{ neuron_memory_test, "neuron_memory_test" },
+	{ neuron_get_min_byte_size_test, "neuron_get_min_byte_size_test" },
 	
 	// SYNAPSE
 	{ synapse_class_create_destroy_test, "synapse_class_create_destroy_test" },
