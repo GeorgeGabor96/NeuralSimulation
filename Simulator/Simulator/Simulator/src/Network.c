@@ -806,6 +806,10 @@ Network* network_optimize_memory_placement(Network* net) {
 			// copy each synapse
 
 			// HOW THE FUCK DO I LINK THE OUT_SYNAPSE_REFS???????
+
+			// trebuie o trecere in care sa fie facute la toate layere sinapsele de input
+			// apoi sa ne prindem care layere sunt in pereche si sa facem match la care neuroni dintr-un layer
+			// este conectat cu altii din altul si atunci sa dam copiezer la acele sinapse
 		}
 
 
