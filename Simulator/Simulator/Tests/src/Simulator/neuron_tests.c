@@ -61,6 +61,23 @@ error:
 }
 
 
+TestStatus neuron_class_get_min_byte_size_test() {
+	TestStatus status = TEST_FAILED;
+
+	NeuronClass* n_class = neuron_class_create("DEFAULT_N", LIF_NEURON);
+	size_t n_class_min_byte_size = neuron_class_get_min_byte_size(n_class);
+	size_t n_class_real_min_byte_size = sizeof(NeuronClass) + string_get_min_byte_size(n_class->name);
+	assert(n_class_min_byte_size == n_class_real_min_byte_size, "Neuron Class byte size should be %llu, not %llu", n_class_real_min_byte_size, n_class_min_byte_size);
+
+	neuron_class_destroy(n_class);
+
+	assert(memory_leak() == FALSE, "Memory leak");
+	status = TEST_SUCCESS;
+error:
+	return status;
+}
+
+
 TestStatus neuron_general_use_case_test() {
 	// setup
 	TestStatus status = TEST_FAILED;
@@ -298,5 +315,40 @@ TestStatus neuron_LIF_refractor_general_test() {
 	status = TEST_SUCCESS;
 
 ERROR
+	return status;
+}
+
+
+TestStatus neuron_get_min_byte_size_test() {
+	TestStatus status = TEST_FAILED;
+
+	NeuronClass* n_class = neuron_class_create("DEFAULT_N", LIF_NEURON);
+	Neuron* neuron = neuron_create(n_class);
+
+	size_t neuron_min_byte_size = neuron_get_min_byte_size(neuron);
+	size_t neuron_real_min_byte_size = sizeof(Neuron);
+	assert(neuron_min_byte_size == neuron_real_min_byte_size, "Neuron min size should be %llu, not %llu", neuron_real_min_byte_size, neuron_min_byte_size);
+
+	SynapseClass* s_class = synapse_class_create_default("DEFAULT_S");
+	Synapse* s1 = synapse_create(s_class, 1.0f);
+	Synapse* s2 = synapse_create(s_class, 1.0f);
+	Synapse* s3 = synapse_create(s_class, 1.0f);
+	neuron_add_in_synapse(neuron, s1);
+	neuron_add_in_synapse(neuron, s2);
+	neuron_add_out_synapse(neuron, s3);
+
+	neuron_min_byte_size = neuron_get_min_byte_size(neuron);
+	// neuron owns s1 and s2, and knows about s3
+	neuron_real_min_byte_size = sizeof(Neuron) + 3 * sizeof(Synapse*) + 2 * synapse_get_min_byte_size(s1);
+	assert(neuron_min_byte_size == neuron_real_min_byte_size, "Neuron min size should be %llu, not %llu", neuron_real_min_byte_size, neuron_min_byte_size);
+
+	neuron_destroy(neuron); // this will destroy s1 s2
+	synapse_destroy(s3);
+	neuron_class_destroy(n_class);
+	synapse_class_destroy(s_class);
+
+	assert(memory_leak() == FALSE, "Memory leak");
+	status = TEST_SUCCESS;
+error:
 	return status;
 }

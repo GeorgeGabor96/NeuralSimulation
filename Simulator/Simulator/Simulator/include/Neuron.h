@@ -53,6 +53,9 @@ void neuron_class_destroy(NeuronClass* neuron_class);
 void neuron_class_ref_destroy(NeuronClass** neuron_class);
 Status neuron_class_set_LIF_parameters(NeuronClass* neuron_class, float u_th, float u_rest, float r, float c);
 Status neuron_class_set_LIF_refractor_parameters(NeuronClass* neuron_class, float u_th, float u_rest, float r, float c, uint32_t refract_time);
+size_t neuron_class_get_min_byte_size(NeuronClass* n_class);
+size_t neuron_class_ref_get_min_byte_size(NeuronClass** n_class);
+uint8_t* neuron_class_copy_to_memory(NeuronClass* n_class, uint8_t* block);
 
 
 /*************************************************************
@@ -61,7 +64,7 @@ Status neuron_class_set_LIF_refractor_parameters(NeuronClass* neuron_class, floa
 
 typedef struct Neuron {
 	NeuronClass* n_class;
-	Array in_synapses_refs;	  // references to input synapses
+	Array in_synapses_refs;	  // references to input synapses, has ownership
 	Array out_synapses_refs;  // references to output synapses
 	float u;
 	float PSC;		 		  // the PSC value that determined the current @u and @spike values
@@ -113,5 +116,6 @@ Status neuron_step_force_spike(Neuron* neuron, uint32_t simulation_time);
 */
 Status neuron_step_inject_current(Neuron* neuron, float PSC, uint32_t simulation_time);
 
+size_t neuron_get_min_byte_size(Neuron* neuron);
 
 #endif // __NEURON_H__

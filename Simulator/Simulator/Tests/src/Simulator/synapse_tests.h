@@ -6,11 +6,13 @@
 
 TestStatus synapse_class_create_destroy_test();
 TestStatus synapse_class_memory_test();
+TestStatus synapse_class_get_min_byte_size_test();
 
 TestStatus synapse_create_destroy_test();
 TestStatus synapse_memory_test();
 TestStatus synapse_add_spike_time_test();
 TestStatus synapse_compute_PSC_test();
 TestStatus synapse_step_test();
+TestStatus synapse_get_min_byte_size_test();
 
 #endif // __SYNAPSE_TESTS_H__

@@ -33,8 +33,8 @@ typedef struct LayerInputData {
 void layer_input_data_reset(LayerInputData* input_data);
 
 struct LayerInputDataLink {
-	Layer* input_layer;
-	SynapseClass* s_class;
+	Layer* input_layer;			// doesn't have ownership
+	SynapseClass* s_class;		// doesn't have ownership
 	float connectivity;
 };
 
@@ -127,6 +127,7 @@ ArrayFloat* layer_get_psc(Layer* layer);
 // utilizty functions
 void layer_summary(Layer* layer);
 size_t layer_get_weights_number(Layer* layer);
+size_t layer_get_min_byte_size(Layer* layer);
 
 // LINK functions
 Status layer_link_fc(Layer* layer, LayerInputDataLink* link_data);

@@ -228,6 +228,38 @@ ERROR
 }
 
 
+size_t neuron_class_get_min_byte_size(NeuronClass* n_class) {
+	check(neuron_class_is_valid(n_class) == TRUE, invalid_argument("n_class"));
+	size_t n_class_min_byte_size = sizeof(NeuronClass);
+	n_class_min_byte_size += string_get_min_byte_size(n_class->name);
+	return n_class_min_byte_size;
+ERROR
+	return 0;
+}
+
+
+size_t neuron_class_ref_get_min_byte_size(NeuronClass** n_class) {
+	check(neuron_class_is_valid(*n_class) == TRUE, invalid_argument("n_class"));
+	return sizeof(NeuronClass*) + neuron_class_get_min_byte_size(*n_class);
+ERROR
+	return 0;
+}
+
+
+uint8_t* neuron_class_copy_to_memory(NeuronClass* n_class, uint8_t* block) {
+	check(neuron_class_is_valid(n_class) == TRUE, invalid_argument("n_class"));
+	memcpy(block, n_class, sizeof(NeuronClass));
+	NeuronClass* new_n_class = (NeuronClass*)block;
+	block += sizeof(NeuronClass);
+
+	new_n_class->name = (String*)block;
+	block = string_copy_to_memory(n_class->name, block);
+	return block;
+ERROR
+	return NULL;
+}
+
+
 /*************************************************************
 * Neuron Functionality
 *************************************************************/
@@ -393,4 +425,16 @@ Status neuron_step_inject_current(Neuron* neuron, float PSC, uint32_t simulation
 
 ERROR
 	return FAIL;
+}
+
+
+size_t neuron_get_min_byte_size(Neuron* neuron) {
+	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
+	size_t neuron_byte_size = sizeof(Neuron);
+	neuron_byte_size += array_data_get_min_byte_size(&(neuron->in_synapses_refs), synapse_ref_get_min_byte_size);
+	neuron_byte_size += array_data_get_min_byte_size(&(neuron->out_synapses_refs), NULL);
+	return neuron_byte_size;
+
+ERROR
+	return 0;
 }

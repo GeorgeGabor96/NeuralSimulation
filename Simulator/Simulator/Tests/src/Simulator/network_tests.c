@@ -280,3 +280,93 @@ TestStatus network_summary_test() {
 ERROR
 	return TEST_FAILED;
 }
+
+
+TestStatus network_get_min_byte_size_test() {
+	// empty network
+	Network* net = network_create();
+	size_t net_min_byte_size = network_get_min_byte_size(net);
+	size_t net_real_min_byte_size = sizeof(Network);
+	assert(net_min_byte_size == net_real_min_byte_size, "Network size should be %llu, not %llu", net_real_min_byte_size, net_min_byte_size);
+
+	// add synaptic and neuron classes
+	network_add_neuron_class(net, neuron_class_create("TEST_N", LIF_NEURON));
+	network_add_synapse_class(net, synapse_class_create_default("TEST_S"));
+	NeuronClass* n_class = network_get_neuron_class_by_name(net, "TEST_N");
+	SynapseClass* s_class = network_get_synapse_class_by_name(net, "TEST_S");
+
+	net_min_byte_size = network_get_min_byte_size(net);
+	net_real_min_byte_size += sizeof(NeuronClass*) + neuron_class_get_min_byte_size(n_class) + // for @neuron_classes
+		sizeof(SynapseClass*) + synapse_class_get_min_byte_size(s_class);	// for @synapse_classes
+	assert(net_min_byte_size == net_real_min_byte_size, "Network size should be %llu, not %llu", net_real_min_byte_size, net_min_byte_size);
+
+	// add layers
+	Layer* l1 = layer_create_fully_connected(10, n_class, "l1");
+	Layer* l2 = layer_create_fully_connected(100, n_class, "l2");
+	Layer* l3 = layer_create_fully_connected(100, n_class, "l3");
+	layer_add_input_layer(l2, l1, s_class, 1.0f);
+	layer_add_input_layer(l3, l2, s_class, 1.0f);
+	network_add_layer(net, l1, TRUE, FALSE);
+	network_add_layer(net, l2, FALSE, FALSE);
+	network_add_layer(net, l3, FALSE, TRUE);
+	l1 = network_get_layer_by_name(net, "l1");
+	l2 = network_get_layer_by_name(net, "l2");
+	l3 = network_get_layer_by_name(net, "l3");
+
+	net_min_byte_size = network_get_min_byte_size(net);
+	size_t net_real_min_byte_size_aux = net_real_min_byte_size +
+		layer_get_min_byte_size(l1) + layer_get_min_byte_size(l2) + layer_get_min_byte_size(l3) + // for @layers
+		sizeof(String*) + // for the @input_names
+		sizeof(String*);  // for the @output_names
+	assert(net_min_byte_size == net_real_min_byte_size_aux, "Network size should be %llu, not %llu", net_real_min_byte_size_aux, net_min_byte_size);
+
+	// compile the network
+	size_t old_net_real_min_byte_size = net_real_min_byte_size_aux;
+	network_compile(net);
+	net_min_byte_size = network_get_min_byte_size(net);
+	net_real_min_byte_size_aux = net_real_min_byte_size +
+		layer_get_min_byte_size(l1) + layer_get_min_byte_size(l2) + layer_get_min_byte_size(l3) + // for @layers
+		sizeof(String*) + // for the @input_names
+		sizeof(String*);  // for the @output_names
+	
+	// check that the synapses are counted
+	assert(old_net_real_min_byte_size < net_real_min_byte_size_aux, "Synapses are not counted when computing min byte size");
+	net_real_min_byte_size_aux += sizeof(Layer*) + sizeof(Layer*); // for the @input_layers and @output_layers
+	assert(net_min_byte_size == net_real_min_byte_size_aux, "Network size should be %llu, not %llu", net_real_min_byte_size_aux, net_min_byte_size);
+
+	network_destroy(net);
+
+	assert(memory_leak() == FALSE, "Memory leak");
+	return TEST_SUCCESS;
+ERROR
+	return TEST_FAILED;
+}
+
+
+TestStatus network_optimize_memory_placement_test() {
+	Network* net = network_create();
+	network_add_neuron_class(net, neuron_class_create("NEURON_T", LIF_NEURON));
+	network_add_synapse_class(net, synapse_class_create_default("SYNAPSE_T"));
+	NeuronClass* n_class = network_get_neuron_class_by_name(net, "NEURON_T");
+	SynapseClass* s_class = network_get_synapse_class_by_name(net, "SYNAPSE_T");
+
+	Layer* l1 = layer_create_fully_connected(100, n_class, "l1");
+	Layer* l2 = layer_create_fully_connected(50, n_class, "l2");
+	Layer* l3 = layer_create_fully_connected(200, n_class, "l3");
+	layer_add_input_layer(l2, l1, s_class, 1.0f);
+	layer_add_input_layer(l3, l2, s_class, 1.0f);
+	network_add_layer(net, l1, TRUE, FALSE);
+	network_add_layer(net, l2, FALSE, FALSE);
+	network_add_layer(net, l3, FALSE, TRUE);
+	network_compile(net);
+
+	Network* net_opt = network_optimize_memory_placement(net);
+	
+	n_class = network_get_neuron_class_by_name(net_opt, "NEURON_T");
+	s_class = network_get_synapse_class_by_name(net_opt, "SYNAPSE_T");
+
+	assert(memory_leak() == FALSE, "Memory leak");
+	return TEST_SUCCESS;
+ERROR
+	return TEST_FAILED;
+}

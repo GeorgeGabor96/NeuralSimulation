@@ -60,7 +60,9 @@ SynapseClass* synapse_class_create_default(const char* name);
 void synapse_class_reset(SynapseClass* synapse_class);
 void synapse_class_destroy(SynapseClass* synapse_class);
 void synapse_class_ref_destroy(SynapseClass** synapse_class);
-
+size_t synapse_class_get_min_byte_size(SynapseClass* synapse_class);
+size_t synapse_class_ref_get_min_byte_size(SynapseClass** synapse_class);
+uint8_t* synapse_class_copy_to_memory(SynapseClass* s_class, uint8_t* block);
 
 /*************************************************************
 * Synapse Functionality
@@ -100,6 +102,9 @@ Status synapse_step(Synapse* synapse, uint32_t simulation_time);
 
 // empties the queue of spikes and resets the conductance
 void synapse_clear_state(Synapse* synapse);
+
+size_t synapse_get_min_byte_size(Synapse* synapse);
+size_t synapse_ref_get_min_byte_size(Synapse** synapse);
 
 
 #endif  // __SYNAPSE_H__

@@ -251,3 +251,96 @@ TestStatus array_swap_test() {
 error:
 	return status;
 }
+
+
+// testing size of array
+typedef struct Dummy {
+	int a;
+	int b;
+	int c;
+	int d;
+	Array ar;
+} Dummy;
+
+size_t dummy_get_min_byte_size(Dummy* dummy) {
+	return sizeof(Dummy) + array_data_get_min_byte_size(&(dummy->ar), NULL);
+}
+
+size_t dummy_ref_get_min_byte_size(Dummy** dummy) {
+	return sizeof(Dummy*) + dummy_get_min_byte_size(*dummy);
+}
+
+Dummy* dummy_create() {
+	Dummy* dummy = (Dummy*)malloc(sizeof(Dummy), "dummy_create");
+	array_init(&(dummy->ar), 10, 10, sizeof(int));
+	return dummy;
+}
+
+void dummy_reset(Dummy* dummy) {
+	array_reset(&(dummy->ar), NULL);
+}
+
+void dummy_destroy(Dummy* dummy) {
+	dummy_reset(dummy);
+	free(dummy);
+}
+
+void dummy_ref_destroy(Dummy** dummy) {
+	dummy_destroy(*dummy);
+}
+
+
+TestStatus array_get_byte_min_size_test() {
+	TestStatus status = TEST_FAILED;
+
+	// keep simple data tyes
+	Array* array = array_create(10, 5, sizeof(int));
+	size_t array_byte_size = array_get_min_byte_size(array, NULL);
+	size_t real_byte_size = sizeof(Array) + 5 * sizeof(int);
+	assert(array_byte_size == real_byte_size, "Array size should be %llu, not %llu", real_byte_size, array_byte_size);
+	array_destroy(array, NULL);
+
+	// keep data types that use additional data
+	array = array_create(10, 0, sizeof(Dummy));
+	array_byte_size = array_get_min_byte_size(array, dummy_get_min_byte_size);
+	real_byte_size = sizeof(Array);
+	assert(array_byte_size == real_byte_size, "Array size should be %llu, not %llu", real_byte_size, array_byte_size);
+	Dummy* dummy1 = dummy_create();
+	Dummy* dummy2 = dummy_create();
+	Dummy* dummy3 = dummy_create();
+	array_append(array, dummy1);
+	array_append(array, dummy2);
+	array_append(array, dummy3);
+	free(dummy1);
+	free(dummy2);
+	free(dummy3);
+
+	array_byte_size = array_get_min_byte_size(array, dummy_get_min_byte_size);
+	real_byte_size = sizeof(Array) + 3 * sizeof(Dummy) + 3 * 10 * sizeof(int);
+	assert(array_byte_size == real_byte_size, "Array size should be %llu, not %llu", real_byte_size, array_byte_size);
+	array_destroy(array, dummy_reset);
+
+	// keep pointers to complex data_types
+	array = array_create(10, 0, sizeof(Dummy*));
+	array_byte_size = array_get_min_byte_size(array, dummy_ref_get_min_byte_size);
+	real_byte_size = sizeof(Array);
+	assert(array_byte_size == real_byte_size, "Array size should be %llu, not %llu", real_byte_size, array_byte_size);
+	dummy1 = dummy_create();
+	dummy2 = dummy_create();
+	dummy3 = dummy_create();
+	array_append(array, &dummy1);
+	array_append(array, &dummy2);
+	array_append(array, &dummy3);
+
+	array_byte_size = array_get_min_byte_size(array, dummy_ref_get_min_byte_size);
+	real_byte_size = sizeof(Array) + 3 * sizeof(Dummy*) + 3 * dummy_get_min_byte_size(dummy1);
+	assert(array_byte_size == real_byte_size, "Array size should be %llu, not %llu", real_byte_size, array_byte_size);
+	array_destroy(array, dummy_ref_destroy);
+
+	assert(memory_leak() == FALSE, "Memory leak");
+	status = TEST_SUCCESS;
+
+
+error:
+	return status;
+}

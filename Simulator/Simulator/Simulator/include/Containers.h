@@ -10,6 +10,7 @@ reset - function that knows how to free the memory inside an element (not the me
 NOTE: if elements are simple (ex: int) and no special deallocation is required, pass NULL to @destroy
 */
 typedef void (*ElemReset) (void* elem);
+typedef size_t (*ElemSize) (void* elem);
 
 /*************************************************************
 * General Printing Functionality
@@ -46,7 +47,7 @@ typedef Array String;
 #define array_get_fast(a, i) ((a)->data + (a)->element_size * (i))
 #define array_set_fast(a, i, d) memcpy((a)->data + (a)->element_size * (i), (void*) (d), (a)->element_size)
 #define array_get_cast(a, i, t) ((t) array_get(a, i))
-#define array_data_size(a) ((a)->length * (a)->element_size)
+#define array_data_size(a) ((a)->max_length * (a)->element_size)
 #define array_data_reset(a) (memset((a)->data, 0, array_data_size(a))) // sets all bytes in data to 0
 #define array_is_full(a) ((a)->length == (a)->max_length)
 #define array_is_empty(a) ((a)->length == 0)
@@ -83,6 +84,13 @@ ArrayFloat* array_ones_float(uint32_t length);
 ArrayBool* array_ones_bool(uint32_t length);
 Status array_of_arrays_init(Array* data, uint32_t length, size_t inner_element_size);
 Status array_of_arrays_reset(Array* data); // assumes primitives data types
+
+// uses elem_size_f to find the full size of each element
+// if NULL then return only the array size
+// NOTE: it will give the minimum memory necessary to keep all the info about the array
+//		meaning that it will give the size regarding the current @length not the @max_length
+size_t array_data_get_min_byte_size(Array* array, ElemSize elem_size_f);
+size_t array_get_min_byte_size(Array* array, ElemSize elem_size_f);
 
 // dumping funtions
 void array_dump(Array* array, String* file_path, String* data_name, uint8_t type);
@@ -131,6 +139,10 @@ String* string_path_join_strings(String* string1, String* string2);
 String* string_path_join_string_and_C(String* string1, const char* string2);
 String* string_path_join_C_and_string(const char* string1, String* string2);
 
+uint8_t* string_copy_to_memory(String* string, uint8_t* block);
+
+#define string_get_min_byte_size(s) array_get_min_byte_size(s, NULL)
+
 /*************************************************************
 * Queue Functionality
 *************************************************************/
@@ -158,6 +170,6 @@ void queue_destroy(Queue* queue, ElemReset reset);
 Status queue_enqueue(Queue* queue, void* data);
 void* queue_dequeue(Queue* queue);
 void* queue_head(Queue* queue);
-
+size_t queue_get_byte_size(Queue* queue, ElemSize elem_size_f);
 
 #endif // __GENERIC_ARRAY_H__

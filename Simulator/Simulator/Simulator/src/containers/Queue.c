@@ -133,3 +133,18 @@ void* queue_head(Queue* queue) {
 ERROR
 	return element;
 }
+
+
+size_t queue_data_get_byte_size(Queue* queue, ElemSize elem_size_f) {
+	return 0;
+}
+
+
+size_t queue_get_byte_size(Queue* queue, ElemSize elem_size_f) {
+	check(queue_is_valid(queue) == TRUE, invalid_argument("queue"));
+	size_t queue_byte_size = sizeof(Queue);
+	return queue_byte_size;
+
+ERROR
+	return 0;
+}

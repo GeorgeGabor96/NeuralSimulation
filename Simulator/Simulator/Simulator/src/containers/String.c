@@ -205,3 +205,18 @@ String* string_path_join_C_and_string(const char* string1, String* string2) {
 ERROR
 	return NULL;
 }
+
+
+uint8_t* string_copy_to_memory(String* string, uint8_t* block) {
+	check(string_is_valid(string) == TRUE, invalid_argument("string"));
+	memcpy(block, string, sizeof(String));
+	String* new_string = (String*)block;
+	block += sizeof(String);
+	new_string->data = block;
+	memcpy(block, string->data, string->length);
+	block += string->length;
+	return block;
+
+ERROR
+	return NULL;
+}

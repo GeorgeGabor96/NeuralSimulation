@@ -370,6 +370,33 @@ ERROR
 }
 
 
+size_t array_data_get_min_byte_size(Array* array, ElemSize elem_size_f) {
+	check(array_is_valid(array) == TRUE, invalid_argument("array"));
+	
+	uint32_t i = 0;
+	size_t data_byte_size = 0;
+	if (elem_size_f == NULL)
+		data_byte_size += array->length * array->element_size;
+	else {
+		for (i = 0; i < array->length; ++i)
+			data_byte_size += elem_size_f(array_get(array, i));
+	}
+	return data_byte_size;
+
+ERROR
+	return 0;
+}
+
+
+size_t array_get_min_byte_size(Array* array, ElemSize elem_size_f) {
+	check(array_is_valid(array) == TRUE, invalid_argument("array"));
+	return sizeof(Array) + array_data_get_min_byte_size(array, elem_size_f);
+
+ERROR
+	return 0;
+}
+
+
 void array_dump(Array* array, String* file_path, String* data_name, uint8_t type) {
 	check(array_is_valid(array), invalid_argument("array"));
 	check(string_is_valid(file_path), invalid_argument("file_path"));

@@ -20,6 +20,9 @@
 
 // TODO: some tests take time, mark them and set a flag to run them or not
 TestInfo tests[] = {
+
+	{ network_optimize_memory_placement_test, "network_optimize_memory_placement_test" },
+
 	// simulator
 	{ simulator_infer_test, "simulator_infer_test" },
 
@@ -41,27 +44,39 @@ TestInfo tests[] = {
 	{ network_summary_test, "network_summary_test" },
 	{ network_compile_general_use_case_test, "network_compile_general_use_case_test" },
 	{ network_step_test, "network_step_test" },
+	{ network_get_min_byte_size_test, "network_get_min_byte_size_test" },
 
 	// LAYER
 	{ layer_general_use_case_test, "layer_general_use_case_test" },
 	{ layer_memory_test_test, "layer_memory_test_test" },
 	{ layer_fully_connected_test, "layer_fully_connected_test" },
 	{ layer_fully_link_input_layer_test, "layer_fully_link_input_layer_test" },
+	{ layer_get_min_byte_size_test, "layer_get_min_byte_size_test" },
+
+	// NEURON CLASS
+	{ neuron_class_general_use_case_test, "neuron_class_general_use_case_test" },
+	{ neuron_class_memory_test, "neuron_class_memory_test" },
+	{ neuron_class_get_min_byte_size_test, "neuron_class_get_min_byte_size_test" },
 
 	// NEURON
 	{ neuron_LIF_refractor_general_test, "neuron_LIF_refractor_general_test" },
 	{ neuron_general_use_case_test, "neuron_general_use_case_test" },
 	{ neuron_memory_test, "neuron_memory_test" },
+	{ neuron_get_min_byte_size_test, "neuron_get_min_byte_size_test" },
 	
-	// SYNAPSE
+	// SYNAPSE CLASS
 	{ synapse_class_create_destroy_test, "synapse_class_create_destroy_test" },
-	{ synapse_create_destroy_test, "synapse_create_destroy_test" },
 	{ synapse_class_memory_test, "synapse_class_memory_test" },
+	{ synapse_class_get_min_byte_size_test, "synapse_class_get_min_byte_size_test" },
+
+	// SYNAPSE
+	{ synapse_create_destroy_test, "synapse_create_destroy_test" },
 	{ synapse_add_spike_time_test, "synapse_add_spike_time_test" },
 	{ synapse_compute_PSC_test, "synapse_compute_PSC_test" },
 	{ synapse_step_test, "synapse_step_test" },
 	{ synapse_class_memory_test, "synapse_class_memory_test" },
-	
+	{ synapse_get_min_byte_size_test, "synapse_get_min_byte_size_test" },
+
 	// STACK
 	{ stack_general_use_case_test, "stack_general_use_case_test" },
 	{ stack_memory_test, "stack_memory_test" },
@@ -79,6 +94,7 @@ TestInfo tests[] = {
 	{ array_copy_data_test, "array_copy_data_test" },
 	{ array_swap_test, "array_swap_test" },
 	{ array_memory_test, "array_memory_test" },
+	{ array_get_byte_min_size_test, "array_get_byte_min_size_test" },
 
 	// MEMORY MANAGEMENT
 	{ memory_management_general_test, "memory_management_general_test" },

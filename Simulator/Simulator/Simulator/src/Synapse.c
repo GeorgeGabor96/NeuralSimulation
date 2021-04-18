@@ -108,6 +108,39 @@ void synapse_class_ref_destroy(SynapseClass** synapse_class) {
 }
 
 
+size_t synapse_class_get_min_byte_size(SynapseClass* s_class) {
+	check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
+	size_t s_class_min_byte_size = sizeof(SynapseClass);
+	s_class_min_byte_size += string_get_min_byte_size(s_class->name);
+	return s_class_min_byte_size;
+ERROR
+	return 0;
+}
+
+
+size_t synapse_class_ref_get_min_byte_size(SynapseClass** s_class) {
+	check(synapse_class_is_valid(*s_class) == TRUE, invalid_argument("s_class"));
+	return sizeof(SynapseClass*) + synapse_class_get_min_byte_size(*s_class);
+ERROR
+	return 0;
+}
+
+
+uint8_t* synapse_class_copy_to_memory(SynapseClass* s_class, uint8_t* block) {
+	check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
+	memcpy(block, s_class, sizeof(SynapseClass));
+	SynapseClass* new_s_class = (SynapseClass*)block;
+	block += sizeof(SynapseClass);
+
+	new_s_class->name = (String*)block;
+	block = string_copy_to_memory(s_class->name, block);
+	return block;
+ERROR
+	return NULL;
+}
+
+
+
 /*************************************************************
 * Synapse Functionality
 *************************************************************/
@@ -259,3 +292,18 @@ ERROR
 	return;
 }
 
+
+size_t synapse_get_min_byte_size(Synapse* synapse) {
+	check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
+	size_t synapse_byte_size = sizeof(Synapse);
+	// I know that for the queue of the synapse I need at most @delay + 1 entries
+	synapse_byte_size += ((size_t)(synapse->s_class->delay) + 1) * sizeof(uint32_t);
+	return synapse_byte_size;
+
+ERROR
+	return 0;
+}
+
+size_t synapse_ref_get_min_byte_size(Synapse** synapse) {
+	return sizeof(Synapse*) + synapse_get_min_byte_size(*synapse);
+}
