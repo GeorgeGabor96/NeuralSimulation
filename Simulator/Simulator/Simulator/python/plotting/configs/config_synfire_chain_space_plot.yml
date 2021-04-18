@@ -1,0 +1,21 @@
+experiments_folder: d:\repositories\Simulator\experiments\synfire_chain_connectivity_vs_synapse_strength
+variable1: connect
+variable2: strength
+title: abc
+time_between_pulses: 200
+dead_spikes: 0
+epileptic_spikes: 200
+almost_dead_spikes: 0.5
+almost_epileptic_spikes: 1.5
+layers:
+  - layer1
+  - layer2
+  - layer3
+  - layer4
+  - layer5
+  - layer6
+  - layer7
+  - layer8
+  - layer9
+  - layer10
+binaries_prefix: spikes

@@ -14,9 +14,11 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_file', type=str, required=True,
                         help='Path to the config file for the plot')
+    # TODO add description for the config file
     return parser.parse_args()
 
 
+# TODO change this to use the new get_binaries for layers function
 def get_spikes_binaries_for_layer(config):
     '''
     This will read all the the spike binary files for all the layers in the @layers variable in the config file

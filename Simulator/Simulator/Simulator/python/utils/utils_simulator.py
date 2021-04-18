@@ -1,5 +1,8 @@
 import numpy as np
 import sys
+import os
+from tqdm import tqdm
+
 
 
 def get_int32_from_bytes(bytes, idx):
@@ -37,3 +40,22 @@ def parse_array_file(array_file):
     _, data = get_np_array_from_bytes(bytes, idx, length, element_size, data_type)
 
     return dict(name=data_name, data=data)
+
+
+def get_binaries_for_layers(layers_folder, layers, prefix, log=True):
+    binaries_for_layer = list()
+
+    if log is True:
+        layers_r = tqdm(layers)
+    else:
+        layers_r = layers
+
+    for layer_name in layers_r:
+        layer_folder = os.path.join(layers_folder, layer_name)
+
+        # get the files that have the prefix
+        binaries = [f for f in os.listdir(layer_folder) if f.endswith('.bin')]
+        binaries_with_prefix = [f for f in binaries if prefix in f]
+        binaries_for_layer.append(dict(layer_name=layer_name, binaries=binaries_with_prefix))
+
+    return binaries_for_layer

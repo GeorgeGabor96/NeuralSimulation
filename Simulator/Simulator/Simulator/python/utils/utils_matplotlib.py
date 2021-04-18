@@ -88,3 +88,52 @@ def line_plot(output_file, y_data, line_label, x_label, y_label, title):
     plt.savefig(output_file, dpi=100)
 
     reset_plot()
+
+
+def fill_plot(output_file, groups, title, x_label, y_label):
+    # groupts is a dict
+
+    plt.figure(figsize=(15, 10))
+
+    # duplicate code
+    x_min = 1e+15
+    x_max = -1e+15
+    y_min = 1e+15
+    y_max = -1e+15
+
+    for group_name in groups.keys():
+        group_data = groups[group_name]
+
+        x_data = group_data['x']
+        y_data = group_data['y']
+
+        plt.fill(x_data, y_data, label=group_name)
+
+        if x_data.shape[0] != 0:
+            x_data_min = x_data.min()
+            x_data_max = x_data.max()
+            y_data_min = y_data.min()
+            y_data_max = y_data.max()
+
+            x_min = x_data_min if x_data_min < x_min else x_min
+            x_max = x_data_max if x_data_max > x_max else x_max
+            y_min = y_data_min if y_data_min < y_min else y_min
+            y_max = y_data_max if y_data_max > y_max else y_max
+
+    x_step = (x_max - x_min) / 40.0
+    if x_step != 0.0:
+        plt.xticks(np.arange(start=x_min, stop=x_max + x_step, step=x_step), rotation=90)
+
+    y_step = (y_max - y_min) / 30.0
+    if y_step != 0.0:
+        plt.yticks(np.arange(start=y_min, stop=y_max + y_step, step=y_step))
+
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.title(title, fontsize=20)
+    plt.xlabel(x_label, fontsize=20)
+    plt.ylabel(y_label, fontsize=20)
+    plt.tight_layout()
+
+    plt.savefig(output_file, dpi=100)
+
+    reset_plot()
