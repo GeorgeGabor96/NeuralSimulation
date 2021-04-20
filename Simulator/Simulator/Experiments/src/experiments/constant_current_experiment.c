@@ -43,7 +43,7 @@ void constant_current_learning_experiment() {
 
 	Layer* layer_input = layer_create_fully_connected(2, n_class, "layer_in");
 	Layer* layer_output = layer_create_fully_connected(1, n_class, "layer_out");
-	layer_add_input_layer(layer_output, layer_input, s_class_voltage, 1.0f);
+	layer_add_input_layer(layer_output, layer_input, s_class_voltage, 1.0f, 1.0f);
 
 	network_add_layer(net, layer_input, TRUE, FALSE);
 	network_add_layer(net, layer_output, FALSE, TRUE);

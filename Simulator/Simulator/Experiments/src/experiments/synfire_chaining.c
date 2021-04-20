@@ -2,6 +2,49 @@
 #include "Simulator.h"
 #include "data/data_gen_random_spikes.h"
 #include "callbacks/callback_dump.h"
+#include "../../include/networks.h"
+
+
+void synfire_chain_space_mapping_connectivity_and_synaptic_strength() {
+	char result_path[512] = { 0 };
+	char result_path_cb_dump[512] = { 0 };
+	sprintf(result_path, "%s\\\\synfire_chain\\mapping_space_connectivity_and_synaptic_strength", result_base_folder);
+
+	Network* net = NULL;
+	DataGenerator* data_gen = NULL;
+	Callback* network_dump_cb = NULL;
+	Simulator* simulator = NULL;
+	float connectivity = 0.0f;
+	float s_strength = 0.0f;
+
+	for (connectivity = 0.0f; connectivity <= 1.0f; connectivity += 0.5f) {
+
+		for (s_strength = 0.0f; s_strength <= 1.0f; s_strength += 0.5f) {
+			printf("Running with connectivity %f and synaptic strength %f\n", connectivity, s_strength);
+
+			memset(result_path_cb_dump, 0, 512);
+
+			// trebuie o functie ce construieste o retea cu parametrii astia
+			net = network_synfire_chain_10_layers(connectivity, s_strength);
+
+			// create data generator
+			data_gen = data_generator_spike_pulses_create(1, net, 10, 200, 10, 0.0f, 0.2f, 100);
+
+			// create callbacks
+			sprintf(result_path_cb_dump, "%s\\connectivity_%.2f_strength_%.2f", result_path, connectivity, s_strength);
+			network_dump_cb = callback_dump_network_create(net, result_path_cb_dump);
+
+			// create simulator and run it
+			simulator = simulator_create(data_gen, net);
+			simulator_add_callback(simulator, network_dump_cb);
+			simulator_infer(simulator);
+
+			// cleanup
+			simulator_destroy(simulator);
+		}
+	}
+}
+
 
 
 void synfire_chain_random_spikes() {
@@ -54,48 +97,48 @@ void synfire_chain_random_spikes() {
 
 	// link the neurons
 	float connectivity = 1.0f;
-	layer_add_input_layer(layer2, layer1, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer2, layer1_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer2_inh, layer1, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer2_inh, layer1_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer2, layer1, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer2, layer1_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer2_inh, layer1, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer2_inh, layer1_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer3, layer2, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer3, layer2_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer3_inh, layer2, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer3_inh, layer2_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer3, layer2, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer3, layer2_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer3_inh, layer2, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer3_inh, layer2_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer4, layer3, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer4, layer3_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer4_inh, layer3, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer4_inh, layer3_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer4, layer3, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer4, layer3_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer4_inh, layer3, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer4_inh, layer3_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer5, layer4, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer5, layer4_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer5_inh, layer4, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer5_inh, layer4_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer5, layer4, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer5, layer4_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer5_inh, layer4, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer5_inh, layer4_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer6, layer5, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer6, layer5_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer6_inh, layer5, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer6_inh, layer5_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer6, layer5, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer6, layer5_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer6_inh, layer5, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer6_inh, layer5_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer7, layer6, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer7, layer6_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer7_inh, layer6, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer7_inh, layer6_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer7, layer6, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer7, layer6_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer7_inh, layer6, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer7_inh, layer6_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer8, layer7, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer8, layer7_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer8_inh, layer7, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer8_inh, layer7_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer8, layer7, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer8, layer7_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer8_inh, layer7, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer8_inh, layer7_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer9, layer8, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer9, layer8_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer9_inh, layer8, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer9_inh, layer8_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer9, layer8, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer9, layer8_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer9_inh, layer8, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer9_inh, layer8_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer10, layer9, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer10, layer9_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer10, layer9, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer10, layer9_inh, inhibitory_s_class, connectivity, 1.0f);
 
 	// add layers to network
 	network_add_layer(net, layer1, TRUE, FALSE);
@@ -200,48 +243,48 @@ void synfire_chain_evolution() {
 
 	// link the neurons
 	float connectivity = 1.0f;
-	layer_add_input_layer(layer2, layer1, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer2, layer1_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer2_inh, layer1, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer2_inh, layer1_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer2, layer1, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer2, layer1_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer2_inh, layer1, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer2_inh, layer1_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer3, layer2, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer3, layer2_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer3_inh, layer2, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer3_inh, layer2_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer3, layer2, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer3, layer2_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer3_inh, layer2, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer3_inh, layer2_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer4, layer3, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer4, layer3_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer4_inh, layer3, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer4_inh, layer3_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer4, layer3, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer4, layer3_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer4_inh, layer3, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer4_inh, layer3_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer5, layer4, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer5, layer4_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer5_inh, layer4, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer5_inh, layer4_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer5, layer4, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer5, layer4_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer5_inh, layer4, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer5_inh, layer4_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer6, layer5, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer6, layer5_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer6_inh, layer5, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer6_inh, layer5_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer6, layer5, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer6, layer5_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer6_inh, layer5, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer6_inh, layer5_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer7, layer6, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer7, layer6_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer7_inh, layer6, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer7_inh, layer6_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer7, layer6, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer7, layer6_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer7_inh, layer6, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer7_inh, layer6_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer8, layer7, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer8, layer7_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer8_inh, layer7, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer8_inh, layer7_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer8, layer7, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer8, layer7_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer8_inh, layer7, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer8_inh, layer7_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer9, layer8, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer9, layer8_inh, inhibitory_s_class, connectivity);
-	layer_add_input_layer(layer9_inh, layer8, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer9_inh, layer8_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer9, layer8, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer9, layer8_inh, inhibitory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer9_inh, layer8, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer9_inh, layer8_inh, inhibitory_s_class, connectivity, 1.0f);
 
-	layer_add_input_layer(layer10, layer9, excitatory_s_class, connectivity);
-	layer_add_input_layer(layer10, layer9_inh, inhibitory_s_class, connectivity);
+	layer_add_input_layer(layer10, layer9, excitatory_s_class, connectivity, 1.0f);
+	layer_add_input_layer(layer10, layer9_inh, inhibitory_s_class, connectivity, 1.0f);
 
 	// add layers to network
 	network_add_layer(net, layer1, TRUE, FALSE);

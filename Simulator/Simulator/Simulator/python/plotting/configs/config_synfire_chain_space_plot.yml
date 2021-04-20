@@ -1,7 +1,7 @@
-experiments_folder: d:\repositories\Simulator\experiments\synfire_chain_connectivity_vs_synapse_strength
-variable1: connect
+experiments_folder: d:\repositories\Simulator\experiments\synfire_chain\mapping_space_connectivity_and_synaptic_strength\
+variable1: connectivity
 variable2: strength
-title: abc
+title: coonectivity_vs_synapse_strength
 time_between_pulses: 200
 dead_spikes: 0
 epileptic_spikes: 200

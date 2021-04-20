@@ -253,12 +253,24 @@ def fill_plot(output_file, groups, title, x_label, y_label):
         x_data = group_data['x']
         y_data = group_data['y']
 
-        plt.fill(x_data, y_data, label=group_name)
+        if x_data.shape[0] == 0:
+            continue
 
-        if x_data.shape[0] != 0:
-            plt.text(np.mean(x_data), np.mean(y_data), group_name)
-            x_min, x_max = get_min_max(x_min, x_max, x_data)
-            y_min, y_max = get_min_max(y_min, y_max, y_data)
+        # create polygon from points
+        pp = [(x, y) for x, y in zip(x_data, y_data)]
+
+        cent = (sum([p[0] for p in pp]) / len(pp), sum([p[1] for p in pp]) / len(pp))
+        # sort by polar angle
+        import math
+        pp.sort(key=lambda p: math.atan2(p[1] - cent[1], p[0] - cent[0]))
+
+
+        plt.fill([p[0] for p in pp], [p[1] for p in pp], label=group_name)
+        #plt.fill(x_data, y_data, label=group_name)
+
+        plt.text(np.mean(x_data), np.mean(y_data), group_name)
+        x_min, x_max = get_min_max(x_min, x_max, x_data)
+        y_min, y_max = get_min_max(y_min, y_max, y_data)
 
     set_x_ticks(x_min, x_max)
     set_y_ticks(y_min, y_max)

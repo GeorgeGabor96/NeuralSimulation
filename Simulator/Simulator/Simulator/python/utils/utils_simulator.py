@@ -4,7 +4,7 @@ import os
 from tqdm import tqdm
 
 
-
+#TODO document everything
 def get_int32_from_bytes(bytes, idx):
     return idx + 4, int.from_bytes(bytes[idx:idx+4], byteorder=sys.byteorder)
 

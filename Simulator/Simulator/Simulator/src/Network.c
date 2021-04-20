@@ -429,6 +429,7 @@ loop1:
 			linking_data.input_layer = network_get_layer_by_string(network, &(input_data->layer_name));
 			linking_data.s_class = network_get_synapse_class_by_string(network, &(input_data->syanpse_class_name));
 			linking_data.connectivity = input_data->connectivity;
+			linking_data.synaptic_strength = input_data->synaptic_strength;
 
 			status = layer->link(layer, &linking_data);
 			check(status == SUCCESS, "Could not link layers");

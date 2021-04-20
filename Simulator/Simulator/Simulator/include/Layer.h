@@ -28,6 +28,7 @@ typedef struct LayerInputData {
 	String layer_name;
 	String syanpse_class_name;
 	float connectivity;			// between 0 and 1. How much are the neurons in the layers connected
+	float synaptic_strength;
 }LayerInputData;
 
 void layer_input_data_reset(LayerInputData* input_data);
@@ -36,6 +37,7 @@ struct LayerInputDataLink {
 	Layer* input_layer;
 	SynapseClass* s_class;
 	float connectivity;
+	float synaptic_strength;
 };
 
 BOOL layer_input_data_link_is_valid(LayerInputDataLink* link_data);
@@ -95,10 +97,10 @@ Layer* layer_create_fully_connected(
 	const char* name);
 
 // stores that @input is an input layer for @layer, does not call @link
-Status layer_add_input_layer(Layer* layer, Layer* input, SynapseClass* s_class, float connectivity);
+Status layer_add_input_layer(Layer* layer, Layer* input, SynapseClass* s_class, float connectivity, float synaptic_strength);
 
 // stores that @input is an input layer for @layer, does call @link
-Status layer_link_input_layer(Layer* layer, Layer* input, SynapseClass* s_class, float connectivity);
+Status layer_link_input_layer(Layer* layer, Layer* input, SynapseClass* s_class, float connectivity, float synaptic_strength);
 
 const char* layer_get_name(Layer* layer);
 

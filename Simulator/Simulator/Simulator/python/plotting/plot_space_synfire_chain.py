@@ -100,8 +100,8 @@ if __name__ == '__main__':
     print('[INFO] Found', len(experiments_dirs), 'experiments')
 
     points_for_state = {
-        'NO_ACTIVITY': dict(x=[0.1], y=[0.1]),
-        'STABLE': dict(x=[0.5], y=[0.8]),
+        'NO_ACTIVITY': dict(x=[], y=[]),
+        'STABLE': dict(x=[], y=[]),
         'EPILEPSY': dict(x=[], y=[])
     }
 
