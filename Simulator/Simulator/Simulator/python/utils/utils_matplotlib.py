@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+import math
 
 
 def reset_plot():
@@ -213,6 +214,18 @@ def line_plot(output_file, y_data, line_label, x_label, y_label, title):
     reset_plot()
 
 
+def order_points_to_polygon(x_data, y_data):
+    '''
+    It orders a set of points so that they form a polygon
+    https://stackoverflow.com/questions/10846431/ordering-shuffled-points-that-can-be-joined-to-form-a-polygon-in-python
+    '''
+    pp = [(x, y) for x, y in zip(x_data, y_data)]
+    # sort by polar angle
+    cent = (sum([p[0] for p in pp]) / len(pp), sum([p[1] for p in pp]) / len(pp))
+    pp.sort(key=lambda p: math.atan2(p[1] - cent[1], p[0] - cent[0]))
+    return np.array([p[0] for p in pp]), np.array([p[1] for p in pp])
+
+
 def fill_plot(output_file, groups, title, x_label, y_label):
     """
     This will plot multiple cluster/polygons/groups of points, each with a different color
@@ -257,17 +270,10 @@ def fill_plot(output_file, groups, title, x_label, y_label):
             continue
 
         # create polygon from points
-        pp = [(x, y) for x, y in zip(x_data, y_data)]
+        #x_data, y_data = order_points_to_polygon(x_data, y_data)
 
-        cent = (sum([p[0] for p in pp]) / len(pp), sum([p[1] for p in pp]) / len(pp))
-        # sort by polar angle
-        import math
-        pp.sort(key=lambda p: math.atan2(p[1] - cent[1], p[0] - cent[0]))
-
-
-        plt.fill([p[0] for p in pp], [p[1] for p in pp], label=group_name)
         #plt.fill(x_data, y_data, label=group_name)
-
+        plt.scatter(x_data, y_data, label=group_name)
         plt.text(np.mean(x_data), np.mean(y_data), group_name)
         x_min, x_max = get_min_max(x_min, x_max, x_data)
         y_min, y_max = get_min_max(y_min, y_max, y_data)

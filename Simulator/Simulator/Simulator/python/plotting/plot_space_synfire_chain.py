@@ -57,8 +57,11 @@ def get_layer_first_pulse_mean_duration(layers_dir, layer_data, max_duration):
         spike_binary_file = os.path.join(layers_dir, layer_data['layer_name'], spike_binary)
         spike_data = parse_array_file(spike_binary_file)
         duration = get_first_pulse_duration(spike_data['data'], max_duration)
-        durations.append(duration)
+        if duration != 0:
+            durations.append(duration)
 
+    if len(durations) == 0:
+        return 0
     mean_duration = np.mean(durations)
     return mean_duration
 
@@ -69,8 +72,11 @@ def get_synfire_state_for_experiment(experiment_dir, spike_binaries, max_duratio
                                                                        layer_data=spike_binaries[1],
                                                                        max_duration=max_duration)
     last_l_mean_pulse_duration = get_layer_first_pulse_mean_duration(layers_dir=experiment_dir,
-                                                                     layer_data=spike_binaries[1],
+                                                                     layer_data=spike_binaries[-1],
                                                                      max_duration=max_duration)
+
+    if second_l_mean_pulse_duration == 0 or last_l_mean_pulse_duration == 0:
+        return 'NO_ACTIVITY'
 
     # if the ratio between the second and last layer is between [0.5, 1.5] then stable
     second_last_duration_ratio = second_l_mean_pulse_duration / last_l_mean_pulse_duration
@@ -79,9 +85,9 @@ def get_synfire_state_for_experiment(experiment_dir, spike_binaries, max_duratio
     # TODO the constant given in config
     if 0.5 <= second_last_duration_ratio <= 1.5:
         return 'STABLE'
-    elif second_last_duration_ratio > 1.5:
-        return 'EPILEPSY'
     elif second_last_duration_ratio < 0.5:
+        return 'EPILEPSY'
+    elif second_last_duration_ratio > 1.5:
         return 'NO_ACTIVITY'
 
     # we can find if the activity died when probagating
@@ -118,7 +124,7 @@ if __name__ == '__main__':
                                                                 log=False)
         state = get_synfire_state_for_experiment(experiment_dir=experiment_dir,
                                                  spike_binaries=spike_binaries_for_experiment,
-                                                 max_duration=config['epileptic_spikes'])
+                                                 max_duration=config['epileptic_spikes_duration_threshold'])
 
         points_for_state[state]['x'].append(variable_values[config['variable1']])
         points_for_state[state]['y'].append(variable_values[config['variable2']])
@@ -133,6 +139,3 @@ if __name__ == '__main__':
               title=config['title'],
               x_label=config['variable1'],
               y_label=config['variable2'])
-
-
-

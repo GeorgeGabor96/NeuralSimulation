@@ -8,7 +8,7 @@
 void synfire_chain_space_mapping_connectivity_and_synaptic_strength() {
 	char result_path[512] = { 0 };
 	char result_path_cb_dump[512] = { 0 };
-	sprintf(result_path, "%s\\\\synfire_chain\\mapping_space_connectivity_and_synaptic_strength", result_base_folder);
+	sprintf(result_path, "%s\\\\synfire_chain\\mapping_space_connectivity_0_01_to_0_10_and_synaptic_strength", result_base_folder);
 
 	Network* net = NULL;
 	DataGenerator* data_gen = NULL;
@@ -17,9 +17,9 @@ void synfire_chain_space_mapping_connectivity_and_synaptic_strength() {
 	float connectivity = 0.0f;
 	float s_strength = 0.0f;
 
-	for (connectivity = 0.0f; connectivity <= 1.0f; connectivity += 0.5f) {
+	for (connectivity = 0.01f; connectivity <= 0.1f; connectivity += 0.01f) {
 
-		for (s_strength = 0.0f; s_strength <= 1.0f; s_strength += 0.5f) {
+		for (s_strength = 0.1f; s_strength <= 1.0f; s_strength += 0.1f) {
 			printf("Running with connectivity %f and synaptic strength %f\n", connectivity, s_strength);
 
 			memset(result_path_cb_dump, 0, 512);
