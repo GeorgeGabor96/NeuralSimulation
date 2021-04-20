@@ -28,7 +28,7 @@ void synfire_chain_space_mapping_connectivity_and_synaptic_strength() {
 			net = network_synfire_chain_10_layers(connectivity, s_strength);
 
 			// create data generator
-			data_gen = data_generator_spike_pulses_create(1, net, 10, 200, 10, 0.0f, 0.2f, 100);
+			data_gen = data_generator_spike_pulses_create(1, net, 10, 2000, 10, 0.0f, 0.2f, 1000);
 
 			// create callbacks
 			sprintf(result_path_cb_dump, "%s\\connectivity_%.2f_strength_%.2f", result_path, connectivity, s_strength);

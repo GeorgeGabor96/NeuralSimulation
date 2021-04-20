@@ -1,8 +1,8 @@
 #ifndef __CONFIG__
 #define __CONFIG__
 
-#define MEMORY_MANAGE
-#define CHECKS
+//#define MEMORY_MANAGE
+//#define CHECKS
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -47,27 +47,27 @@ Network* network_synfire_chain_10_layers(float connectivity, float s_strength) {
 	NeuronClass* n_class = LIF_n_class;
 
 	uint32_t w = 70;
-	Layer* layer1 = layer_create_fully_connected(w, n_class, "layer1");
-	Layer* layer2 = layer_create_fully_connected(w, n_class, "layer2");
-	Layer* layer3 = layer_create_fully_connected(w, n_class, "layer3");
-	Layer* layer4 = layer_create_fully_connected(w, n_class, "layer4");
-	Layer* layer5 = layer_create_fully_connected(w, n_class, "layer5");
-	Layer* layer6 = layer_create_fully_connected(w, n_class, "layer6");
-	Layer* layer7 = layer_create_fully_connected(w, n_class, "layer7");
-	Layer* layer8 = layer_create_fully_connected(w, n_class, "layer8");
-	Layer* layer9 = layer_create_fully_connected(w, n_class, "layer9");
+	Layer* layer1 = layer_create_fully_connected(w, n_class, "layer01");
+	Layer* layer2 = layer_create_fully_connected(w, n_class, "layer02");
+	Layer* layer3 = layer_create_fully_connected(w, n_class, "layer03");
+	Layer* layer4 = layer_create_fully_connected(w, n_class, "layer04");
+	Layer* layer5 = layer_create_fully_connected(w, n_class, "layer05");
+	Layer* layer6 = layer_create_fully_connected(w, n_class, "layer06");
+	Layer* layer7 = layer_create_fully_connected(w, n_class, "layer07");
+	Layer* layer8 = layer_create_fully_connected(w, n_class, "layer08");
+	Layer* layer9 = layer_create_fully_connected(w, n_class, "layer09");
 	Layer* layer10 = layer_create_fully_connected(w, n_class, "layer10");
 
 	uint32_t w_inh = 30;
-	Layer* layer1_inh = layer_create_fully_connected(w_inh, n_class, "layer1_inh");
-	Layer* layer2_inh = layer_create_fully_connected(w_inh, n_class, "layer2_inh");
-	Layer* layer3_inh = layer_create_fully_connected(w_inh, n_class, "layer3_inh");
-	Layer* layer4_inh = layer_create_fully_connected(w_inh, n_class, "layer4_inh");
-	Layer* layer5_inh = layer_create_fully_connected(w_inh, n_class, "layer5_inh");
-	Layer* layer6_inh = layer_create_fully_connected(w_inh, n_class, "layer6_inh");
-	Layer* layer7_inh = layer_create_fully_connected(w_inh, n_class, "layer7_inh");
-	Layer* layer8_inh = layer_create_fully_connected(w_inh, n_class, "layer8_inh");
-	Layer* layer9_inh = layer_create_fully_connected(w_inh, n_class, "layer9_inh");
+	Layer* layer1_inh = layer_create_fully_connected(w_inh, n_class, "layer01_inh");
+	Layer* layer2_inh = layer_create_fully_connected(w_inh, n_class, "layer02_inh");
+	Layer* layer3_inh = layer_create_fully_connected(w_inh, n_class, "layer03_inh");
+	Layer* layer4_inh = layer_create_fully_connected(w_inh, n_class, "layer04_inh");
+	Layer* layer5_inh = layer_create_fully_connected(w_inh, n_class, "layer05_inh");
+	Layer* layer6_inh = layer_create_fully_connected(w_inh, n_class, "layer06_inh");
+	Layer* layer7_inh = layer_create_fully_connected(w_inh, n_class, "layer07_inh");
+	Layer* layer8_inh = layer_create_fully_connected(w_inh, n_class, "layer08_inh");
+	Layer* layer9_inh = layer_create_fully_connected(w_inh, n_class, "layer09_inh");
 
 	// link the neurons
 	layer_add_input_layer(layer2, layer1, excitatory_s_class, connectivity, s_strength);

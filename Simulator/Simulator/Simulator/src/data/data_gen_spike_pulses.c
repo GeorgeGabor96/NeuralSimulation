@@ -167,8 +167,11 @@ NetworkInputs* data_element_spike_pulses_get_values(DataElement* element, uint32
 
 				spikes_percent = data->in_pulse == TRUE ? data->pulse_spike_frequency : data->between_pulses_spike_frequency;
 			}
-			
-			spike = (double)rand() / (double)RAND_MAX <= spikes_percent ? TRUE : FALSE;
+
+			if (spikes_percent > 0.0)
+				spike = (double)rand() / (double)RAND_MAX <= spikes_percent ? TRUE : FALSE;
+			else
+				spike = FALSE;
 			array_set(&(net_input.values), j, &spike);
 		}
 		net_input.type = SPIKES;
