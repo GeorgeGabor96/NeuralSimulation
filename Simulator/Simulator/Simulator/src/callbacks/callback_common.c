@@ -34,6 +34,7 @@ ERROR
 	return;
 }
 
+
 void callback_destroy(Callback* callback) {
 	check(callback_is_valid(callback) == TRUE, invalid_argument("callback"));
 	callback_reset(callback);

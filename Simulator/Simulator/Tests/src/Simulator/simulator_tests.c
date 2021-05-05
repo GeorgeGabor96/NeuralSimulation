@@ -17,7 +17,7 @@ TestStatus simulator_infer_test() {
 
 	Layer* layer_input = layer_create_fully_connected(100, n_class, "layer_input");
 	Layer* layer_output = layer_create_fully_connected(1, n_class, "layer_output");
-	layer_add_input_layer(layer_output, layer_input, s_class, 1.0f);
+	layer_add_input_layer(layer_output, layer_input, s_class, 1.0f, 1.0f);
 
 	network_add_layer(net, layer_input, TRUE, FALSE);
 	network_add_layer(net, layer_output, FALSE, TRUE);
@@ -29,7 +29,7 @@ TestStatus simulator_infer_test() {
 
 	// create callbacks
 	layer_output = *((Layer**)array_get(&(net->output_layers), 0));
-	Callback* callback = callback_dump_layer_neurons_create(layer_output, ".\\simulator_visu", FALSE);
+	Callback* callback = callback_dump_layer_neurons_create(layer_output, ".\\simulator_visu");
 
 	// create the simulator
 	Simulator* simulator = simulator_create(generator, net);

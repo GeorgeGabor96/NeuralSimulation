@@ -9,7 +9,7 @@
 TestStatus callback_dump_layer_neurons_test() {
 	NeuronClass* n_class = neuron_class_create("TEST NEURON", LIF_NEURON);
 	Layer* layer = layer_create_fully_connected(10, n_class, "layer_visu");
-	Callback* callback_visu = callback_dump_layer_neurons_create(layer, ".\\callback_visu", FALSE);
+	Callback* callback_visu = callback_dump_layer_neurons_create(layer, ".\\callback_visu");
 	ArrayFloat* constant_current = array_ones_float(10);
 	assert(callback_is_valid(callback_visu) == TRUE, invalid_argument("callback"));
 
@@ -47,8 +47,8 @@ TestStatus callback_dump_network_test() {
 	Layer* l1 = layer_create(LAYER_FULLY_CONNECTED, 10, n_class, "l1");
 	Layer* l2 = layer_create(LAYER_FULLY_CONNECTED, 10, n_class, "l2");
 	Layer* l3 = layer_create(LAYER_FULLY_CONNECTED, 10, n_class, "l3");
-	layer_add_input_layer(l2, l1, s_class, 1.0f);
-	layer_add_input_layer(l3, l2, s_class, 1.0f);
+	layer_add_input_layer(l2, l1, s_class, 1.0f, 1.0f);
+	layer_add_input_layer(l3, l2, s_class, 1.0f, 1.0f);
 
 	network_add_layer(net, l1, TRUE, FALSE);
 	network_add_layer(net, l2, FALSE, FALSE);
