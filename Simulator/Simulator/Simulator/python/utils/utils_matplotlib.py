@@ -274,7 +274,7 @@ def fill_plot(output_file, groups, title, x_label, y_label):
 
         #plt.fill(x_data, y_data, label=group_name)
         plt.scatter(x_data, y_data, label=group_name)
-        plt.text(np.mean(x_data), np.mean(y_data), group_name)
+        #plt.text(np.mean(x_data), np.mean(y_data), group_name)
         x_min, x_max = get_min_max(x_min, x_max, x_data)
         y_min, y_max = get_min_max(y_min, y_max, y_data)
 

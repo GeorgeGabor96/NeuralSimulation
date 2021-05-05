@@ -19,5 +19,6 @@ layers:
 - layer09
 - layer09_inh
 - layer10
-layers_folder: d:\repositories\Simulator\experiments\synfire_chain\mapping_space_connectivity_0_01_to_0_10_and_synaptic_strength\connectivity_0.03_strength_0.10
-title: connectivity_0.03_strength_0.10
+- network.png
+layers_folder: d:\repositories\Simulator\experiments\synfire_chain\wide_mapping_space_connectivity_0_03_to_0_60_and_synaptic_strength_0_003_to_0_03\connectivity_0.0300_strength_0.0180
+title: connectivity_0.0300_strength_0.0180

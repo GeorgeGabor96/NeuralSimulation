@@ -6,10 +6,10 @@
 
 
 void synfire_chain_space_mapping_connectivity_and_synaptic_strength() {
-	char result_path[512] = { 0 };
-	char result_path_cb_dump[512] = { 0 };
-	sprintf(result_path, "%s\\\\synfire_chain\\mapping_space_connectivity_0_01_to_0_10_and_synaptic_strength", result_base_folder);
-
+	char result_path[1024] = { 0 };
+	char result_path_cb_dump[1024] = { 0 };
+	sprintf(result_path, "%s\\synfire_chain\\w_connectivity_0_025_to_0_8_and_synaptic_strength_0_025_to_0_8", result_base_folder);
+	
 	Network* net = NULL;
 	DataGenerator* data_gen = NULL;
 	Callback* network_dump_cb = NULL;
@@ -17,21 +17,21 @@ void synfire_chain_space_mapping_connectivity_and_synaptic_strength() {
 	float connectivity = 0.0f;
 	float s_strength = 0.0f;
 
-	for (connectivity = 0.01f; connectivity <= 0.1f; connectivity += 0.01f) {
+	for (connectivity = 0.025f; connectivity < 0.81f; connectivity += 0.025f) {
 
-		for (s_strength = 0.1f; s_strength <= 1.0f; s_strength += 0.1f) {
+		for (s_strength = 0.025f; s_strength < 0.81f; s_strength += 0.025f) {
 			printf("Running with connectivity %f and synaptic strength %f\n", connectivity, s_strength);
 
-			memset(result_path_cb_dump, 0, 512);
+			memset(result_path_cb_dump, 0, 1024);
 
 			// trebuie o functie ce construieste o retea cu parametrii astia
 			net = network_synfire_chain_10_layers(connectivity, s_strength);
 
 			// create data generator
-			data_gen = data_generator_spike_pulses_create(1, net, 10, 2000, 10, 0.0f, 0.2f, 1000);
+			data_gen = data_generator_spike_pulses_create(1, net, 10, 2000, 20, 0.0f, 0.05f, 1000);
 
 			// create callbacks
-			sprintf(result_path_cb_dump, "%s\\connectivity_%.2f_strength_%.2f", result_path, connectivity, s_strength);
+			sprintf(result_path_cb_dump, "%s\\connectivity_%.4f_strength_%.4f", result_path, connectivity, s_strength);
 			network_dump_cb = callback_dump_network_create(net, result_path_cb_dump);
 
 			// create simulator and run it

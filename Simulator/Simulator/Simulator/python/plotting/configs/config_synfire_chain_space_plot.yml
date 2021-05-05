@@ -1,7 +1,7 @@
-experiments_folder: d:\repositories\Simulator\experiments\synfire_chain\mapping_space_connectivity_0_01_to_0_10_and_synaptic_strength
+experiments_folder: d:\repositories\Simulator\experiments\synfire_chain\w_connectivity_0_025_to_0_8_and_synaptic_strength_0_025_to_0_8\
 variable1: connectivity
 variable2: strength
-title: coonectivity_vs_synapse_strength
+title: connectivity_vs_synapse_strength
 epileptic_spikes_duration_threshold: 200
 layers:
   - layer01
