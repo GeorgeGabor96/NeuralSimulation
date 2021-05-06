@@ -1,7 +1,6 @@
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-import math
 
 
 def reset_plot():
@@ -214,21 +213,9 @@ def line_plot(output_file, y_data, line_label, x_label, y_label, title):
     reset_plot()
 
 
-def order_points_to_polygon(x_data, y_data):
-    '''
-    It orders a set of points so that they form a polygon
-    https://stackoverflow.com/questions/10846431/ordering-shuffled-points-that-can-be-joined-to-form-a-polygon-in-python
-    '''
-    pp = [(x, y) for x, y in zip(x_data, y_data)]
-    # sort by polar angle
-    cent = (sum([p[0] for p in pp]) / len(pp), sum([p[1] for p in pp]) / len(pp))
-    pp.sort(key=lambda p: math.atan2(p[1] - cent[1], p[0] - cent[0]))
-    return np.array([p[0] for p in pp]), np.array([p[1] for p in pp])
-
-
-def fill_plot(output_file, groups, title, x_label, y_label):
+def scatter_plot(output_file, groups, title, x_label, y_label):
     """
-    This will plot multiple cluster/polygons/groups of points, each with a different color
+    This will plot multiple groups of points, each with a different color
 
     :param output_file: str
         path to the file where to save the plot
@@ -250,11 +237,8 @@ def fill_plot(output_file, groups, title, x_label, y_label):
     :param y_label: str
         label for the y axis
     """
-    # groupts is a dict
-
     plt.figure(figsize=(15, 10))
 
-    # duplicate code
     x_min = 1e+15
     x_max = -1e+15
     y_min = 1e+15
@@ -269,12 +253,7 @@ def fill_plot(output_file, groups, title, x_label, y_label):
         if x_data.shape[0] == 0:
             continue
 
-        # create polygon from points
-        #x_data, y_data = order_points_to_polygon(x_data, y_data)
-
-        #plt.fill(x_data, y_data, label=group_name)
         plt.scatter(x_data, y_data, label=group_name)
-        #plt.text(np.mean(x_data), np.mean(y_data), group_name)
         x_min, x_max = get_min_max(x_min, x_max, x_data)
         y_min, y_max = get_min_max(y_min, y_max, y_data)
 

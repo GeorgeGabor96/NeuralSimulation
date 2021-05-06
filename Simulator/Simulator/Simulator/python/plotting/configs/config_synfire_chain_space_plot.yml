@@ -1,21 +1,4 @@
-experiments_folder: d:\repositories\Simulator\experiments\synfire_chain\w_connectivity_0_025_to_0_8_and_synaptic_strength_0_025_to_0_8\
+experiments_folder: d:\repositories\Simulator\experiments\synfire_chain_callback\refract_connectivity_0_025_to_1_and_synaptic_strength_0_025_to_0_1_v3\
 variable1: connectivity
 variable2: strength
 title: connectivity_vs_synapse_strength
-epileptic_spikes_duration_threshold: 200
-layers:
-  - layer01
-  - layer02
-  - layer03
-  - layer04
-  - layer05
-  - layer06
-  - layer07
-  - layer08
-  - layer09
-  - layer10
-
-time_between_pulses: 200
-dead_spikes: 0
-almost_dead_spikes: 0.5
-almost_epileptic_spikes: 1.5

@@ -31,8 +31,8 @@ void time_between_spikes_experiment() {
 	// create callbacks
 	layer_input = network_get_layer_by_name(net, "layer_in");
 	layer_output = network_get_layer_by_name(net, "layer_out");
-	Callback* c1 = callback_dump_layer_neurons_create(layer_input, result_path, TRUE);
-	Callback* c2 = callback_dump_layer_neurons_create(layer_output, result_path, TRUE);
+	Callback* c1 = callback_dump_layer_neurons_create(layer_input, result_path);
+	Callback* c2 = callback_dump_layer_neurons_create(layer_output, result_path);
 
 	// create simulator
 	Simulator* simulator = simulator_create(constant_current, net);

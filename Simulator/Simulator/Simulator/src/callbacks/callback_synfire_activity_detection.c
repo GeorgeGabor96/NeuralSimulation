@@ -224,15 +224,15 @@ void callback_detect_synfire_activity_data_run(C_Data* data, Network* net) {
 	// decide the state of the network
 	const char* state = NULL;
 	if (second_layer_mean_pulse_duration <= 0.0f || last_layer_mean_pulse_duration <= 0.0f) {
-		state = "DEAD";
+		state = "NO_ACTIVITY";
 	}
 	else {
 		float second_last_pulse_duration_ratio = second_layer_mean_pulse_duration / last_layer_mean_pulse_duration;
 		if (second_last_pulse_duration_ratio < data->min_ratio) {
-			state = "DEAD";
-		}
-		else if (second_layer_mean_pulse_duration > data->max_ratio) {
 			state = "EPILEPSY";
+		}
+		else if (second_last_pulse_duration_ratio > data->max_ratio) {
+			state = "NO_ACTIVITY";
 		}
 		else {
 			state = "STABLE";
