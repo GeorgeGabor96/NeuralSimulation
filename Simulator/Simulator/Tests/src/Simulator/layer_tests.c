@@ -308,9 +308,9 @@ TestStatus layer_fully_link_input_layer_test() {
 	Layer* l1 = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, "layer1");
 	Layer* l2 = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, "layer2");
 	Layer* l3 = layer_create(LAYER_FULLY_CONNECTED, 100, n_class, "layer3");
-	layer_link_input_layer(l2, l1, s_class, 1.0f);
-	layer_link_input_layer(l3, l2, s_class, 1.0f);
-	layer_link_input_layer(l3, l1, s_class, 1.0f);
+	layer_link_input_layer(l2, l1, s_class, 1.0f, 1.0f);
+	layer_link_input_layer(l3, l2, s_class, 1.0f, 1.0f);
+	layer_link_input_layer(l3, l1, s_class, 1.0f, 1.0f);
 
 	start = clock();
 	for (uint32_t i = 0; i < 100; ++i) {

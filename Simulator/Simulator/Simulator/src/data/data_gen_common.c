@@ -85,6 +85,27 @@ ERROR
 }
 
 
+NetworkInputs* data_element_get_values(DataElement* element, uint32_t time) {
+	check(data_element_is_valid(element) == TRUE, invalid_argument("element"));
+	return element->get_values(element, time);
+
+ERROR
+	return NULL;
+}
+
+
+void data_element_remove_values(DataElement* element, NetworkInputs* values) {
+	check(data_element_is_valid(element) == TRUE, invalid_argument("element"));
+	element->remove_values(element, values);
+
+ERROR
+	return;
+}
+
+
+/*************************************************************
+* DATA ELEMENT HELPER FUNCTIONALITY
+*************************************************************/
 void data_element_base_remove_values(DataElement* element, NetworkInputs* inputs) {
 	(element);
 	network_values_destroy(inputs);

@@ -32,7 +32,7 @@ Callback* callback_dump_network_create(Network* net, const char* output_folder) 
 	check(status == SUCCESS, init_argument("data->callbacks_layers"));
 	for (i = 0; i < net->layers.length; ++i) {
 		layer = network_get_layer_by_idx(net, i);
-		callback = callback_dump_layer_neurons_create(layer, output_folder, FALSE);
+		callback = callback_dump_layer_neurons_create(layer, output_folder);
 		array_append(&(data->callbacks_layers), callback);
 		free(callback);
 	}

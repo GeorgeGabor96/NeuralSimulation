@@ -12,7 +12,6 @@ typedef struct C_Data {
 	Array voltages_per_neuron;	// contains an ArrayFloat for every neuron
 	Array spikes_per_neuron;	// contains an ArrayBool for every neuron
 	Array psc_per_neuron;		// contains an ArrayFloat for every neuron
-	BOOL plot;					// if it should also plot the dumped arrays
 } C_Data;
 
 
@@ -22,7 +21,7 @@ void callback_dump_layer_neurons_data_update(C_Data* data, Network* net);
 void callback_dump_layer_neurons_data_run(C_Data* data, Network* net);
 
 
-Callback* callback_dump_layer_neurons_create(Layer* layer, const char* output_folder, BOOL plot) {
+Callback* callback_dump_layer_neurons_create(Layer* layer, const char* output_folder) {
 	Callback* callback = NULL;
 	C_Data* data = NULL;
 	Status status = FAIL;
@@ -51,7 +50,6 @@ Callback* callback_dump_layer_neurons_create(Layer* layer, const char* output_fo
 	os_mkdir(data->output_folder.data);
 
 	data->layer = layer;
-	data->plot = plot;
 
 	callback->data = (void*)data;
 	callback->data_is_valid = callback_dump_layer_neurons_data_is_valid;
@@ -91,7 +89,6 @@ void callback_dump_layer_neurons_data_destroy(C_Data* data) {
 	array_of_arrays_reset(&(data->voltages_per_neuron));
 	array_of_arrays_reset(&(data->spikes_per_neuron));
 	array_of_arrays_reset(&(data->psc_per_neuron));
-	data->plot = FALSE;
 	free(data);
 
 ERROR
@@ -176,10 +173,6 @@ void callback_dump_layer_neurons_data_run(C_Data* data, Network* net) {
 		string_destroy(file_path);
 		string_destroy(data_name);
 	}
-
-	// call the plotting script if necessary
-	if (data->plot == TRUE)
-		os_plot_layers(string_get_C_string(&(data->output_folder)));
 
 ERROR
 	return;

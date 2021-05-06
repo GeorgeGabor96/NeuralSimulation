@@ -112,7 +112,7 @@ void* stack_top(Stack* stack_p);
 * String Functionality
 *************************************************************/
 // string have at most 256 chars currently
-#define STRING_LIMIT 256
+#define STRING_LIMIT 1024
 BOOL string_is_valid(String* string);
 Status string_init(String* string_p, const char* c_string_p);
 String* string_create(const char* c_string_p);

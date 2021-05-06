@@ -1,0 +1,23 @@
+layers_folder: d:\repositories\Simulator\experiments\synfire_chain_callback\refract_connectivity_0_025_to_1_and_synaptic_strength_0_025_to_0_1\connectivity_0.0250_strength_0.0500\
+layers:
+- layer01
+- layer01_inh
+- layer02
+- layer02_inh
+- layer03
+- layer03_inh
+- layer04
+- layer04_inh
+- layer05
+- layer05_inh
+- layer06
+- layer06_inh
+- layer07
+- layer07_inh
+- layer08
+- layer08_inh
+- layer09
+- layer09_inh
+- layer10
+title: connectivity_0.0300_strength_0.0180
+binaries_prefix: spikes

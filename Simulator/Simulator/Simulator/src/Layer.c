@@ -39,6 +39,7 @@ BOOL layer_input_data_link_is_valid(LayerInputDataLink* link_data) {
 	check(layer_is_valid(link_data->input_layer) == TRUE, invalid_argument("link_data->input_layer"));
 	check(synapse_class_is_valid(link_data->s_class) == TRUE, invalid_argument("linkd_data->s_class"));
 	check(link_data->connectivity >= 0.0f && link_data->connectivity <= 1.0f, "connectivity should be in [0.0, 1.0], not %f", link_data->connectivity);
+	check(link_data->synaptic_strength >= 0.0f && link_data->synaptic_strength <= 1.0f, "synaptic strength should be in [0.0, 1.0], not %f", link_data->synaptic_strength);
 	return TRUE;
 
 ERROR
@@ -166,16 +167,18 @@ Layer* layer_create_fully_connected(
 }
 
 
-Status layer_add_input_layer(Layer* layer, Layer* input, SynapseClass* s_class, float connectivity) {
+Status layer_add_input_layer(Layer* layer, Layer* input, SynapseClass* s_class, float connectivity, float synaptic_strength) {
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	check(layer_is_valid(input) == TRUE, invalid_argument("input"));
 	check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
 	check(connectivity >= 0.0f && connectivity <= 1.0f, "connectivity should be in [0.0, 1.0], not %f", connectivity);
+	check(synaptic_strength >= 0.0f && synaptic_strength <= 1.0f, "synaptic_strength should be in [0.0, 1.0], not %f", synaptic_strength);
 
 	LayerInputData input_data = { 0 };
 	string_init(&(input_data.layer_name), string_get_C_string(input->name));
 	string_init(&(input_data.syanpse_class_name), string_get_C_string(s_class->name));
 	input_data.connectivity = connectivity;
+	input_data.synaptic_strength = synaptic_strength;
 
 	return array_append(&(layer->inputs_data), &input_data);
 ERROR
@@ -184,17 +187,18 @@ ERROR
 
 
 // unused
-Status layer_link_input_layer(Layer* layer, Layer* input, SynapseClass* s_class, float connectivity) {
+Status layer_link_input_layer(Layer* layer, Layer* input, SynapseClass* s_class, float connectivity, float synaptic_strength) {
 	Status status = FAIL;
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	check(layer_is_valid(input) == TRUE, invalid_argument("input"));
-	status = layer_add_input_layer(layer, input, s_class, connectivity);
+	status = layer_add_input_layer(layer, input, s_class, connectivity, synaptic_strength);
 	check(status == FALSE, "@layer_add_input_layer failed");
 
 	LayerInputDataLink link_data = { 0 };
 	link_data.input_layer = input;
 	link_data.s_class = s_class;
 	link_data.connectivity = connectivity;
+	link_data.synaptic_strength = synaptic_strength;
 
 	status = layer->link(layer, &link_data);
 ERROR
@@ -409,7 +413,7 @@ Status layer_link_fc(Layer* layer, LayerInputDataLink* link_data) {
 			neuron_input_layer = (Neuron*)array_get(&(link_data->input_layer->neurons), j);
 			check(neuron_is_valid(neuron_input_layer) == TRUE, invalid_argument("neuron_input_layer"));
 
-			synapse = synapse_create(link_data->s_class, 1.0f);
+			synapse = synapse_create(link_data->s_class, link_data->synaptic_strength);
 			check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 			
 			// copy the synapse into the @neuron_layer and get it back to have the reference for the @neuron_input_layer

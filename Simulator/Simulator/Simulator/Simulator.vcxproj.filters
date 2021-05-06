@@ -122,5 +122,8 @@
     <ClCompile Include="src\callbacks\callback_common.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\callbacks\callback_synfire_activity_detection.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

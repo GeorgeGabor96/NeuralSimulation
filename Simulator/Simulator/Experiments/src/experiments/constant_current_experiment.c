@@ -14,9 +14,9 @@ void constant_current_experiment() {
 	Layer* l1 = network_get_layer_by_idx(net, 0);
 	Layer* l2 = network_get_layer_by_idx(net, 1);
 	Layer* l3 = network_get_layer_by_idx(net, 2);
-	Callback* visu_1 = callback_dump_layer_neurons_create(l1, result_dir, TRUE);
-	Callback* visu_2 = callback_dump_layer_neurons_create(l2, result_dir, TRUE);
-	Callback* visu_3 = callback_dump_layer_neurons_create(l3, result_dir, TRUE);
+	Callback* visu_1 = callback_dump_layer_neurons_create(l1, result_dir);
+	Callback* visu_2 = callback_dump_layer_neurons_create(l2, result_dir);
+	Callback* visu_3 = callback_dump_layer_neurons_create(l3, result_dir);
 
 	Simulator* simulator = simulator_create(constant_current, net);
 	simulator_add_callback(simulator, visu_1);
@@ -43,7 +43,7 @@ void constant_current_learning_experiment() {
 
 	Layer* layer_input = layer_create_fully_connected(2, n_class, "layer_in");
 	Layer* layer_output = layer_create_fully_connected(1, n_class, "layer_out");
-	layer_add_input_layer(layer_output, layer_input, s_class_voltage, 1.0f);
+	layer_add_input_layer(layer_output, layer_input, s_class_voltage, 1.0f, 1.0f);
 
 	network_add_layer(net, layer_input, TRUE, FALSE);
 	network_add_layer(net, layer_output, FALSE, TRUE);
@@ -56,8 +56,8 @@ void constant_current_learning_experiment() {
 	// create callbacks
 	layer_input = network_get_layer_by_name(net, "layer_in");
 	layer_output = network_get_layer_by_name(net, "layer_out");
-	Callback* c1 = callback_dump_layer_neurons_create(layer_input, result_dir, TRUE);
-	Callback* c2 = callback_dump_layer_neurons_create(layer_output, result_dir, TRUE);
+	Callback* c1 = callback_dump_layer_neurons_create(layer_input, result_dir);
+	Callback* c2 = callback_dump_layer_neurons_create(layer_output, result_dir);
 
 	// create simulator
 	Simulator* simulator = simulator_create(constant_current, net);
