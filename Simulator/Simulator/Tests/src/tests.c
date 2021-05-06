@@ -32,6 +32,7 @@ TestInfo tests[] = {
 	// callbacks
 	{ callback_dump_layer_neurons_test, "callbacks_dump_layer_neurons_test" },
 	{ callback_dump_network_test, "callback_dump_network_test" },
+	{ callback_detect_synfire_activity_test, "callback_detect_synfire_activity_test" },
 
 	// OS
 	{ os_mkdir_rmdir_test, "os_mkdir_rmdir_test" },

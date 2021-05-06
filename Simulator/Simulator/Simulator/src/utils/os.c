@@ -3,12 +3,14 @@
 
 #define COMMAND_MAX_LENGTH 512
 
+
 BOOL os_mkdir(const char* dir) {
 	char mkdir_command[COMMAND_MAX_LENGTH] = { 0 };
 	sprintf(mkdir_command, "if not exist %s mkdir %s", dir, dir);
 	if (system(mkdir_command) == 0) return TRUE;
 	return FALSE;
 }
+
 
 BOOL os_rmdir(const char* dir) {
 	char rmdir_command[COMMAND_MAX_LENGTH] = { 0 };
@@ -18,6 +20,15 @@ BOOL os_rmdir(const char* dir) {
 	if (system(rmdir_command) == 0) return TRUE;
 	return FALSE;
 }
+
+
+BOOL os_rmfile(const char* file) {
+	char rmfile_command[COMMAND_MAX_LENGTH] = { 0 };
+	sprintf(rmfile_command, "del %s", file);
+	if (system(rmfile_command) == 0) return TRUE;
+	return FALSE;
+}
+
 
 BOOL os_file_exits(const char* file) {
 	char exits_command[COMMAND_MAX_LENGTH] = { 0 };

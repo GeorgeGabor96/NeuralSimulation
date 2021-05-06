@@ -152,6 +152,7 @@
   <ItemGroup>
     <ClCompile Include="src\callbacks\callback_common.c" />
     <ClCompile Include="src\callbacks\callback_dump_network.c" />
+    <ClCompile Include="src\callbacks\callback_synfire_activity_detection.c" />
     <ClCompile Include="src\containers\Array.c" />
     <ClCompile Include="src\callbacks\callback_dump_layer.c" />
     <ClCompile Include="src\data\data_gen_common.c" />
