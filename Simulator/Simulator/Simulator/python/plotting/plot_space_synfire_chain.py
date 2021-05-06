@@ -13,7 +13,17 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_file', type=str, required=True,
                         help='Path to the config file for the plot')
-    # TODO add description for the config file
+    '''
+    Config file format: YAML
+    Needed keys:
+        experiments_folder: absolute path to the folder that contains a txt file for each experiment
+        variable1: name of the first variable to consider, like connectivity
+        variable2: name of the second variable to consider, like strength
+        title: title of the plot
+
+    Note: the variable1 and variable2 values need to be encoded in the experiment file name like this
+        variable1_value_variable2_value.txt
+    '''
     return parser.parse_args()
 
 

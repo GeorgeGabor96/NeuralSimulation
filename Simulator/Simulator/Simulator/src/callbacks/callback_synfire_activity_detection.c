@@ -4,7 +4,6 @@
 #include "Containers.h"
 
 
-
 // helper definitions
 typedef Array SpikeStatesForNeuron;	// contains the state of the spike variable at each timestamp
 typedef Array SpikeStatesForLayer;	// contains @SpikeStatesForNeuron's
@@ -117,7 +116,6 @@ ERROR
 }
 
 
-
 void callback_detect_synfire_activity_data_destroy(C_Data* data) {
 	check(callback_detect_synfire_activity_data_is_valid(data) == TRUE, invalid_argument("data"));
 	uint32_t layer_idx = 0;
@@ -163,7 +161,6 @@ void callback_detect_synfire_activity_data_update(C_Data* data, Network* net) {
 ERROR
 	return;
 }
-
 
 
 static inline float get_layer_pulse_mean_duration(SpikeStatesForLayer* spike_states_for_layer, uint32_t max_pulse_duration) {

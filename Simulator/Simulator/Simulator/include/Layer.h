@@ -23,7 +23,8 @@ typedef enum { LAYER_INVALID = 0, LAYER_FULLY_CONNECTED = 1 } LayerType;
 const char* layer_type_C_string(LayerType type);
 
 
-// used by the network to know to link layers, it keeps copies to names
+// used by the network to know to link layers, it keeps copies to names of the objects, 
+// because the network may reorder layers, in which case the pointers will be wrong
 typedef struct LayerInputData {
 	String layer_name;
 	String syanpse_class_name;
@@ -33,6 +34,7 @@ typedef struct LayerInputData {
 
 void layer_input_data_reset(LayerInputData* input_data);
 
+// actual data used when linking, see network_compile function
 struct LayerInputDataLink {
 	Layer* input_layer;
 	SynapseClass* s_class;

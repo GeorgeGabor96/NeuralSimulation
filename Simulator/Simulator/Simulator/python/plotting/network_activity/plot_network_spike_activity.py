@@ -6,6 +6,7 @@ from tqdm import tqdm
 sys.path.append(os.path.join(os.path.realpath(__file__).split('python')[0], 'python'))
 
 from utils.utils_simulator import parse_array_file
+from utils.utils_simulator import get_binaries_for_layers
 from utils.utils_config import parse_yaml_config
 from utils.utils_matplotlib import NetworkSpikesPlot
 
@@ -14,14 +15,21 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config_file', type=str, required=True,
                         help='Path to the config file for the plot')
-    # TODO add description for the config file
+    '''
+    Config file format: YAML
+    Needed keys:
+        layers_folder: absolute path to the folder that contains the information for the layers
+        layers: the layers to consider, order of plotting respects this order
+        title: title of the plot
+        binaries_prefix: the prefix of the binaries that store the spikes, usually 'spikes'
+    '''
     return parser.parse_args()
 
 
-# TODO change this to use the new get_binaries for layers function
 def get_spikes_binaries_for_layer(config):
     '''
     This will read all the the spike binary files for all the layers in the @layers variable in the config file
+    and reverse the order of the layers to keep the plotting order
 
     :param config: dict
         the configuration
@@ -29,15 +37,12 @@ def get_spikes_binaries_for_layer(config):
     :return: list
         @binaries_for_layer, each element has the @layer_name and the @binaries associated with it
     '''
-    binaries_for_layer = list()
+    binaries_for_layer = get_binaries_for_layers(
+        layers_folder=config['layers_folder'],
+        layers=config['layers'],
+        prefix=config['binaries_prefix'],
+        log=True)
 
-    for layer_name in tqdm(config['layers']):
-        layer_folder = os.path.join(config['layers_folder'], layer_name)
-
-        # get the files that have the prefix
-        binaries = [f for f in os.listdir(layer_folder) if f.endswith('.bin')]
-        spikes_binaries = [f for f in binaries if config['binaries_prefix'] in f]
-        binaries_for_layer.append(dict(layer_name=layer_name, binaries=spikes_binaries))
     # to keep the plotting order as in the config, need to start plotting from the last layer to the first one
     binaries_for_layer.reverse()
     return binaries_for_layer
