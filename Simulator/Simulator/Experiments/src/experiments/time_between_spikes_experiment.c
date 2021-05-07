@@ -12,7 +12,7 @@ void time_between_spikes_experiment() {
 	// create network
 	Network* net = network_create();
 	network_add_neuron_class(net, neuron_class_create("LIF_NEURON", LIF_NEURON));
-	network_add_synapse_class(net, synapse_class_create("SYN_20TAU", 0.0f, 100.0f, 1, CONDUCTANCE_SYNAPSE, 1));
+	network_add_synapse_class(net, synapse_class_create("SYN_20TAU", 0.0f, 1.0f, 100.0f, 1, CONDUCTANCE_SYNAPSE, 1));
 
 	NeuronClass* n_class = network_get_neuron_class_by_name(net, "LIF_NEURON");
 	SynapseClass* s_class = network_get_synapse_class_by_name(net, "SYN_20TAU");

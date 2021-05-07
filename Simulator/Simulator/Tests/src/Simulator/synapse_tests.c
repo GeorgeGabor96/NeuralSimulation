@@ -9,6 +9,7 @@ TestStatus synapse_class_create_destroy_test() {
 	TestStatus status = TEST_FAILED;
 	SynapseClass* synapse_class = NULL;
 	float rev_potential = 0.0f;
+	float amplitude = 1.0f;
 	float tau_ms = -1.0f / (float)log(0.5);
 	uint32_t delay = 1;
 	SynapseType s_type = CONDUCTANCE_SYNAPSE;
@@ -17,29 +18,34 @@ TestStatus synapse_class_create_destroy_test() {
 	const char* name = "SYN CLASS";
 
 	// call normal case
-	synapse_class = synapse_class_create(name, rev_potential, tau_ms, delay, s_type, simuation_time_ms);
+	synapse_class = synapse_class_create(name, rev_potential, amplitude, tau_ms, delay, s_type, simuation_time_ms);
 	assert(synapse_class != NULL, "@synapse_class is NULL");
 	assert(strcmp(string_get_C_string(synapse_class->name), name) == 0, "@synapse_class->name should be %s not %s", name, string_get_C_string(synapse_class->name));
 	assert(synapse_class->E == rev_potential, "@synapse_class->E should be %f not %f", rev_potential, synapse_class->E);
+	assert(synapse_class->A == amplitude, "@synapse_class->A should be %f not %f", amplitude, synapse_class->A);
 	assert(synapse_class->delay == delay, "@synapse_class->delay should be %u not %u", delay, synapse_class->delay);
 	assert(synapse_class->type == s_type, "@synapse_class->type should be %d not %d", s_type, synapse_class->type);
 	assert(float_test(synapse_class->tau_exp, tau_exp), "@synapse_class->tau_exp %f not close enough to %f", synapse_class->tau_exp, tau_exp);
 	synapse_class_destroy(synapse_class);
 
 	// call with @name == NULL
-	synapse_class = synapse_class_create(NULL, rev_potential, tau_ms, delay, s_type, simuation_time_ms);
+	synapse_class = synapse_class_create(NULL, rev_potential, amplitude, tau_ms, delay, s_type, simuation_time_ms);
 	assert(synapse_class == NULL, "@synapse_class should be NULL for @name = NULL");
 
+	// call with @amplitude <= 0.0
+	synapse_class = synapse_class_create(name, rev_potential, 0.0f, tau_ms, delay, s_type, simuation_time_ms);
+	assert(synapse_class == NULL, "@synapse_class should be NULL for @amplitude = 0.0f");
+
 	// call with @tau_ms <= 0.0
-	synapse_class = synapse_class_create(name, rev_potential, 0.0f, delay, s_type, simuation_time_ms);
+	synapse_class = synapse_class_create(name, rev_potential, amplitude, 0.0f, delay, s_type, simuation_time_ms);
 	assert(synapse_class == NULL, "@synapse_class should be NULL for @tau_ms = 0");
 
 	// call with @simulation_step_ms <= 0
-	synapse_class = synapse_class_create(name, rev_potential, tau_ms, delay, s_type, 0.0f);
+	synapse_class = synapse_class_create(name, rev_potential, amplitude, tau_ms, delay, s_type, 0.0f);
 	assert(synapse_class == NULL, "@synapse_class should be NULL for @simulation_step_ms == 0");
 
 	// call with @type = INVALID_SYNAPSE
-	synapse_class = synapse_class_create(name, rev_potential, tau_ms, delay, INVALID_SYNAPSE, simuation_time_ms);
+	synapse_class = synapse_class_create(name, rev_potential, amplitude, tau_ms, delay, INVALID_SYNAPSE, simuation_time_ms);
 	assert(synapse_class == NULL, "@synapse_class should be NULL for @type = 2");
 	
 	// destroy with NULL
@@ -71,6 +77,7 @@ error:
 
 void synapse_class_set_default_values(SynapseType type, SynapseClass* s_class) {
 	s_class->E = 0.0f;
+	s_class->A = 1.0f;
 	s_class->tau_exp = 0.5f;
 	s_class->delay = 1;
 	s_class->type = type;

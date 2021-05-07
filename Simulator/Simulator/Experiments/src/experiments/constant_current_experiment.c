@@ -36,8 +36,8 @@ void constant_current_learning_experiment() {
 
 	Network* net = network_create();
 	NeuronClass* n_class = neuron_class_create("TEST_N", LIF_NEURON);
-	SynapseClass* s_class_conductance = synapse_class_create("TEST_CONDUCTANCE", 0.0f, 20.0f, 1, CONDUCTANCE_SYNAPSE, 1);
-	SynapseClass* s_class_voltage = synapse_class_create("TEST_VOLTAGE", -75.0f, 50.0f, 1, VOLTAGE_DEPENDENT_SYNAPSE, 1);
+	SynapseClass* s_class_conductance = synapse_class_create("TEST_CONDUCTANCE", 0.0f, 1.0f, 20.0f, 1, CONDUCTANCE_SYNAPSE, 1);
+	SynapseClass* s_class_voltage = synapse_class_create("TEST_VOLTAGE", -75.0f, 1.0f, 50.0f, 1, VOLTAGE_DEPENDENT_SYNAPSE, 1);
 	network_add_neuron_class(net, n_class);
 	network_add_synapse_class(net, s_class_conductance);
 	network_add_synapse_class(net, s_class_voltage);
