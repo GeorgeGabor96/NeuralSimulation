@@ -31,9 +31,9 @@ Network* network_synfire_chain_10_layers(float connectivity, float s_strength) {
 	network_add_neuron_class(net, neuron_class_create("LIF_NEURON_REFRAC", LIF_REFRACTORY_NEURON));
 
 	// excitation and inhibition
-	network_add_synapse_class(net, synapse_class_create("GABA_A", -90.0f, 6, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1));
-	network_add_synapse_class(net, synapse_class_create("AMPA", 0.0f, 3, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1));
-	network_add_synapse_class(net, synapse_class_create("CONDUCTANCE_10_TAU", 0.0, 10, 10, CONDUCTANCE_SYNAPSE, 1));
+	network_add_synapse_class(net, synapse_class_create("GABA_A", -90.0f, 1.0f, 6, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1));
+	network_add_synapse_class(net, synapse_class_create("AMPA", 0.0f, 1.0f, 3, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1));
+	network_add_synapse_class(net, synapse_class_create("CONDUCTANCE_10_TAU", 0.0, 1.0f, 10, 10, CONDUCTANCE_SYNAPSE, 1));
 
 
 	NeuronClass* LIF_n_class = network_get_neuron_class_by_name(net, "LIF_NEURON");

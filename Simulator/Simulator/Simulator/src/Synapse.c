@@ -12,6 +12,7 @@ Status synapse_class_is_valid(SynapseClass* synapse_class) {
 	check(string_is_valid(synapse_class->name) == TRUE, invalid_argument("synapse_class->name"));
 	// NOTE: If you add more types this check needs to be updated
 	check(synapse_class->type == CONDUCTANCE_SYNAPSE || synapse_class->type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("synapse_class->type"));
+	check(synapse_class->A > 0.0f, "@synapse_class->A <= 0.0f");
 
 	return TRUE;
 
@@ -47,10 +48,11 @@ const char* synapse_type_C_string(SynapseType type) {
 /*************************************************************
 * SynapseClass Functionality
 *************************************************************/
-SynapseClass* synapse_class_create(const char* name, float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms) {
+SynapseClass* synapse_class_create(const char* name, float rev_potential, float amplitude, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms) {
 	Status status = FAIL;
 	SynapseClass* synapse_class = NULL;
 	
+	check(amplitude > 0.0f, "@amplitude <= 0.0f");
 	check(tau_ms > 0.0, "@tau_ms should be > 0");
 	check(simulation_step_ms > 0.0, "@simulation_step_ms should be > 0");
 	check(type == CONDUCTANCE_SYNAPSE || type == VOLTAGE_DEPENDENT_SYNAPSE, invalid_argument("type"));
@@ -61,6 +63,7 @@ SynapseClass* synapse_class_create(const char* name, float rev_potential, float 
 	synapse_class->name = string_create(name);
 	check(string_is_valid(synapse_class->name) == TRUE, invalid_argument("synapse_class->name"));
 	synapse_class->E = rev_potential;
+	synapse_class->A = amplitude;
 	synapse_class->tau_exp = (float)(exp(- (double)simulation_step_ms / tau_ms));
 	synapse_class->delay = delay;
 	synapse_class->type = type;
@@ -76,7 +79,7 @@ ERROR
 
 
 SynapseClass* synapse_class_create_default(const char* name) {
-	return synapse_class_create(name, SYNAPSE_REV_POTENTIAL_DF, SYNAPSE_TAU_MS_DF, SYNAPSE_DELAY_DF, SYNAPSE_TYPE_DF, SYNAPSE_SIMULATION_TIME_MS_DF);
+	return synapse_class_create(name, SYNAPSE_REV_POTENTIAL_DF, SYNAPSE_AMP_DF, SYNAPSE_TAU_MS_DF, SYNAPSE_DELAY_DF, SYNAPSE_TYPE_DF, SYNAPSE_SIMULATION_TIME_MS_DF);
 }
 
 
@@ -86,6 +89,7 @@ void synapse_class_reset(SynapseClass* synapse_class) {
 	synapse_class->name = NULL;
 	synapse_class->delay = 0;
 	synapse_class->E = 0.0f;
+	synapse_class->A = 0.0f;
 	synapse_class->tau_exp = 0.0f;
 	synapse_class->type = INVALID_SYNAPSE;
 ERROR
@@ -201,11 +205,11 @@ float synapse_compute_PSC(Synapse* synapse, float u) {
 	switch (synapse->s_class->type)
 	{
 	case CONDUCTANCE_SYNAPSE:
-		I = synapse->w * synapse->g;
+		I = synapse->s_class->A * synapse->w * synapse->g;
 		break;
 
 	case VOLTAGE_DEPENDENT_SYNAPSE:
-		I = - synapse->w * synapse->g * (u - synapse->s_class->E);
+		I = - synapse->s_class->A * synapse->w * synapse->g * (u - synapse->s_class->E);
 		break;
 
 	default:

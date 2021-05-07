@@ -19,6 +19,7 @@ const char* synapse_type_C_string(SynapseType type);
 typedef struct SynapseClass {
 	String* name;
 	float E; // reversal potential
+	float A; // amplitude of synapse, its like a scale value
 	float tau_exp; 
 	uint32_t delay; // all spikes are delayed
 	SynapseType type;
@@ -27,6 +28,7 @@ typedef struct SynapseClass {
 
 
 #define SYNAPSE_REV_POTENTIAL_DF 0.0f
+#define SYNAPSE_AMP_DF 1.0f
 #define SYNAPSE_TAU_MS_DF -1.0f / (float)log(0.5f)
 #define SYNAPSE_DELAY_DF 1
 #define SYNAPSE_TYPE_DF CONDUCTANCE_SYNAPSE
@@ -43,18 +45,20 @@ Status synapse_class_is_valid(SynapseClass* synapse_class);
 /*
 * Parameters: 
 * ----------
-* rev_potential -
-* tau_ms - time constant of the synapse (bigger will make the reduction in current slower)
-* delay - difference between time when a spike is processed and when it arrives
-* type - type of synapse, controls how current is computed
-* simulation_step_ms - the number of miliseconds the integration is made, cumulated that many miliseconds in the upate
+* @name - string identifier of this synaptic class
+* @rev_potential - reversal potential for synapse class
+* @amplitude - the scaling factor of the synaptic class
+* @tau_ms - time constant of the synapse (bigger will make the reduction in current slower)
+* @delay - difference between time when a spike is processed and when it arrives
+* @type - type of synapse, controls how current is computed
+* @simulation_step_ms - the number of miliseconds the integration is made, cumulated that many miliseconds in the upate
 * 
 * 
 * Preconditions: @tau_ms > 0
 * 			   @simulation_step_ms > 0
 * 			   @type == CONDUCTANCE_SYNPASE || @type == VOLTAGE_DEPENDENT_SYNAPSE
 */
-SynapseClass* synapse_class_create(const char* name, float rev_potential, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms);
+SynapseClass* synapse_class_create(const char* name, float rev_potential, float amplitude, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms);
 
 SynapseClass* synapse_class_create_default(const char* name);
 void synapse_class_reset(SynapseClass* synapse_class);
