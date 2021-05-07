@@ -1,5 +1,5 @@
 #include "utils/MemoryManagement.h"
-#include "data/data_gen_random_spikes.h"
+#include "DataGen.h"
 
 
 

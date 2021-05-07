@@ -173,12 +173,9 @@
     <ClCompile Include="src\Synapse.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\callbacks\callback.h" />
-    <ClInclude Include="include\callbacks\callback_dump.h" />
+    <ClInclude Include="include\Callback.h" />
     <ClInclude Include="include\config.h" />
-    <ClInclude Include="include\data\DataGen.h" />
-    <ClInclude Include="include\data\data_gen_constant_current.h" />
-    <ClInclude Include="include\data\data_gen_random_spikes.h" />
+    <ClInclude Include="include\DataGen.h" />
     <ClInclude Include="include\utils\debug.h" />
     <ClInclude Include="include\Containers.h" />
     <ClInclude Include="include\Layer.h" />

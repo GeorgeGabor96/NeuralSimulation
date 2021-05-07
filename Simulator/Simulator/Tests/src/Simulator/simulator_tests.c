@@ -1,7 +1,8 @@
 #include "simulator_tests.h"
+
 #include "Simulator.h"
-#include "callbacks/callback_dump.h"
-#include "data/data_gen_constant_current.h"
+#include "Callback.h"
+#include "DataGen.h"
 #include "utils/os.h"
 
 

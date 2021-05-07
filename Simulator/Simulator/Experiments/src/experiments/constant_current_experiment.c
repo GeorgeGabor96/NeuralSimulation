@@ -1,6 +1,7 @@
 #include "Simulator.h"
-#include "data/data_gen_constant_current.h"
-#include "callbacks/callback_dump.h"
+#include "DataGen.h"
+#include "Callback.h"
+
 #include "../../include/networks.h"
 #include "../../include/config.h"
 
