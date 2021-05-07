@@ -2,7 +2,7 @@
 
 #include "utils/os.h"
 #include "Callback.h"
-#include "data/data_gen_constant_current.h"
+#include "DataGen.h"
 
 
 /********************

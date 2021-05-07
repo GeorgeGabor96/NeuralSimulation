@@ -89,10 +89,79 @@ NetworkInputs* data_element_get_values(DataElement* element, uint32_t time);
 void data_element_remove_values(DataElement* element, NetworkInputs* values);
 
 
-// helper functions
-
+/*************************************************************
+* HELPER FUNCTIONALITY
+*************************************************************/
 // general function to destroy a @NetworkInputs structure
 void data_element_base_remove_values(DataElement* element, NetworkInputs* inputs);
+
+
+/*************************************************************
+* DATA GENERATORS
+*************************************************************/
+/*
+* Callback for generating a constant input current for a network
+* 
+* Params:
+* @length - how many examples to generate
+* @net - pointer to the @Network object for which to generate the input
+* @current_value - value of the current
+* @duration - duration of the example
+*/
+DataGenerator* data_generator_constant_current_create(uint32_t length, Network* net, float current_value, uint32_t duration);
+
+
+/*
+* Callback for generating random spikes as input for a network
+* 
+* Params:
+* @n_examples - how many examples to generate
+* @net - pointer to the @Network object for which to generate the input
+* @spike_percent - the chance of generation a spike at any time
+* @duration - duration of time for the examples
+*/
+DataGenerator* data_generator_random_spikes_create(uint32_t n_examples, Network* net, float spikes_percent, uint32_t duration);
+
+
+/*
+* This callback will generate one spike per neuron, sequentially with a step between them
+* For example: first neuron will spike at time 0
+*			   second neuron will spike at time @step_between_neurons
+*			   third neuron will spike at time 2 * @step_between_neurons
+*			   and so on
+* 
+* Params:
+* @n_examples - number of examples to be generated
+* @net - pointer to the network object for which to generate input
+* @step_between_neurons - the interval of time between the spikes of succesive neurons
+* @duration - the duration of each example
+*/
+DataGenerator* data_generator_with_step_between_neurons_create(uint32_t n_examples, Network* net, uint32_t step_between_neurons, uint32_t duration);
+
+
+/*
+* Callback for creating spike 'pulses'
+* A pulse is define as a period of time in which the activity increases
+* 
+* Params:
+* @n_examples - number of examples to generate
+* @net - pointer to the network object for which to generate input
+* @first_pulse_timestamp - the time value at which the first pulse starts
+* @between_pulses_duration - the time between pulses
+* @pulse_duration - duration of a pulse
+* @between_pulses_spike_frequency - the probability for a spike when the pulse is not activ, between [0 - 1]
+* @pulse_spike_frequency - the probability for a spike inside a pulse, between [0 - 1]
+* @duration - the duration of the examples
+*/
+DataGenerator* data_generator_spike_pulses_create(
+	uint32_t n_examples,
+	Network* net,
+	uint32_t first_pulse_timestamp,
+	uint32_t between_pulses_duration,
+	uint32_t pulse_duration,
+	float between_pulses_spike_frequency,
+	float pulse_spike_frequency,
+	uint32_t duration);
 
 
 #endif // __DATA_GEN_H__

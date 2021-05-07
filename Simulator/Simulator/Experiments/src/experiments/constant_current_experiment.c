@@ -1,5 +1,5 @@
 #include "Simulator.h"
-#include "data/data_gen_constant_current.h"
+#include "DataGen.h"
 #include "Callback.h"
 
 #include "../../include/networks.h"

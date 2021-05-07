@@ -1,6 +1,7 @@
 #include "data_gen_tests.h"
-#include "data/data_gen_constant_current.h"
-#include "data/data_gen_random_spikes.h"
+
+#include "DataGen.h"
+#include "DataGen.h"
 
 
 Network* create_basic_network() {

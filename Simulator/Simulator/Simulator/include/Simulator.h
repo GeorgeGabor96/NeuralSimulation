@@ -4,7 +4,7 @@
 
 #include "config.h"
 #include "Network.h"
-#include "data/DataGen.h"
+#include "DataGen.h"
 #include "Callback.h"
 
 

@@ -1,6 +1,6 @@
 #include "Simulator.h"
 #include "Callback.h"
-#include "data/data_gen_random_spikes.h"
+#include "DataGen.h"
 
 #include "../../include/config.h"
 
