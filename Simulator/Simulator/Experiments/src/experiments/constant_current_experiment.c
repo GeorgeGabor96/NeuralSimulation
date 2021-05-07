@@ -3,7 +3,7 @@
 #include "Callback.h"
 
 #include "../../include/networks.h"
-#include "../../include/config.h"
+#include "../../include/config_exp.h"
 
 
 void constant_current_experiment() {

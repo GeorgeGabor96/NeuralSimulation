@@ -163,6 +163,36 @@ ERROR
 }
 
 
+static inline GaussianDist* get_layer_spike_distribution(SpikeStatesForLayer* spike_states_for_layer) {
+	uint32_t neuron_idx = 0;
+	uint32_t time_idx = 0;
+	float time_idx_f = 0.0f;
+	float std = 0.0f;
+	BOOL spike_state = FALSE;
+	GaussianDist* dist = NULL;
+	SpikeStatesForNeuron* spike_states_for_neuron = NULL;
+	Array* spike_times = array_create(spike_states_for_layer->length, 0, sizeof(float));
+
+	for (neuron_idx = 0; neuron_idx < spike_states_for_layer->length; ++neuron_idx) {
+		spike_states_for_neuron = (SpikeStatesForNeuron*)array_get(spike_states_for_layer, neuron_idx);
+
+		for (time_idx = 0; time_idx < spike_states_for_neuron->length; ++time_idx) {
+			spike_state = *((BOOL*)array_get(spike_states_for_neuron, time_idx));
+			
+			if (spike_state == TRUE) {
+				time_idx_f = (float)time_idx;
+				array_append(spike_times, &time_idx_f);
+			}
+		}
+	}
+
+	dist = array_float_get_gaussian_dist(spike_times);
+	array_destroy(spike_times, NULL);
+
+	return dist;
+}
+
+
 static inline float get_layer_pulse_mean_duration(SpikeStatesForLayer* spike_states_for_layer, uint32_t max_pulse_duration) {
 	uint32_t total_neurons_pulse_duration = 0;
 
@@ -171,7 +201,13 @@ static inline float get_layer_pulse_mean_duration(SpikeStatesForLayer* spike_sta
 	uint32_t time_idx = 0;
 	uint32_t pulse_time_idx = 0;
 	uint32_t last_spike = 0;
+	uint32_t neurons_with_pulses = 0;
+	uint32_t max_duration = 0;
+	uint32_t duration = 0;
 	BOOL spike_state = FALSE;
+
+	uint32_t min_spike_time = UINT32_MAX;
+	uint32_t max_spike_time = 0;
 
 	for (neuron_idx = 0; neuron_idx < spike_states_for_layer->length; ++neuron_idx) {
 		spike_states_for_neuron = (SpikeStatesForNeuron*)array_get(spike_states_for_layer, neuron_idx);
@@ -191,16 +227,28 @@ static inline float get_layer_pulse_mean_duration(SpikeStatesForLayer* spike_sta
 					}
 				}
 
+				if (time_idx < min_spike_time) min_spike_time = time_idx;
+				if (last_spike > max_spike_time) max_spike_time = last_spike;
+
 				// add the duration
-				total_neurons_pulse_duration += last_spike - time_idx;
-				
+				duration = last_spike - time_idx + 1;
+				total_neurons_pulse_duration += duration;
+				++neurons_with_pulses;
 				// go to next neuron
+				if (duration > max_duration) {
+					max_duration = duration;
+				}
+
 				break;
 			}
 		}
 	}
-
-	return (float)total_neurons_pulse_duration / (float)(spike_states_for_layer->length);
+	// TODO: Ask Raul how to define a synfire chain, is this ok?
+	float score1 = max_spike_time == 0 ? 0.0f : (float)(max_spike_time - min_spike_time);
+	float score2 = (float)max_duration;
+	float score3 = neurons_with_pulses == 0 ? 0.0f : (float)total_neurons_pulse_duration / (float)(neurons_with_pulses);
+	//printf("%f %f %f\n", score1, score2, score3);
+	return score1; //(score1 + score2) / 2.0f;
 }
 
 
@@ -210,38 +258,67 @@ void callback_detect_synfire_activity_data_run(C_Data* data, Network* net) {
 
 	/* NOTE
 		currently to compute the state of the synfire chain we compare the activity from the second layer and the last layer
+		TODO allow the user to speciy what layers to compare
 	*/
 	SpikeStatesForNetwork* spike_states_for_net = &(data->spike_states_for_network);
-	SpikeStatesForLayer* spike_states_second_layer = (SpikeStatesForLayer*)array_get(spike_states_for_net, 1);
+	
+	// TODO: let the user decide the two layers
+	SpikeStatesForLayer* spike_states_second_layer = (SpikeStatesForLayer*)array_get(spike_states_for_net, 4);
 	SpikeStatesForLayer* spike_states_last_layer = (SpikeStatesForLayer*)array_get(spike_states_for_net, spike_states_for_net->length - 1);
 
+	GaussianDist* layer_1_dist = get_layer_spike_distribution(spike_states_second_layer);
+	GaussianDist* layer_2_dist = get_layer_spike_distribution(spike_states_last_layer);
+	
+	//printf("\n%f %f\n%f %f\n", layer_1_dist->mean, layer_1_dist->std, layer_2_dist->mean, layer_2_dist->std);
+
+	const char* state = NULL;
+	float layers_std_ratio = layer_1_dist->std / (layer_2_dist->std + EPSILON);
+	if (layer_2_dist->mean == 0.0f || layer_1_dist->mean == 0.0f) {
+		state = "NO_ACTIVITY";
+	}
+	else if (layers_std_ratio < data->min_ratio) {
+		state = "EPILEPSY";
+	}
+	else if (layers_std_ratio > data->max_ratio) {
+		state = "NO_ACTIVITY";
+	}
+	else {
+		state = "STABLE";
+	}
+
+	/*
 	float second_layer_mean_pulse_duration = get_layer_pulse_mean_duration(spike_states_second_layer, data->max_sync_act_duration);
 	float last_layer_mean_pulse_duration = get_layer_pulse_mean_duration(spike_states_last_layer, data->max_sync_act_duration);
 
 	// decide the state of the network
 	const char* state = NULL;
-	if (second_layer_mean_pulse_duration <= 0.0f || last_layer_mean_pulse_duration <= 0.0f) {
+	float second_last_pulse_duration_ratio = second_layer_mean_pulse_duration / (last_layer_mean_pulse_duration + 0.00001f);
+	printf("%f %f %f\n", second_layer_mean_pulse_duration, last_layer_mean_pulse_duration, second_last_pulse_duration_ratio);
+	if (last_layer_mean_pulse_duration == 0) {
+		state = "NO_ACTIVITY";
+	}
+	else if (second_last_pulse_duration_ratio < data->min_ratio) {
+		state = "EPILEPSY";
+	}
+	else if (second_last_pulse_duration_ratio > data->max_ratio) {
 		state = "NO_ACTIVITY";
 	}
 	else {
-		float second_last_pulse_duration_ratio = second_layer_mean_pulse_duration / last_layer_mean_pulse_duration;
-		if (second_last_pulse_duration_ratio < data->min_ratio) {
-			state = "EPILEPSY";
-		}
-		else if (second_last_pulse_duration_ratio > data->max_ratio) {
-			state = "NO_ACTIVITY";
-		}
-		else {
-			state = "STABLE";
-		}
+		state = "STABLE";
 	}
-
+	*/
 	const char* output_file_path = string_get_C_string(data->output_file_path);
 	FILE* fp = fopen(output_file_path, "w");
 	check(fp != NULL, "Couldn't oepn file %s for writting", output_file_path);
 
 	fprintf(fp, state);
+	//fprintf(fp, "\n%f %f %f\n", second_layer_mean_pulse_duration, last_layer_mean_pulse_duration, second_last_pulse_duration_ratio);
+	fprintf(fp, "\nstd1: %f std2: %f ratio %f\n", layer_1_dist->std, layer_2_dist->std, layers_std_ratio);
+
 	fclose(fp);
+
+	free(layer_1_dist);
+	free(layer_2_dist);
 
 ERROR
 	return;

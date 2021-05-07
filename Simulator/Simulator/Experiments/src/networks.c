@@ -24,16 +24,16 @@ Network* network_3_L_3_3_3() {
 }
 
 
-Network* network_synfire_chain_10_layers(float connectivity, float s_strength) {
+Network* network_synfire_chain_10_layers(float connectivity, float amplitude, float s_strength, BOOL use_refract) {
 	// create network
 	Network* net = network_create();
 	network_add_neuron_class(net, neuron_class_create("LIF_NEURON", LIF_NEURON));
 	network_add_neuron_class(net, neuron_class_create("LIF_NEURON_REFRAC", LIF_REFRACTORY_NEURON));
 
 	// excitation and inhibition
-	network_add_synapse_class(net, synapse_class_create("GABA_A", -90.0f, 1.0f, 6, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1));
-	network_add_synapse_class(net, synapse_class_create("AMPA", 0.0f, 1.0f, 3, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1));
-	network_add_synapse_class(net, synapse_class_create("CONDUCTANCE_10_TAU", 0.0, 1.0f, 10, 10, CONDUCTANCE_SYNAPSE, 1));
+	network_add_synapse_class(net, synapse_class_create("GABA_A", -90.0f, amplitude, 6, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1)); // inhibition
+	network_add_synapse_class(net, synapse_class_create("AMPA", 0.0f, amplitude, 1, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1));	// excitation
+	network_add_synapse_class(net, synapse_class_create("CONDUCTANCE_10_TAU", 0.0, amplitude, 10, 10, CONDUCTANCE_SYNAPSE, 1));
 
 
 	NeuronClass* LIF_n_class = network_get_neuron_class_by_name(net, "LIF_NEURON");
@@ -44,7 +44,7 @@ Network* network_synfire_chain_10_layers(float connectivity, float s_strength) {
 	SynapseClass* excitatory_s_class = network_get_synapse_class_by_name(net, "AMPA");
 
 	// build 10 layers with 100 neurons
-	NeuronClass* n_class = LIF_n_class;
+	NeuronClass* n_class = use_refract == TRUE ? LIF_refrac_n_class : LIF_n_class;
 
 	uint32_t w = 70;
 	Layer* layer1 = layer_create_fully_connected(w, n_class, "layer01");

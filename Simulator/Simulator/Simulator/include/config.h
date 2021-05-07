@@ -1,8 +1,8 @@
 #ifndef __CONFIG__
 #define __CONFIG__
 
-#define MEMORY_MANAGE
-#define CHECKS
+//#define MEMORY_MANAGE
+//#define CHECKS
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +14,7 @@
 typedef uint8_t BOOL;
 #define TRUE 1ui8
 #define FALSE 0ui8
+#define EPSILON 0.000001f
 
 // status type definition
 typedef enum { SUCCESS = 0, FAIL = 1 } Status;

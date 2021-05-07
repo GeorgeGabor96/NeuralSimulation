@@ -96,6 +96,8 @@ class NetworkSpikesPlot:
         self.title = title
         self.xlabel = 'Time (ms)'
         self.ylabel = 'Layers'
+        self.min_x_value = 1e+15
+        self.max_x_value = -1e+15
 
         self.layer_names = []
         self.y_ticks = []
@@ -135,12 +137,19 @@ class NetworkSpikesPlot:
             the y values for the first and second point of the line
         """
         plt.plot(x_coord, y_coord, color='black')
+        min_x_value = min(x_coord) if isinstance(x_coord, list) else x_coord.min()
+        max_x_value = max(x_coord) if isinstance(x_coord, list) else x_coord.max()
+        if min_x_value < self.min_x_value:
+            self.min_x_value = min_x_value
+        if max_x_value > self.max_x_value:
+            self.max_x_value = max_x_value
 
     def plot(self):
         """
         Plots the network activity plot based on the info gathered in the for the @plot_line and @plot_points
         """
         plt.xlabel(self.xlabel)
+        set_x_ticks(self.min_x_value, self.max_x_value)
 
         plt.ylabel(self.ylabel)
         plt.yticks(ticks=self.y_ticks, labels=self.layer_names)
@@ -269,3 +278,58 @@ def scatter_plot(output_file, groups, title, x_label, y_label):
     plt.savefig(output_file, dpi=100)
 
     reset_plot()
+
+
+def scatter_plot_with_colorscheme(output_file, x_data, y_data, c_data, title, x_label, y_label, cmap='jet'):
+    """
+    This will create a 2D plot where every point will have a color on a colormap
+    Usefull to show properties of points like probabilities
+
+    :param output_file: str
+        path to the file that will be the image
+
+    :param x_data: np array
+        1D array of x values
+
+    :param y_data: np array
+        1D array of y values
+
+    :param c_data: np array
+        1D array of values, represent 'indexes' of colors for the x, y points
+        if 2 (x, y) points have the same c_data they will have the same color
+
+    :param title: str
+        title of the plot
+
+    :param x_label: str
+        label for the x axis
+
+    :param y_label: str
+        label for the y axis
+
+    :param cmap: str
+        matplotlib colorma name
+    """
+    plt.figure(figsize=(15, 10))
+
+    x_min = x_data.min()
+    x_max = x_data.max()
+    y_min = y_data.min()
+    y_max = y_data.max()
+
+    plt.scatter(x_data, y_data, c=c_data, cmap=cmap)
+    plt.colorbar()
+
+    set_x_ticks(x_min, x_max)
+    set_y_ticks(y_min, y_max)
+
+    plt.title(title, fontsize=20)
+    plt.xlabel(x_label, fontsize=20)
+    plt.ylabel(y_label, fontsize=20)
+    plt.tight_layout()
+
+    plt.savefig(output_file, dpi=100)
+
+    reset_plot()
+
+

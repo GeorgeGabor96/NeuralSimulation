@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <math.h>
 
 #include "Containers.h"
 #include "utils/MemoryManagement.h"
@@ -370,6 +371,47 @@ ERROR
 }
 
 
+/*************************************
+* Statistics functions
+*************************************/
+GaussianDist* array_float_get_gaussian_dist(ArrayFloat* array) {
+	check(array_is_valid(array) == TRUE, invalid_argument("array"));
+	check(array->element_size == sizeof(float), "@array doesn't contain floats");
+
+	float sum = 0.0f;
+	float mean = 0.0f;
+	float value = 0.0f;
+	double std = 0.0f;
+	GaussianDist* dist = NULL;
+	uint32_t i = 0;
+	
+	// compute the mean
+	for (i = 0; i < array->length; ++i) {
+		sum += *((float*)array_get(array, i));
+	}
+	mean = sum / ((float)array->length + EPSILON);
+
+	// compute the std
+	for (i = 0; i < array->length; ++i) {
+		value = *((float*)array_get(array, i));
+		std += pow((double)(value - mean), 2.0);
+	}
+	std = sqrt(std / ((double)array->length + EPSILON));
+
+	dist = (GaussianDist*)malloc(sizeof(GaussianDist), "array_float_get_gaussian_dist");
+	check_memory(dist);
+	dist->mean = mean;
+	dist->std = (float)std;
+	return dist;
+
+ERROR
+	return NULL;
+}
+
+
+/*************************************
+* Dumping functions
+*************************************/
 void array_dump(Array* array, String* file_path, String* data_name, uint8_t type) {
 	check(array_is_valid(array), invalid_argument("array"));
 	check(string_is_valid(file_path), invalid_argument("file_path"));

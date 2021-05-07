@@ -80,6 +80,7 @@ TestInfo tests[] = {
 	{ array_copy_data_test, "array_copy_data_test" },
 	{ array_swap_test, "array_swap_test" },
 	{ array_memory_test, "array_memory_test" },
+	{ array_float_get_gaussian_dist_test, "array_float_get_gaussian_dist_test" },
 
 	// MEMORY MANAGEMENT
 	{ memory_management_general_test, "memory_management_general_test" },

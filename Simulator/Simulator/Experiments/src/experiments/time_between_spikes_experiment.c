@@ -2,7 +2,7 @@
 #include "Callback.h"
 #include "DataGen.h"
 
-#include "../../include/config.h"
+#include "../../include/config_exp.h"
 
 
 void time_between_spikes_experiment() {
