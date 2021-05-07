@@ -1,8 +1,7 @@
 #include "callbacks_tests.h"
 
 #include "utils/os.h"
-#include "callbacks/callback.h"
-#include "callbacks/callback_dump.h"
+#include "Callback.h"
 #include "data/data_gen_constant_current.h"
 
 

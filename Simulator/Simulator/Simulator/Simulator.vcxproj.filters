@@ -36,9 +36,6 @@
     <ClInclude Include="include\config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\callbacks\callback.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\data\DataGen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -57,7 +54,7 @@
     <ClInclude Include="include\utils\debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\callbacks\callback_dump.h">
+    <ClInclude Include="include\Callback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
