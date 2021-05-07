@@ -1,7 +1,6 @@
 #include "data_gen_tests.h"
 
 #include "DataGen.h"
-#include "DataGen.h"
 
 
 Network* create_basic_network() {
