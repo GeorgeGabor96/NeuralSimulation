@@ -2,6 +2,7 @@ import numpy as np
 import argparse
 from tqdm import tqdm
 import os
+import yaml
 import sys
 sys.path.append(os.path.join(os.path.realpath(__file__).split('python')[0], 'python'))
 
@@ -29,6 +30,25 @@ def get_args():
     return parser.parse_args()
 
 
+def run_plot_space_synfire_chain(trial_folder, config):
+    # build the configuration
+    plot_config = dict()
+    plot_config['experiments_folder'] = trial_folder
+    plot_config['variable1'] = config['variable1']
+    plot_config['variable2'] = config['variable2']
+    plot_config['title'] = config['variable1'] + '_vs_' + config['variable2']
+
+    # create the config file
+    config_file = os.path.join(trial_folder + '_config.yml')
+    with open(config_file, 'w') as fp:
+        yaml.dump(plot_config, fp)
+
+    # call the plotter
+    os.system('plot_space_synfire_chain.py --config_file {}'.format(config_file))
+
+    os.remove(config_file)
+
+
 if __name__ == '__main__':
     args = get_args()
     config = parse_yaml_config(args.config_file)
@@ -42,6 +62,9 @@ if __name__ == '__main__':
 
     trails_info = {}
     for trial_folder in tqdm(trials_folder):
+
+        # run the space activity for this trial
+        run_plot_space_synfire_chain(trial_folder, config)
 
         # get the txts
         trial_folder_elements = [os.path.join(trial_folder, f) for f in os.listdir(trial_folder)]

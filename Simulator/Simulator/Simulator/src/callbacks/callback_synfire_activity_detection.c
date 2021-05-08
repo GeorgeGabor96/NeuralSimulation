@@ -272,7 +272,15 @@ void callback_detect_synfire_activity_data_run(C_Data* data, Network* net) {
 	//printf("\n%f %f\n%f %f\n", layer_1_dist->mean, layer_1_dist->std, layer_2_dist->mean, layer_2_dist->std);
 
 	const char* state = NULL;
-	float layers_std_ratio = layer_1_dist->std / (layer_2_dist->std + EPSILON);
+	float layers_std_ratio = 0.0f;
+	// when at least one is fully syncronized
+	if (layer_1_dist->std == 0.0f || layer_2_dist->std == 0.0f) {
+		layers_std_ratio = (layer_1_dist->std + 1.0f) / (layer_2_dist->std + 1.0f);
+	}
+	else {
+		layers_std_ratio = layer_1_dist->std / (layer_2_dist->std + EPSILON);
+	}
+	
 	if (layer_2_dist->mean == 0.0f || layer_1_dist->mean == 0.0f) {
 		state = "NO_ACTIVITY";
 	}
@@ -285,7 +293,9 @@ void callback_detect_synfire_activity_data_run(C_Data* data, Network* net) {
 	else {
 		state = "STABLE";
 	}
-
+	//printf("%.10f %.10f\n", layer_1_dist->mean, layer_1_dist->std);
+	//printf("%.10f %.10f\n", layer_2_dist->mean, layer_2_dist->std);
+	//printf("%s\n", state);
 	/*
 	float second_layer_mean_pulse_duration = get_layer_pulse_mean_duration(spike_states_second_layer, data->max_sync_act_duration);
 	float last_layer_mean_pulse_duration = get_layer_pulse_mean_duration(spike_states_last_layer, data->max_sync_act_duration);
@@ -313,7 +323,8 @@ void callback_detect_synfire_activity_data_run(C_Data* data, Network* net) {
 
 	fprintf(fp, state);
 	//fprintf(fp, "\n%f %f %f\n", second_layer_mean_pulse_duration, last_layer_mean_pulse_duration, second_last_pulse_duration_ratio);
-	fprintf(fp, "\nstd1: %f std2: %f ratio %f\n", layer_1_dist->std, layer_2_dist->std, layers_std_ratio);
+	fprintf(fp, "\nstd1: %.10f std2: %.10f ratio %.10f\n", layer_1_dist->std, layer_2_dist->std, layers_std_ratio);
+	fprintf(fp, "mean1: %.10f mean2: %.10f\n", layer_1_dist->mean, layer_2_dist->mean);
 
 	fclose(fp);
 
