@@ -110,7 +110,7 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
     return data_for_layer, lines
 
 
-def plot_data_and_lines(data_for_layer, lines, config):
+def plot_data_and_lines(data_for_layer, lines, config, file_name='network.png'):
     '''
     It uses @NetworkSpikesPlot to display the spike activity of every layer on a plot
 
@@ -124,7 +124,7 @@ def plot_data_and_lines(data_for_layer, lines, config):
 
     '''
     # create network plot object
-    spikes_plotter = NetworkSpikesPlot(os.path.join(config['layers_folder'], 'network.png'), config['title'])
+    spikes_plotter = NetworkSpikesPlot(os.path.join(config['layers_folder'], file_name), config['title'])
 
     # plot the lines
     for line in lines:

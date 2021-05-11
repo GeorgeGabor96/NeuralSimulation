@@ -280,7 +280,7 @@ def scatter_plot(output_file, groups, title, x_label, y_label):
     reset_plot()
 
 
-def scatter_plot_with_colorscheme(output_file, x_data, y_data, c_data, title, x_label, y_label, cmap='jet'):
+def scatter_plot_with_colorscheme(output_file, x_data, y_data, c_data, title, x_label, y_label, cmap='BuGn'):
     """
     This will create a 2D plot where every point will have a color on a colormap
     Usefull to show properties of points like probabilities

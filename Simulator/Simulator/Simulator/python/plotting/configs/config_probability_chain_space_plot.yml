@@ -1,3 +1,4 @@
 trials_folder: d:\repositories\Simulator\experiments\synfire_chain_callback\r_1_connect_s_0.0250_e_1.0000_i_0.0250_ampli_s_0.0250_e_1.0000_i_0.0250_min_r_0.50_max_r_2.00\
 variable1: connectivity
 variable2: amplitude
+csv_sep: ;

@@ -123,8 +123,7 @@ if __name__ == '__main__':
         no_activity_probs[i] = point_data['no_activity_cnt'] / point_data['cnt']
         unknown_probs[i] = point_data['unknown_cnt'] / point_data['cnt']
 
-    # TODO: sep to be in config, or can you get it somehow???
-    sep = ';'
+    sep = config['csv_sep']
     with open(os.path.join(config['trials_folder'], 'values.csv'), 'w') as fp:
         fp.write(str(config['variable1']) + sep + str(config['variable2']) + sep + 'No_Activity' + sep + 'Stable' + sep + 'Epilepsy' + sep + 'Unknown\n')
         for i in range(n_points):

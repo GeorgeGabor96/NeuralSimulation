@@ -70,7 +70,6 @@ if __name__ == '__main__':
         points_for_state[state]['x'].append(variable_values[config['variable1']])
         points_for_state[state]['y'].append(variable_values[config['variable2']])
 
-    print(points_for_state)
     for state in points_for_state.keys():
         points_for_state[state]['x'] = np.array(points_for_state[state]['x'])
         points_for_state[state]['y'] = np.array(points_for_state[state]['y'])
