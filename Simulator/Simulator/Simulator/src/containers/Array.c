@@ -313,6 +313,21 @@ ERROR
 	return array_b;
 }
 
+
+ArrayUint32* array_zeros_uint23(uint32_t length) {
+	ArrayUint32* array_u32 = (ArrayUint32*)array_create(length, length, sizeof(uint32_t));
+	check_memory(array_b);
+
+	uint32_t zero = 0;
+	uint32_t i = 0;
+	for (i = 0; i < length; ++i)
+		array_set(array_u32, i, &zero);
+
+ERROR
+	return array_u32;
+}
+
+
 ArrayFloat* array_ones_float(uint32_t length) {
 	ArrayFloat* array_f = (ArrayFloat*)array_create(length, length, sizeof(float));
 	check_memory(array_f);

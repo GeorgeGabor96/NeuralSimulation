@@ -22,6 +22,8 @@ BOOL callback_detect_synfire_activity_data_is_valid(C_Data* data);
 void callback_detect_synfire_activity_data_destroy(C_Data* data);
 void callback_detect_synfire_activity_data_update(C_Data* data, Network* net);
 void callback_detect_synfire_activity_data_run(C_Data* data, Network* net);
+void callback_detect_synfire_activity_data_run_with_syn_info(C_Data* data, Network* net);
+
 
 
 Callback* callback_detect_synfire_activity_create(Network* net, uint32_t max_sync_act_duration, float min_ratio, float max_ratio, const char* output_file_path) {
@@ -65,7 +67,7 @@ Callback* callback_detect_synfire_activity_create(Network* net, uint32_t max_syn
 	callback->data_is_valid = callback_detect_synfire_activity_data_is_valid;
 	callback->data_destroy = callback_detect_synfire_activity_data_destroy;
 	callback->data_update = callback_detect_synfire_activity_data_update;
-	callback->data_run = callback_detect_synfire_activity_data_run;
+	callback->data_run = callback_detect_synfire_activity_data_run_with_syn_info;
 
 	return callback;
 
@@ -191,6 +193,148 @@ static inline GaussianDist* get_layer_spike_distribution(SpikeStatesForLayer* sp
 
 	return dist;
 }
+
+
+typedef struct SynfireInfo {
+	float mean_time;
+	float duration;
+} SynfireInfo;
+
+
+static inline SynfireInfo* get_layer_synfire_info(SpikeStatesForLayer* spike_states_for_layer) {
+	uint32_t neuron_idx = 0;
+	uint32_t time_idx = 0;
+	uint32_t* h_value = 0;
+	BOOL spike_state = FALSE;
+	SynfireInfo* syn_info = (SynfireInfo*)malloc(sizeof(SynfireInfo), "get_layer_synfire_info syn_info");
+	SpikeStatesForNetwork* spike_states_for_neuron = (SpikeStatesForNeuron*)array_get(spike_states_for_layer, 0);
+	Array* spike_cumm_hist = array_zeros_uint23(spike_states_for_neuron->length);
+
+	// make the histogram
+	for (neuron_idx = 0; neuron_idx < spike_states_for_layer->length; ++neuron_idx) {
+		spike_states_for_neuron = (SpikeStatesForNeuron*)array_get(spike_states_for_layer, neuron_idx);
+
+		for (time_idx = 0; time_idx < spike_states_for_neuron->length; ++time_idx) {
+			spike_state = *((BOOL*)array_get(spike_states_for_neuron, time_idx));
+			if (spike_state == TRUE) {
+				h_value = (uint32_t*)array_get(spike_cumm_hist, time_idx);
+				++(*h_value);
+			}
+		}
+	}
+
+	// find the portion with synfire chain
+	// take a +- 2 ms window at each point, if there are like +10 neurons theyn syncron
+	// if we cannot find a window for 10 ms then it is over
+	uint32_t window_size = 2;
+	uint32_t start = 0;
+	uint32_t end = 0;
+	uint32_t spikes_in_window = 0;
+	uint32_t window_start = 0;
+	uint32_t window_end = 0;
+	uint32_t window_pos = 0;
+	uint32_t last_syn_window = 0;
+	BOOL syncrony = FALSE;
+
+
+	for (time_idx = 0; time_idx < spike_cumm_hist->length; ++time_idx) {
+		spikes_in_window = 0;
+
+		// compute window value
+		window_start = time_idx - window_size;
+		window_start = window_start < 0 ? 0 : window_start;
+
+		window_end = time_idx + window_size;
+		window_end = window_end >= spike_cumm_hist->length ? spike_cumm_hist->length - 1 : window_end;
+
+		for (window_pos = window_start; window_pos <= window_end; ++window_pos)
+			spikes_in_window += *((uint32_t*)array_get(spike_cumm_hist, window_pos));
+
+		if (spikes_in_window >= 10) {
+			// check if pulse starts
+			if (syncrony == FALSE) {
+				start = time_idx;
+				syncrony = TRUE;
+			}
+			last_syn_window = time_idx;
+		}
+		else if (syncrony == TRUE) {
+			// check if pulse ends, if more than 10 ms passed since last sync then its over
+			if (time_idx - last_syn_window > 10) {
+				end = last_syn_window;
+				break;
+			}
+		}
+
+	}
+	array_destroy(spike_cumm_hist, NULL);
+
+	// modify @end if the activity doesn't end
+	if (syncrony == TRUE && end == 0) end = last_syn_window;
+
+	// if no syncrony no duration
+	if (syncrony == FALSE) syn_info->duration = 0;
+	else syn_info->duration = (float)end - (float)start + 1.0f;
+
+	syn_info->mean_time = (float)start + syn_info->duration / 2.0f;
+	return syn_info;
+}
+
+void callback_detect_synfire_activity_data_run_with_syn_info(C_Data* data, Network* net) {
+	check(callback_detect_synfire_activity_data_is_valid(data) == TRUE, invalid_argument("data"));
+	check(network_is_valid(net) == TRUE, invalid_argument("net"));
+
+	SpikeStatesForNetwork* spike_states_for_net = &(data->spike_states_for_network);
+
+	// TODO: let the user decide the two layers
+	SpikeStatesForLayer* spike_states_second_layer = (SpikeStatesForLayer*)array_get(spike_states_for_net, 4);
+	SpikeStatesForLayer* spike_states_last_layer = (SpikeStatesForLayer*)array_get(spike_states_for_net, spike_states_for_net->length - 1);
+
+	SynfireInfo* layer_1_syn_info = get_layer_synfire_info(spike_states_second_layer);
+	SynfireInfo* layer_2_syn_info = get_layer_synfire_info(spike_states_last_layer);
+
+	const char* state = "STABLE";
+
+	float layers_duration_ratio = 0.0f;
+	// when at least one is fully syncronized
+	if (layer_1_syn_info->duration == 0.0f || layer_2_syn_info->duration == 0.0f) {
+		state = "NO_ACTIVITY";
+	}
+	else {
+		layers_duration_ratio = layer_1_syn_info->duration / (layer_2_syn_info->duration + EPSILON);
+
+		// FIRST IF MAY BE REDUNDANT
+		if (layer_1_syn_info->mean_time == 0.0f || layer_2_syn_info->mean_time == 0.0f) {
+			state = "NO_ACTIVITY";
+		}
+		else if (layers_duration_ratio < data->min_ratio) {
+			state = "EPILEPSY";
+		}
+		else if (layers_duration_ratio > data->max_ratio) {
+			state = "NO_ACTIVITY";
+		}
+		else {
+			state = "STABLE";
+		}
+	}
+	const char* output_file_path = string_get_C_string(data->output_file_path);
+	FILE* fp = fopen(output_file_path, "w");
+	check(fp != NULL, "Couldn't oepn file %s for writting", output_file_path);
+
+	fprintf(fp, state);
+	fprintf(fp, "\nduration1: %.10f duration2: %.10f ratio %.10f\n", layer_1_syn_info->duration, layer_2_syn_info->duration, layers_duration_ratio);
+	fprintf(fp, "mean_t1: %.10f mean_t2: %.10f\n", layer_1_syn_info->mean_time, layer_2_syn_info->mean_time);
+
+	fclose(fp);
+
+	free(layer_1_syn_info);
+	free(layer_2_syn_info);
+
+ERROR
+	return;
+}
+
+
 
 
 static inline float get_layer_pulse_mean_duration(SpikeStatesForLayer* spike_states_for_layer, uint32_t max_pulse_duration) {
