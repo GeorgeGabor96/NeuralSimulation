@@ -1,23 +1,26 @@
-layers_folder: d:\repositories\Simulator\experiments\synfire_chain_callback\refract_connectivity_0_025_to_1_and_synaptic_strength_0_025_to_0_1\connectivity_0.0250_strength_0.0500\
+layers_folder: d:\repositories\Simulator\experiments\synfire_chain_callback\r_1_connectivity_0.5000_amplitude_0.1000\coonectivity_0.5000_amplitude_0.1000\
 layers:
 - layer01
-- layer01_inh
+- layer01_inhi
 - layer02
-- layer02_inh
+- layer02_inhi
 - layer03
-- layer03_inh
+- layer03_inhi
 - layer04
-- layer04_inh
+- layer04_inhi
 - layer05
-- layer05_inh
+- layer05_inhi
 - layer06
-- layer06_inh
+- layer06_inhi
 - layer07
-- layer07_inh
+- layer07_inhi
 - layer08
-- layer08_inh
+- layer08_inhi
 - layer09
-- layer09_inh
+- layer09_inhi
 - layer10
-title: connectivity_0.0300_strength_0.0180
+title: activity
 binaries_prefix: spikes
+color_for_inner_substring:
+  inhi: blue
+default_color: red

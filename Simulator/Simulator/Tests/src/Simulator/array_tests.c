@@ -251,3 +251,34 @@ TestStatus array_swap_test() {
 error:
 	return status;
 }
+
+
+TestStatus array_float_get_gaussian_dist_test() {
+	TestStatus status = TEST_FAILED;
+
+	Array* array = array_create(10, 10, sizeof(float));
+	uint32_t i = 0;
+	float value = 0.0f;
+	for (i = 0; i < 10; ++i) {
+		value = (float)(i + 1);
+		array_set(array, i, &value);
+	}
+	GaussianDist* dist = array_float_get_gaussian_dist(array);
+	float_test(dist->mean, 5.5f);
+	float_test(dist->std, 2.872281f);
+	array_destroy(array, NULL);
+	free(dist);
+
+	array = array_create(10, 10, sizeof(size_t));
+	dist = array_float_get_gaussian_dist(array);
+	assert(dist == NULL, "Should return NULL for array of size_t");
+	array_destroy(array, NULL);
+
+	dist = array_float_get_gaussian_dist(NULL);
+	assert(dist == NULL, "Should return NULL for invalid array");
+
+	assert(memory_leak() == FALSE, "Memory leak");
+	status = TEST_SUCCESS;
+error:
+	return status;
+}

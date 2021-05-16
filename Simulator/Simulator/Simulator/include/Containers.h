@@ -81,8 +81,17 @@ ArrayDouble* array_float_to_double(ArrayFloat* array_f, BOOL destroy_array_float
 ArrayFloat* array_arange_float(uint32_t length);
 ArrayFloat* array_ones_float(uint32_t length);
 ArrayBool* array_ones_bool(uint32_t length);
+ArrayUint32* array_zeros_uint23(uint32_t length);
 Status array_of_arrays_init(Array* data, uint32_t length, size_t inner_element_size);
 Status array_of_arrays_reset(Array* data); // assumes primitives data types
+
+// statictics functions
+typedef struct GaussianDist{
+	float mean;
+	float std;
+} GaussianDist;
+
+GaussianDist* array_float_get_gaussian_dist(ArrayFloat* array);
 
 // dumping funtions
 void array_dump(Array* array, String* file_path, String* data_name, uint8_t type);

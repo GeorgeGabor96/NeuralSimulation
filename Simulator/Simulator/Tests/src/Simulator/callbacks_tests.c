@@ -105,12 +105,15 @@ ERROR
 TestStatus callback_detect_synfire_activity_test() {
 	Network* net = get_network();
 	const char* file_path = "test.txt";
-	Callback* syn_detect = callback_detect_synfire_activity_create(net, 200, 0.5f, 1.5f, file_path);
+	Callback* syn_detect_std = callback_detect_synfire_activity_create(net, SYNFIRE_STD, 0, 2, 0.5f, 1.5f, file_path);
+	Callback* syn_detect_duration = callback_detect_synfire_activity_create(net, SYNFIRE_FP_DURATION, 0, 2, 0.5f, 1.5f, file_path);
 	DataGenerator* data = data_generator_constant_current_create(10, net, 10.f, 100);
 	
-	simulator_step(data, net, syn_detect);
+	simulator_step(data, net, syn_detect_std);
+	simulator_step(data, net, syn_detect_duration);
 
-	callback_destroy(syn_detect);
+	callback_destroy(syn_detect_std);
+	callback_destroy(syn_detect_duration);
 	data_generator_destroy(data);
 	network_destroy(net);
 

@@ -41,7 +41,7 @@
     <ClInclude Include="include\networks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\config.h">
+    <ClInclude Include="include\config_exp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

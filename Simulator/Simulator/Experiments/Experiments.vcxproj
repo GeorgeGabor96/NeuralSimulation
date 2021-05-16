@@ -167,7 +167,7 @@
     <ClCompile Include="src\networks.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\config.h" />
+    <ClInclude Include="include\config_exp.h" />
     <ClInclude Include="include\experiments.h" />
     <ClInclude Include="include\networks.h" />
   </ItemGroup>

@@ -10,5 +10,6 @@ TestStatus array_expand_test();
 TestStatus array_show_test();
 TestStatus array_copy_data_test();
 TestStatus array_swap_test();
+TestStatus array_float_get_gaussian_dist_test();
 
 #endif // __SIMULATOR_ARRAY_TESTS__
