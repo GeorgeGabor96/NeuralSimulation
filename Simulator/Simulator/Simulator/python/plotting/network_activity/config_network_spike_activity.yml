@@ -21,3 +21,6 @@ layers:
 - layer10
 title: activity
 binaries_prefix: spikes
+color_for_inner_substring:
+  inhi: blue
+default_color: red

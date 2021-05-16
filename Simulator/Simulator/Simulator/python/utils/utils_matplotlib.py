@@ -102,7 +102,7 @@ class NetworkSpikesPlot:
         self.layer_names = []
         self.y_ticks = []
 
-    def plot_points(self, layer_name, label_tick, x_coord, y_coord):
+    def plot_points(self, layer_name, label_tick, x_coord, y_coord, color='black'):
         """
         This plots a layer
 
@@ -120,7 +120,7 @@ class NetworkSpikesPlot:
             shape: 1D
             y values for the layer, it expects the exact coordinates, the user is responsible for that
         """
-        plt.scatter(x_coord, y_coord, color='black', s=0.5)
+        plt.scatter(x_coord, y_coord, color=color, s=0.5)
         self.y_ticks.append(label_tick)
         self.layer_names.append(layer_name)
 

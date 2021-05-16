@@ -22,6 +22,10 @@ def get_args():
         layers: the layers to consider, order of plotting respects this order
         title: title of the plot
         binaries_prefix: the prefix of the binaries that store the spikes, usually 'spikes'
+    Optional keys:
+        color_for_inner_string: dict where each key is a string and values are color (matplotlib style). 
+                If a layer has a key in its name it will be plotting with the corresponding color 
+        default_color: the default colors for a layer
     '''
     return parser.parse_args()
 
@@ -110,6 +114,22 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
     return data_for_layer, lines
 
 
+def get_layer_color(layer_name, config):
+    color = None
+
+    if 'color_for_inner_substring' in config.keys():
+        for key in config['color_for_inner_substring'].keys():
+            if key in layer_name:
+                color = config['color_for_inner_substring'][key]
+                break
+    if color is None:
+        if 'default_color' in config.keys():
+            color = config['default_color']
+        else:
+            color = 'black'
+    return color
+
+
 def plot_data_and_lines(data_for_layer, lines, config, file_name='network.png'):
     '''
     It uses @NetworkSpikesPlot to display the spike activity of every layer on a plot
@@ -132,7 +152,11 @@ def plot_data_and_lines(data_for_layer, lines, config, file_name='network.png'):
 
     # plot the layers
     for layer in data_for_layer:
-        spikes_plotter.plot_points(layer['layer_name'], layer['label_tick'], layer['spike_x_coord'], layer['spike_y_coord'])
+        spikes_plotter.plot_points(layer_name=layer['layer_name'],
+                                   label_tick=layer['label_tick'],
+                                   x_coord=layer['spike_x_coord'],
+                                   y_coord=layer['spike_y_coord'],
+                                   color=get_layer_color(layer['layer_name'], config))
 
     spikes_plotter.plot()
 
