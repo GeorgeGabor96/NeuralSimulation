@@ -75,7 +75,6 @@ if __name__ == '__main__':
                                                    variable1_name=config['variable1'],
                                                    variable2_name=config['variable2'])
 
-
             state = get_synfire_state(os.path.join(config['trials_folder'], txt_file))
             x_values.append(variable_values[config['variable1']])
             y_values.append(variable_values[config['variable2']])

@@ -113,7 +113,6 @@ void synfire_chain_space_mapping_connectivity_and_amplitude_specific(float conne
 
 	printf("Running with connectivity %f and amplitude %f\n", connectivity, amplitude);
 
-	// trebuie o functie ce construieste o retea cu parametrii astia
 	net = network_synfire_chain_n_layers(10, connectivity, amplitude, 1.0f, use_refract);
 
 	// create data generator
