@@ -87,8 +87,14 @@ The network is given in the @callback_run method
 Parameters:
 @net - pointer the the network object
 
-@max_sync_act_duration - the maximum "pulse" or "wave" of activity that the syncronous activity should last
-	The callback computes for each neuron a duration of a pulse by finding the start of the activity and searching for the last spike
+@detection_mode - the alg to use to detect synfire chains
+		SYNFIRE_STD - uses the ratio between the standard deviation of two layers spike times
+		SYNFIRE_FP_DURATION - uses the the population coding to detect the duration of the 
+				first pulse of two layers and based on their ratio it will decide
+
+@first_layer_idx - the index of the first layer to consider in the @detection_mode
+
+@second_layer_idx - the index of the second layer to consider in the @detection_mode
 
 @min_ratio - the minimum ratio between the duration of activity for the second layer and the last layer
 	if the mean_act_second_layer / mean_act_last_layer < @min_ratio -> the activity is considered to be dying
@@ -101,9 +107,13 @@ Parameters:
 !!! NOTE: Currently on the ratio between the second and last layer is considered, but a more complex analysis can be conducted
 	for example considering all the layers, or more complex structures than a sequential network
 */
+typedef enum { SYNFIRE_STD = 1, SYNFIRE_FP_DURATION = 2} SYNFIRE_DETECTION_MODE;
+
 Callback* callback_detect_synfire_activity_create(
 	Network* net,
-	uint32_t max_sync_act_duration,
+	SYNFIRE_DETECTION_MODE detection_mode,
+	uint32_t first_layer_idx,
+	uint32_t second_layer_idx,
 	float min_ratio,
 	float max_ratio,
 	const char* output_file_path

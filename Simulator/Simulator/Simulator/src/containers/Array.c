@@ -316,7 +316,7 @@ ERROR
 
 ArrayUint32* array_zeros_uint23(uint32_t length) {
 	ArrayUint32* array_u32 = (ArrayUint32*)array_create(length, length, sizeof(uint32_t));
-	check_memory(array_b);
+	check_memory(array_u32);
 
 	uint32_t zero = 0;
 	uint32_t i = 0;
@@ -409,7 +409,7 @@ GaussianDist* array_float_get_gaussian_dist(ArrayFloat* array) {
 	// compute the std
 	for (i = 0; i < array->length; ++i) {
 		value = *((float*)array_get(array, i));
-		std += pow((double)(value - mean), 2.0);
+		std += pow((double)value - mean, 2.0);
 	}
 	std = sqrt(std / ((double)array->length + EPSILON));
 
