@@ -165,6 +165,33 @@ ERROR
 }
 
 
+NeuronClass* neuron_class_copy(NeuronClass* n_class) {
+	NeuronClass* n_class_copy = NULL;
+	check(neuron_class_is_valid(n_class) == TRUE, invalid_argument("n_class"));
+	n_class_copy = calloc(1, sizeof(NeuronClass), "neuron_class_copy");
+	check_memory(n_class_copy);
+
+	n_class_copy->name = string_copy(n_class->name);
+	check(string_is_valid(n_class_copy->name) == TRUE, invalid_argument("n_class_copy->name"));
+	n_class_copy->free_factor = n_class->free_factor;
+	n_class_copy->i_factor = n_class->i_factor;
+	n_class_copy->refractory_time = n_class->refractory_time;
+	n_class_copy->tau = n_class->tau;
+	n_class_copy->type = n_class->type;
+	n_class_copy->u_factor = n_class->u_factor;
+	n_class_copy->u_rest = n_class->u_rest;
+	n_class_copy->u_th = n_class->u_th;
+
+	return n_class_copy;
+ERROR
+	if (n_class_copy != NULL) {
+		if (n_class_copy->name != NULL) string_destroy(n_class_copy->name);
+		free(n_class_copy);
+	}
+	return NULL;
+}
+
+
 void neuron_class_reset(NeuronClass* neuron_class) {
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
 	string_destroy(neuron_class->name);
@@ -226,6 +253,31 @@ Status neuron_class_set_LIF_refractor_parameters(NeuronClass* neuron_class, floa
 ERROR
 	return status;
 }
+
+
+String* neuron_class_get_desc(NeuronClass* neuron_class) {
+	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
+	char description[1024] = { 0 };
+	sprintf(description, "name: %s\n"
+		"type: %s\n"
+		"u_th: %f\n"
+		"u_rest: %f\n"
+		"tau: %f\n"
+		"u_factor: %f\n"
+		"i_factor: %f\n"
+		"free_factor: %f\n"
+		"refractory_period: %u\n",
+		string_get_C_string(neuron_class->name),
+		neuron_type_C_string(neuron_class->type),
+		neuron_class->u_rest, neuron_class->u_rest,
+		neuron_class->tau,
+		neuron_class->u_factor, neuron_class->i_factor, neuron_class->free_factor,
+		neuron_class->refractory_time);
+	return string_create((const char*)description);
+ERROR
+	return NULL;
+}
+
 
 
 /*************************************************************

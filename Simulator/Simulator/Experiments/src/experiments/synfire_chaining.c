@@ -8,129 +8,187 @@
 #include "../../include/experiments.h"
 
 
-void synfire_space_exploration_connectivity_amplitude_multiple(uint32_t n_trials) {
+typedef struct connectivity_amplitude_space_exp {
+	const char* exp_abs_path;
+
+	float connectivity_start;
+	float connectivity_end;
+	float connectivity_inc;
+
+	float amplitude_start;
+	float amplitude_end;
+	float amplitude_inc;
+
+	float min_ratio;
+	float max_ratio;
+
+	uint32_t n_excitatory;
+	uint32_t n_inhibitory;
+
+	uint32_t n_trials;
+
+	NeuronClass* neuron_class;
+	SynapseClass* synapse_exci_class;
+	SynapseClass* synapse_inhi_class;
+
+	// data gen values
+	uint32_t example_duration;
+	float between_pulse_spike_frequency;
+	float pulse_spike_frequency;
+
+	// callback values;
+	BOOL use_dump_net_callback;
+
+}connectivity_amplitude_space_exp;
+
+
+void dump_config(const char* file_path, connectivity_amplitude_space_exp* config);
+void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_amplitude_space_exp* config);
+
+
+void synfire_space_exploration_connectivity_amplitude() {
 	connectivity_amplitude_space_exp config = { 0 };
+	config.exp_abs_path = "d:\\repositories\\Simulator\\experiments\\refactor\\test";
+	
 	config.connectivity_start = 0.025f;
 	config.connectivity_end = 1.0f;
 	config.connectivity_inc = 0.025f;
 
-	config.amplitude_start = 0.005f;
-	config.amplitude_end = 0.450f;
-	config.amplitude_inc = 0.010f;
+	config.amplitude_start = 0.025f;
+	config.amplitude_end = 1.0f;
+	config.amplitude_inc = 0.025;
 
-	config.use_refract = FALSE;
 	config.min_ratio = 0.5f;
 	config.max_ratio = 2.0f;
 
-	char result_folder[1024] = { 0 };
-	char result_trail_folder[1024] = { 0 };
-	sprintf(result_folder, "%s\\synfire_chain_hist\\r_%u_connect_s_%.4f_e_%.4f_i_%.4f_ampli_s_%.4f_e_%.4f_i_%.4f_min_r_%.2f_max_r_%.2f",
-		result_base_folder,
-		config.use_refract,
-		config.connectivity_start, config.connectivity_end, config.connectivity_inc,
-		config.amplitude_start, config.amplitude_end, config.amplitude_inc,
-		config.min_ratio, config.max_ratio);
+	config.n_excitatory = 80;
+	config.n_inhibitory = 20;
 
+	config.neuron_class = neuron_class_create("LIF_NEURON", LIF_NEURON);
+	//config.neuron_class = neuron_class_create("LIF_NEURON_REFRAC", LIF_REFRACTORY_NEURON);
 
-	for (uint32_t i = 0; i < n_trials; ++i) {
-		memset(result_trail_folder, 0, 1024);
-		sprintf(result_trail_folder, "%s\\t%d", result_folder, i);
-		os_mkdir(result_trail_folder);
-		synfire_chain_space_mapping_connectivity_and_amplitude(&config, result_trail_folder);
-	}
+	config.synapse_exci_class = synapse_class_create("AMPA", 0.0f, 1.0f, 1, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1);
+	config.synapse_inhi_class = synapse_class_create("GABA_A", -90.0f, 1.0f, 6, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1);
+	//config.synapse_exci_class = synapse_class_create("CONDUCTANCE_10_TAU", 0.0, 1.0f, 10, 10, CONDUCTANCE_SYNAPSE, 1);
+	//config.synapse_inhi_class = synapse_class_create("CONDUCTANCE_10_TAU", 0.0, 1.0f, 10, 10, CONDUCTANCE_SYNAPSE, 1);
+
+	config.n_trials = 10;
+
+	config.example_duration = 1000;
+	config.between_pulse_spike_frequency = 0.0f;
+	config.pulse_spike_frequency = 0.05f;
+
+	config.use_dump_net_callback = FALSE;
+
+	synfire_space_exploration_connectivity_amplitude_run_config(&config);
 }
 
 
-void synfire_chain_space_mapping_connectivity_and_amplitude(connectivity_amplitude_space_exp* config, const char* result_path) {
-	char synfire_result_file[1024] = { 0 };
-
-	// experiment variables
-	float connectivity_start = config->connectivity_start;
-	float connectivity_end = config->connectivity_end;
-	float connectivity_inc = config->connectivity_inc;
-
-	float amplitude_start = config->amplitude_start;
-	float amplitude_end = config->amplitude_end;
-	float amplitude_inc = config->amplitude_inc;
-	BOOL use_refract = config->use_refract;
-
-	float min_ratio = config->min_ratio;
-	float max_ratio = config->max_ratio;
-	
-	Network* net = NULL;
-	DataGenerator* data_gen = NULL;
-	Callback* synfire_detect_cb = NULL;
-	Simulator* simulator = NULL;
+void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_amplitude_space_exp* config) {
+	char result_trail_folder[1024] = { 0 };
+	char callback_result_folder[1024] = { 0 };
+	uint32_t i = 0;
 	float connectivity = 0.0f;
 	float amplitude = 0.0f;
-
-	for (connectivity = connectivity_start; connectivity < connectivity_end + 0.00001f; connectivity += connectivity_inc) {
-
-		for (amplitude = amplitude_start; amplitude < amplitude_end + 0.00001f; amplitude += amplitude_inc) {
-			printf("Running with connectivity %f and amplitude %f\n", connectivity, amplitude);
-
-			memset(synfire_result_file, 0, 1024);
-
-			// trebuie o functie ce construieste o retea cu parametrii astia
-			net = network_synfire_chain_n_layers(10, connectivity, amplitude, 1.0f, use_refract);
-
-			// create data generator
-			data_gen = data_generator_spike_pulses_create(1, net, 10, 2000, 20, 0.0f, 0.05f, 500);
-
-			// create callbacks
-			sprintf(synfire_result_file, "%s\\connectivity_%.4f_amplitude_%.4f.txt", result_path, connectivity, amplitude);
-			synfire_detect_cb = callback_detect_synfire_activity_create(net, SYNFIRE_FP_DURATION, 4, net->layers.length - 1, min_ratio, max_ratio, synfire_result_file);
-
-			// create simulator and run it
-			simulator = simulator_create(data_gen, net);
-			simulator_add_callback(simulator, synfire_detect_cb);
-			simulator_infer(simulator);
-
-			// cleanup
-			simulator_destroy(simulator);
-		}
-	}
-}
-
-
-void synfire_chain_space_mapping_connectivity_and_amplitude_specific(float connectivity, float amplitude, BOOL use_refract) {
-	char result_path[1024] = { 0 };
-	char synfire_result_file[1024] = { 0 };
-	char net_dump_result_folder[1024] = { 0 };
-
-	sprintf(result_path, "%s\\synfire_chain_callback\\r_%u_connectivity_%.4f_amplitude_%.4f",
-		result_base_folder,
-		use_refract,
-		connectivity,
-		amplitude);
-	os_mkdir(result_path);
-
 	Network* net = NULL;
 	DataGenerator* data_gen = NULL;
 	Callback* synfire_detect_cb = NULL;
 	Callback* net_dump_cb = NULL;
 	Simulator* simulator = NULL;
+	network_sequential_n_layers_config net_config = { 0 };
 
-	printf("Running with connectivity %f and amplitude %f\n", connectivity, amplitude);
+	for (i = 0; i < config->n_trials; ++i) {
+		memset(result_trail_folder, 0, 1024);
+		sprintf(result_trail_folder, "%s\\t%d", config->exp_abs_path, i);
+		os_mkdir(result_trail_folder);
+		
+		for (connectivity = config->connectivity_start; connectivity < config->connectivity_end + EPSILON; connectivity += config->connectivity_inc) {
 
-	net = network_synfire_chain_n_layers(10, connectivity, amplitude, 1.0f, use_refract);
+			for (amplitude = config->amplitude_start; amplitude < config->amplitude_end + EPSILON; amplitude += config->amplitude_inc) {
+				printf("Running with connectivity %f and amplitude %f\n", connectivity, amplitude);
 
-	// create data generator
-	data_gen = data_generator_spike_pulses_create(1, net, 10, 2000, 20, 0.01f, 0.05f, 1000);
+				// trebuie o functie ce construieste o retea cu parametrii astia
+				net_config.n_layers = 10;
+				net_config.n_exci_neurons = config->n_excitatory;
+				net_config.n_inhi_neurons = config->n_inhibitory;
+				net_config.connectivity = connectivity;
+				net_config.synapse_weight = 1.0f;
+				net_config.n_class = neuron_class_copy(config->neuron_class);
+				net_config.s_exci_class = synapse_class_copy(config->synapse_exci_class);
+				net_config.s_exci_class->A = amplitude;
+				net_config.s_inhi_class = synapse_class_copy(config->synapse_inhi_class);
+				net_config.s_inhi_class->A = amplitude;
+				net = network_sequential_n_layers(&config);
 
-	// create callbacks
-	sprintf(synfire_result_file, "%s\\connectivity_%.4f_amplitude_%.4f.txt", result_path, connectivity, amplitude);
-	synfire_detect_cb = callback_detect_synfire_activity_create(net, SYNFIRE_FP_DURATION, 4, net->layers.length - 1, 0.5f, 2.0f, synfire_result_file);
+				// create data generator
+				data_gen = data_generator_spike_pulses_create(1, net, 10, 2000, 20, 0.0f, 0.05f, 500);
 
-	sprintf(net_dump_result_folder, "%s\\coonectivity_%.4f_amplitude_%.4f", result_path, connectivity, amplitude);
-	net_dump_cb = callback_dump_network_create(net, net_dump_result_folder);
+				// create callbacks
+				memset(callback_result_folder, 0, 1024);
+				sprintf(callback_result_folder, "%s\\connectivity_%.4f_amplitude_%.4f.txt", result_trail_folder, connectivity, amplitude);
+				synfire_detect_cb = callback_detect_synfire_activity_create(net, SYNFIRE_FP_DURATION, 4, net->layers.length - 1, config->min_ratio, config->max_ratio, callback_result_folder);
 
-	// create simulator and run it
-	simulator = simulator_create(data_gen, net);
-	simulator_add_callback(simulator, synfire_detect_cb);
-	simulator_add_callback(simulator, net_dump_cb);
-	simulator_infer(simulator);
+				if (config->use_dump_net_callback == TRUE) {
+					memset(callback_result_folder, 0, 1024);
+					sprintf(callback_result_folder, "%s\\coonectivity_%.4f_amplitude_%.4f", result_trail_folder, connectivity, amplitude);
+					net_dump_cb = callback_dump_network_create(net, callback_result_folder);
+				}
+				// create simulator and run it
+				simulator = simulator_create(data_gen, net);
+				simulator_add_callback(simulator, synfire_detect_cb);
+				if (config->use_dump_net_callback == TRUE) simulator_add_callback(simulator, net_dump_cb);
+				simulator_infer(simulator);
 
-	// cleanup
-	simulator_destroy(simulator);
+				// cleanup
+				simulator_destroy(simulator);
+			}
+		}
+	}
+}
+
+
+void dump_config(const char* file_path, connectivity_amplitude_space_exp* config) {
+	FILE* fp = fopen(file_path, "w");
+	if (fp == NULL) log_error("Couldn't open %s for writting", file_path);
+
+	String* n_class_desc = neuron_class_get_desc(config->neuron_class);
+	String* s_exci_class_desc = synapse_class_get_desc(config->synapse_exci_class);
+	String* s_inhi_class_desc = synapse_class_get_desc(config->synapse_inhi_class);
+
+	fprintf(fp, "exp_abs_path: %s\n\n"
+		"connectivity_start: %f\n"
+		"connectivity_end: %f\n"
+		"connectivity_inc: %f\n\n"
+		"amplitude_start: %f\n"
+		"amplitude_end: %f\n"
+		"amplitude_inc: %f\n\n"
+		"min_ratio: %f\n"
+		"max_ratio: %f\n"
+		"n_excitatory: %u\n"
+		"n_inhibitory: %u\n"
+		"n_trials: %u\n\n"
+		"neuron_class: %s\n"
+		"synapse_exci_class: %s\n"
+		"synapse_inhi_class: %s\n\n"
+		"example_duration: %u\n"
+		"between_pulse_spike_frequency: %f\n"
+		"pulse_spike_frequency: %f\n\n"
+		"use_dump_net_callback: %d",
+		config->exp_abs_path,
+		config->connectivity_start, config->connectivity_end, config->connectivity_inc,
+		config->amplitude_start, config->amplitude_end, config->amplitude_inc,
+		config->min_ratio, config->max_ratio,
+		config->n_excitatory, config->n_inhibitory, config->n_trials,
+		string_get_C_string(n_class_desc), string_get_C_string(s_exci_class_desc), string_get_C_string(s_inhi_class_desc),
+		config->example_duration, config->between_pulse_spike_frequency, config->pulse_spike_frequency,
+		config->use_dump_net_callback
+	);
+	fclose(fp);
+
+	string_destroy(n_class_desc);
+	string_destroy(s_exci_class_desc);
+	string_destroy(s_inhi_class_desc);
+
+ERROR
+	return;
 }

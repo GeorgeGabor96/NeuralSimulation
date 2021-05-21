@@ -78,6 +78,30 @@ ERROR
 }
 
 
+SynapseClass* synapse_class_copy(SynapseClass* s_class) {
+	SynapseClass* s_class_copy = NULL;
+	check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
+	s_class_copy = calloc(1, sizeof(SynapseClass), "synapse_class_copy");
+	check_memory(s_class_copy);
+
+	s_class_copy->name = string_copy(s_class->name);
+	check(string_is_valid(s_class_copy->name) == TRUE, invalid_argument("s_class_copy->name"));
+	s_class_copy->E = s_class->E;
+	s_class_copy->A = s_class->A;
+	s_class_copy->tau_exp = s_class->tau_exp;
+	s_class_copy->delay = s_class->delay;
+	s_class_copy->type = s_class->type;
+
+	return s_class_copy;
+ERROR
+	if (s_class_copy != NULL) {
+		if (s_class_copy->name != NULL) string_destroy(s_class_copy->name);
+		free(s_class_copy);
+	}
+	return NULL;
+}
+
+
 SynapseClass* synapse_class_create_default(const char* name) {
 	return synapse_class_create(name, SYNAPSE_REV_POTENTIAL_DF, SYNAPSE_AMP_DF, SYNAPSE_TAU_MS_DF, SYNAPSE_DELAY_DF, SYNAPSE_TYPE_DF, SYNAPSE_SIMULATION_TIME_MS_DF);
 }
@@ -110,6 +134,28 @@ ERROR
 void synapse_class_ref_destroy(SynapseClass** synapse_class) {
 	synapse_class_destroy(*synapse_class);
 }
+
+String* synapse_class_get_desc(SynapseClass* synapse_class) {
+	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
+	char description[1024] = { 0 };
+	sprintf(description, "name: %s\n"
+		"E: %f\n"
+		"A: %f\n"
+		"tau_exp: %f\n"
+		"delay: %u\n"
+		"synapse_type: %s\n",
+		string_get_C_string(synapse_class->name),
+		synapse_class->E,
+		synapse_class->A,
+		synapse_class->tau_exp,
+		synapse_class->delay,
+		synapse_type_C_string(synapse_class->type));
+
+	return string_create((const char*)description);
+ERROR
+	return NULL;
+}
+
 
 
 /*************************************************************
