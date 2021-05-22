@@ -5,8 +5,6 @@
 #include "config.h"
 #include "Containers.h"
 
-// TODO: Update documentation
-
 
 /*************************************************************
 * SynapseClass Functionality
@@ -59,11 +57,12 @@ Status synapse_class_is_valid(SynapseClass* synapse_class);
 * 			   @type == CONDUCTANCE_SYNPASE || @type == VOLTAGE_DEPENDENT_SYNAPSE
 */
 SynapseClass* synapse_class_create(const char* name, float rev_potential, float amplitude, float tau_ms, uint32_t delay, SynapseType type, float simulation_step_ms);
-
+SynapseClass* synapse_class_copy(SynapseClass* s_class);
 SynapseClass* synapse_class_create_default(const char* name);
 void synapse_class_reset(SynapseClass* synapse_class);
 void synapse_class_destroy(SynapseClass* synapse_class);
 void synapse_class_ref_destroy(SynapseClass** synapse_class);
+String* synapse_class_get_desc(SynapseClass* synapse_class);
 
 
 /*************************************************************

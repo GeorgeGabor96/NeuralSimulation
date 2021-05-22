@@ -61,6 +61,36 @@ error:
 }
 
 
+TestStatus neuron_class_copy_test() {
+	TestStatus status = TEST_FAILED;
+
+	NeuronClass* n_class = neuron_class_create("COPY_TEST", LIF_NEURON);
+	NeuronClass* n_class_copy = neuron_class_copy(n_class);
+
+	assert(neuron_class_is_valid(n_class_copy) == TRUE, invalid_argument("n_class_copy"));
+	assert(string_equal(n_class_copy->name, n_class->name) == TRUE, "@n_class_copy->name is %s, @n_class->name is %s", string_get_C_string(n_class_copy->name), string_get_C_string(n_class->name));
+	assert(n_class_copy->type == n_class->type, "@n_class_copy->type is %u, @n_class->type is %u", n_class_copy->type, n_class->type);
+	assert(float_test(n_class_copy->u_th, n_class->u_th), "@n_class_copy->u_th is %f, @n_class->u_th is %f", n_class_copy->u_th, n_class->u_th);
+	assert(float_test(n_class_copy->u_rest, n_class->u_rest), "@n_class_copy->u_rest is %f, @n_class->u_rest is %f", n_class_copy->u_rest, n_class->u_rest);
+	assert(float_test(n_class_copy->tau, n_class->tau), "@n_class_copy->tau is %f, @n_class->tau is %f", n_class_copy->tau, n_class->tau);
+	assert(float_test(n_class_copy->u_factor, n_class->u_factor), "@n_class_copy->u_factor is %f, @n_class->u_factor is %f", n_class_copy->u_factor, n_class->u_factor);
+	assert(float_test(n_class_copy->i_factor, n_class->i_factor), "@n_class_copy->i_factor is %f, @n_class->i_factor is %f", n_class_copy->i_factor, n_class->i_factor);
+	assert(float_test(n_class_copy->free_factor, n_class->free_factor), "@n_class_copy->free_factor is %f, @n_class->free_factor is %f", n_class_copy->free_factor, n_class->free_factor);
+	assert(float_test(n_class_copy->refractory_time, n_class->refractory_time), "@n_class_copy->refractory_time is %u, @n_class->refractory_time is %u", n_class_copy->refractory_time, n_class->refractory_time);
+
+	neuron_class_destroy(n_class);
+	neuron_class_destroy(n_class_copy);
+
+	n_class_copy = neuron_class_copy(NULL);
+	assert(n_class_copy == NULL, "Should return NULL for NULL input");
+	assert(memory_leak() == FALSE, "Memory leak");
+
+	status = TEST_SUCCESS;
+error:
+	return status;
+}
+
+
 TestStatus neuron_general_use_case_test() {
 	// setup
 	TestStatus status = TEST_FAILED;

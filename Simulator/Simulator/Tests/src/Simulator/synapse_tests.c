@@ -75,6 +75,33 @@ error:
 }
 
 
+TestStatus synapse_class_copy_test() {
+	TestStatus status = TEST_FAILED;
+
+	SynapseClass* s_class = synapse_class_create_default("COPY_TEST");
+	SynapseClass* s_class_copy = synapse_class_copy(s_class);
+
+	assert(synapse_class_is_valid(s_class_copy) == TRUE, invalid_argument("s_class_copy"));
+	assert(string_equal(s_class_copy->name, s_class->name) == TRUE, "@s_class_copy->name is %s, @s_class->name is %s", string_get_C_string(s_class_copy->name), string_get_C_string(s_class->name));
+	assert(float_test(s_class_copy->E, s_class->E), "@s_class_copy->E is %f, @s_class->E is %f", s_class_copy->E, s_class->E);
+	assert(float_test(s_class_copy->A, s_class->A), "@s_class_copy->A is %f, @s_class->A is %f", s_class_copy->A, s_class->A);
+	assert(float_test(s_class_copy->tau_exp, s_class->tau_exp), "@s_class_copy->tau_exp is %f, @s_class->tau_exp is %f", s_class_copy->tau_exp, s_class->tau_exp);
+	assert(float_test(s_class_copy->delay, s_class->delay), "@s_class_copy->delay is %u, @s_class->delay is %u", s_class_copy->delay, s_class->delay);
+	assert(float_test(s_class_copy->type, s_class->type), "@s_class_copy->type is %u, @s_class->type is %u", s_class_copy->type, s_class->type);
+
+	synapse_class_destroy(s_class);
+	synapse_class_destroy(s_class_copy);
+
+	s_class_copy = synapse_class_copy(NULL);
+	assert(s_class_copy == NULL, "Should return NULL for NULL input");
+
+	assert(memory_leak() == FALSE, "Memory leak");
+	status = TEST_SUCCESS;
+error:
+	return status;
+}
+
+
 void synapse_class_set_default_values(SynapseType type, SynapseClass* s_class) {
 	s_class->E = 0.0f;
 	s_class->A = 1.0f;
