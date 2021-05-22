@@ -33,6 +33,7 @@ typedef struct connectivity_amplitude_space_exp {
 
 	// data gen values
 	uint32_t example_duration;
+	uint32_t pulse_duration;
 	float between_pulse_spike_frequency;
 	float pulse_spike_frequency;
 
@@ -48,15 +49,15 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 
 void synfire_space_exploration_connectivity_amplitude() {
 	connectivity_amplitude_space_exp config = { 0 };
-	config.exp_abs_path = "d:\\repositories\\Simulator\\experiments\\refactor\\test_single";
+	config.exp_abs_path = "d:\\repositories\\Simulator\\experiments\\rerun_probability_plots\\exp2_normal";
 	
 	config.connectivity_start = 0.025f;
 	config.connectivity_end = 1.0f;
 	config.connectivity_inc = 0.025f;
 
-	config.amplitude_start = 0.025f;
-	config.amplitude_end = 1.0f;
-	config.amplitude_inc = 0.025f;
+	config.amplitude_start = 0.005f;
+	config.amplitude_end = 0.45f;
+	config.amplitude_inc = 0.01f;
 
 	config.min_ratio = 0.5f;
 	config.max_ratio = 2.0f;
@@ -75,10 +76,11 @@ void synfire_space_exploration_connectivity_amplitude() {
 	config.n_trials = 10;
 
 	config.example_duration = 1000;
+	config.pulse_duration = 20;
 	config.between_pulse_spike_frequency = 0.0f;
 	config.pulse_spike_frequency = 0.05f;
 
-	config.use_dump_net_callback = TRUE;
+	config.use_dump_net_callback = FALSE;
 
 	synfire_space_exploration_connectivity_amplitude_run_config(&config);
 }
@@ -125,7 +127,7 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 				net = network_sequential_n_layers(&net_config);
 
 				// create data generator
-				data_gen = data_generator_spike_pulses_create(1, net, 10, 2000, 20, 0.0f, 0.05f, 500);
+				data_gen = data_generator_spike_pulses_create(1, net, 10, 2000, config->pulse_duration, config->between_pulse_spike_frequency, config->pulse_spike_frequency, config->example_duration);
 
 				// create callbacks
 				memset(callback_result_folder, 0, 1024);
@@ -177,6 +179,7 @@ void dump_config(const char* file_path, connectivity_amplitude_space_exp* config
 		"synapse_exci_class: %s\n"
 		"synapse_inhi_class: %s\n\n"
 		"example_duration: %u\n"
+		"pulse_duration: %u\n"
 		"between_pulse_spike_frequency: %f\n"
 		"pulse_spike_frequency: %f\n\n"
 		"use_dump_net_callback: %d",
@@ -186,7 +189,7 @@ void dump_config(const char* file_path, connectivity_amplitude_space_exp* config
 		config->min_ratio, config->max_ratio,
 		config->n_excitatory, config->n_inhibitory, config->n_trials,
 		string_get_C_string(n_class_desc), string_get_C_string(s_exci_class_desc), string_get_C_string(s_inhi_class_desc),
-		config->example_duration, config->between_pulse_spike_frequency, config->pulse_spike_frequency,
+		config->example_duration, config->pulse_duration, config->between_pulse_spike_frequency, config->pulse_spike_frequency,
 		config->use_dump_net_callback
 	);
 	fclose(fp);
