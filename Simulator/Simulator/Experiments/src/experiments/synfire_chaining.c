@@ -48,7 +48,7 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 
 void synfire_space_exploration_connectivity_amplitude() {
 	connectivity_amplitude_space_exp config = { 0 };
-	config.exp_abs_path = "d:\\repositories\\Simulator\\experiments\\refactor\\test";
+	config.exp_abs_path = "d:\\repositories\\Simulator\\experiments\\refactor\\test_single";
 	
 	config.connectivity_start = 0.025f;
 	config.connectivity_end = 1.0f;
@@ -56,7 +56,7 @@ void synfire_space_exploration_connectivity_amplitude() {
 
 	config.amplitude_start = 0.025f;
 	config.amplitude_end = 1.0f;
-	config.amplitude_inc = 0.025;
+	config.amplitude_inc = 0.025f;
 
 	config.min_ratio = 0.5f;
 	config.max_ratio = 2.0f;
@@ -78,14 +78,14 @@ void synfire_space_exploration_connectivity_amplitude() {
 	config.between_pulse_spike_frequency = 0.0f;
 	config.pulse_spike_frequency = 0.05f;
 
-	config.use_dump_net_callback = FALSE;
+	config.use_dump_net_callback = TRUE;
 
 	synfire_space_exploration_connectivity_amplitude_run_config(&config);
 }
 
 
 void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_amplitude_space_exp* config) {
-	char result_trail_folder[1024] = { 0 };
+	char result_trial_folder[1024] = { 0 };
 	char callback_result_folder[1024] = { 0 };
 	uint32_t i = 0;
 	float connectivity = 0.0f;
@@ -97,10 +97,14 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 	Simulator* simulator = NULL;
 	network_sequential_n_layers_config net_config = { 0 };
 
+	os_mkdir(config->exp_abs_path);
+	sprintf(result_trial_folder, "%s\\config.txt", config->exp_abs_path);
+	dump_config(result_trial_folder, config);
+
 	for (i = 0; i < config->n_trials; ++i) {
-		memset(result_trail_folder, 0, 1024);
-		sprintf(result_trail_folder, "%s\\t%d", config->exp_abs_path, i);
-		os_mkdir(result_trail_folder);
+		memset(result_trial_folder, 0, 1024);
+		sprintf(result_trial_folder, "%s\\t%d", config->exp_abs_path, i);
+		os_mkdir(result_trial_folder);
 		
 		for (connectivity = config->connectivity_start; connectivity < config->connectivity_end + EPSILON; connectivity += config->connectivity_inc) {
 
@@ -118,19 +122,19 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 				net_config.s_exci_class->A = amplitude;
 				net_config.s_inhi_class = synapse_class_copy(config->synapse_inhi_class);
 				net_config.s_inhi_class->A = amplitude;
-				net = network_sequential_n_layers(&config);
+				net = network_sequential_n_layers(&net_config);
 
 				// create data generator
 				data_gen = data_generator_spike_pulses_create(1, net, 10, 2000, 20, 0.0f, 0.05f, 500);
 
 				// create callbacks
 				memset(callback_result_folder, 0, 1024);
-				sprintf(callback_result_folder, "%s\\connectivity_%.4f_amplitude_%.4f.txt", result_trail_folder, connectivity, amplitude);
+				sprintf(callback_result_folder, "%s\\connectivity_%.4f_amplitude_%.4f.txt", result_trial_folder, connectivity, amplitude);
 				synfire_detect_cb = callback_detect_synfire_activity_create(net, SYNFIRE_FP_DURATION, 4, net->layers.length - 1, config->min_ratio, config->max_ratio, callback_result_folder);
 
 				if (config->use_dump_net_callback == TRUE) {
 					memset(callback_result_folder, 0, 1024);
-					sprintf(callback_result_folder, "%s\\coonectivity_%.4f_amplitude_%.4f", result_trail_folder, connectivity, amplitude);
+					sprintf(callback_result_folder, "%s\\coonectivity_%.4f_amplitude_%.4f", result_trial_folder, connectivity, amplitude);
 					net_dump_cb = callback_dump_network_create(net, callback_result_folder);
 				}
 				// create simulator and run it
@@ -149,8 +153,10 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 
 void dump_config(const char* file_path, connectivity_amplitude_space_exp* config) {
 	FILE* fp = fopen(file_path, "w");
-	if (fp == NULL) log_error("Couldn't open %s for writting", file_path);
-
+	if (fp == NULL) {
+		fprintf(stderr, "!!!!!Couldn't open %s for writting\n", file_path);
+		return;
+	}
 	String* n_class_desc = neuron_class_get_desc(config->neuron_class);
 	String* s_exci_class_desc = synapse_class_get_desc(config->synapse_exci_class);
 	String* s_inhi_class_desc = synapse_class_get_desc(config->synapse_inhi_class);
@@ -188,7 +194,4 @@ void dump_config(const char* file_path, connectivity_amplitude_space_exp* config
 	string_destroy(n_class_desc);
 	string_destroy(s_exci_class_desc);
 	string_destroy(s_inhi_class_desc);
-
-ERROR
-	return;
 }
