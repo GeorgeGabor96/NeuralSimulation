@@ -6,6 +6,7 @@
 
 TestStatus synapse_class_create_destroy_test();
 TestStatus synapse_class_memory_test();
+TestStatus synapse_class_copy_test();
 
 TestStatus synapse_create_destroy_test();
 TestStatus synapse_memory_test();

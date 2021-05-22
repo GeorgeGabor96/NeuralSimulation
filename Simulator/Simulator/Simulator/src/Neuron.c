@@ -255,6 +255,7 @@ ERROR
 }
 
 
+// UNTESTED
 String* neuron_class_get_desc(NeuronClass* neuron_class) {
 	check(neuron_class_is_valid(neuron_class) == TRUE, invalid_argument("neuron_class"));
 	char description[1024] = { 0 };

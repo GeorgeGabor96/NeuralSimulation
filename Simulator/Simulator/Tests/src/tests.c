@@ -53,16 +53,24 @@ TestInfo tests[] = {
 	{ neuron_LIF_refractor_general_test, "neuron_LIF_refractor_general_test" },
 	{ neuron_general_use_case_test, "neuron_general_use_case_test" },
 	{ neuron_memory_test, "neuron_memory_test" },
+
+	// NEURON CLASS
+	{ neuron_class_general_use_case_test, "neuron_class_general_use_case_test" },
+	{ neuron_class_memory_test, "neuron_class_memory_test" },
+	{ neuron_class_copy_test, "neuron_class_copy_test" },
 	
 	// SYNAPSE
-	{ synapse_class_create_destroy_test, "synapse_class_create_destroy_test" },
 	{ synapse_create_destroy_test, "synapse_create_destroy_test" },
-	{ synapse_class_memory_test, "synapse_class_memory_test" },
 	{ synapse_add_spike_time_test, "synapse_add_spike_time_test" },
 	{ synapse_compute_PSC_test, "synapse_compute_PSC_test" },
 	{ synapse_step_test, "synapse_step_test" },
 	{ synapse_class_memory_test, "synapse_class_memory_test" },
-	
+
+	// SYNAPSE CLASS
+	{ synapse_class_create_destroy_test, "synapse_class_create_destroy_test" },
+	{ synapse_class_memory_test, "synapse_class_memory_test" },
+	{ synapse_class_copy_test, "synapse_class_copy_test" },
+
 	// STACK
 	{ stack_general_use_case_test, "stack_general_use_case_test" },
 	{ stack_memory_test, "stack_memory_test" },

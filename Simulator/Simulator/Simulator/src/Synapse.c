@@ -135,6 +135,8 @@ void synapse_class_ref_destroy(SynapseClass** synapse_class) {
 	synapse_class_destroy(*synapse_class);
 }
 
+
+// UNTESTED
 String* synapse_class_get_desc(SynapseClass* synapse_class) {
 	check(synapse_class_is_valid(synapse_class) == TRUE, invalid_argument("synapse_class"));
 	char description[1024] = { 0 };

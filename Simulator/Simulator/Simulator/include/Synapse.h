@@ -5,8 +5,6 @@
 #include "config.h"
 #include "Containers.h"
 
-// TODO: Update documentation
-
 
 /*************************************************************
 * SynapseClass Functionality
