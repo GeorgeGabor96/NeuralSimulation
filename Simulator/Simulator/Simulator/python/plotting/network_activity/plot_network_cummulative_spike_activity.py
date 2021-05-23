@@ -14,6 +14,34 @@ Almost the same code as plot_network_spike_activity.py but it will create a hist
 '''
 
 
+def get_histogram_for_layer(n_times, layer_data, config):
+    '''
+
+    :param n_times: int
+        number of points to consider, no spike should have a time bigger than this
+
+    :param layer_data: dict
+        entry from the output of @get_spikes_binaries_for_layer function
+
+    :param config: dict
+        the configuration, should have the @layers_folder key
+
+    :return: 1D np array
+        represents the histogram of spike times or population coding
+    '''
+    spike_histogram = np.zeros((n_times,), dtype=np.int32)
+
+    for binary in layer_data['binaries']:
+        # read data of the neuron
+        array_file = os.path.join(config['layers_folder'], layer_data['layer_name'], binary)
+        neuron_data = parse_array_file(array_file)
+
+        # need to extract the times of the spikes
+        spike_times = np.where(neuron_data['data'] == 1)[0]
+        spike_histogram[spike_times] += 1
+    return spike_histogram
+
+
 def make_data_for_layer_and_lines(binaries_for_layer, config):
     '''
     For each layer it will stack the spikes at each timestamps -> histogram effect
@@ -46,18 +74,7 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
 
     for layer in tqdm(binaries_for_layer):
         n_neurons = len(layer['binaries'])
-
-        spike_histogram = np.zeros((n_times, ), dtype=np.int32)
-
-        for binary in layer['binaries']:
-
-            # read data of the neuron
-            array_file = os.path.join(config['layers_folder'], layer['layer_name'], binary)
-            neuron_data = parse_array_file(array_file)
-
-            # need to extract the times of the spikes
-            spike_times = np.where(neuron_data['data'] == 1)[0]
-            spike_histogram[spike_times] += 1
+        spike_histogram = get_histogram_for_layer(n_times, layer, config)
 
         x_points = []
         y_points = []
