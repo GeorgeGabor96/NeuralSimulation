@@ -77,7 +77,7 @@ def get_min_max(c_min, c_max, array):
 
 
 class NetworkSpikesPlot:
-    def __init__(self, output_file, title):
+    def __init__(self, output_file, title, x_label='Time (ms)', y_label='Layers', scatter=True):
         """
         This class creates a plot where the x axis represents time and the y represents layers
         It knows how to plot a layer and if necessary lines between them
@@ -92,10 +92,11 @@ class NetworkSpikesPlot:
         """
         reset_plot()
         plt.figure(figsize=(15, 10))
+        self.scatter = scatter
         self.output_file = output_file
         self.title = title
-        self.xlabel = 'Time (ms)'
-        self.ylabel = 'Layers'
+        self.xlabel = x_label
+        self.ylabel = y_label
         self.min_x_value = 1e+15
         self.max_x_value = -1e+15
 
@@ -120,7 +121,10 @@ class NetworkSpikesPlot:
             shape: 1D
             y values for the layer, it expects the exact coordinates, the user is responsible for that
         """
-        plt.scatter(x_coord, y_coord, color=color, s=0.5)
+        if self.scatter is True:
+            plt.scatter(x_coord, y_coord, color=color, s=0.5)
+        else:
+            plt.plot(x_coord, y_coord, color=color)
         self.y_ticks.append(label_tick)
         self.layer_names.append(layer_name)
 
@@ -162,7 +166,7 @@ class NetworkSpikesPlot:
         reset_plot()
 
 
-def line_plot(output_file, y_data, line_label, x_label, y_label, title):
+def line_plot(output_file, y_data, x_label, y_label, title, x_data=None, line_label=None, figsize=(15, 10)):
     """
     Plots multiple lines on the same plot with different colors
 
@@ -174,8 +178,8 @@ def line_plot(output_file, y_data, line_label, x_label, y_label, title):
         each element represents the y values for one line
         the x values are computed with np.arange
 
-    :param line_label: list or str
-        if str it will be put in a lsit
+    :param line_label: list or str or None
+        if str it will be put in a list
         each element represents the label for one line
 
     :param x_label: str
@@ -187,11 +191,17 @@ def line_plot(output_file, y_data, line_label, x_label, y_label, title):
     :param title: str
         title of the plot
     """
-    plt.figure(figsize=(15, 10))
+    plt.figure(figsize=figsize)
 
     if isinstance(y_data, list) is False:
         y_data = [y_data]
-    if isinstance(line_label, list) is False:
+    if x_data is None:
+        x_data = []
+        for i in range(len(y_data)):
+            x_data.append(np.arange(y_data[i].shape[0]))
+    elif isinstance(x_data, list) is False:
+        x_data = [x_data]
+    if line_label is not None and isinstance(line_label, list) is False:
         line_label = [line_label]
 
     x_min = 1e+15
@@ -200,16 +210,19 @@ def line_plot(output_file, y_data, line_label, x_label, y_label, title):
     y_max = -1e+15
 
     for i in range(len(y_data)):
-        x_data = np.arange(y_data[i].shape[0])
-        plt.plot(x_data, y_data[i], label=line_label[i])
+        if line_label is not None:
+            plt.plot(x_data[i], y_data[i], label=line_label[i])
+        else:
+            plt.plot(x_data[i], y_data[i])
 
-        if x_data.shape[0] != 0:
-            x_min, x_max = get_min_max(x_min, x_max, x_data)
+        if x_data[i].shape[0] != 0:
+            x_min, x_max = get_min_max(x_min, x_max, x_data[i])
             y_min, y_max = get_min_max(y_min, y_max, y_data[i])
 
     set_x_ticks(x_min, x_max)
     set_y_ticks(y_min, y_max)
-    set_legend()
+    if line_label is not None:
+        set_legend()
 
     plt.grid(True, linestyle='--')
     plt.title(title, fontsize=20)
