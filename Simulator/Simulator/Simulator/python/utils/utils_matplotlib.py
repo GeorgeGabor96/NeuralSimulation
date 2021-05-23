@@ -166,7 +166,7 @@ class NetworkSpikesPlot:
         reset_plot()
 
 
-def line_plot(output_file, y_data, x_label, y_label, title, x_data=None, line_label=None, figsize=(15, 10)):
+def line_plot(output_file, y_data, x_label, y_label, title, x_data=None, line_label=None):
     """
     Plots multiple lines on the same plot with different colors
 
@@ -176,11 +176,6 @@ def line_plot(output_file, y_data, x_label, y_label, title, x_data=None, line_la
     :param y_data: list or np array
         if np array it will be put in a list
         each element represents the y values for one line
-        the x values are computed with np.arange
-
-    :param line_label: list or str or None
-        if str it will be put in a list
-        each element represents the label for one line
 
     :param x_label: str
         label for the x axis
@@ -190,8 +185,18 @@ def line_plot(output_file, y_data, x_label, y_label, title, x_data=None, line_la
 
     :param title: str
         title of the plot
+
+    :param x_data: list or np array or None
+        if None the x values will be generated using the np.arange function
+        if np array it will be put in a list
+        each element represents the x values for one line
+
+    :param line_label: list or str or None
+        if None the lines will not have any labels
+        if str it will be put in a list
+        each element represents the label for one line
     """
-    plt.figure(figsize=figsize)
+    plt.figure(figsize=(15, 10))
 
     if isinstance(y_data, list) is False:
         y_data = [y_data]
