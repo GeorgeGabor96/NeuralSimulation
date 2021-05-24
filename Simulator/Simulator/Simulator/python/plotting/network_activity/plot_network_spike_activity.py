@@ -165,9 +165,8 @@ def plot_data_and_lines(data_for_layer, lines, config, file_name='network.png', 
     spikes_plotter.plot()
 
 
-if __name__ == '__main__':
-    args = get_args()
-    config = parse_yaml_config(args.config_file)
+def plot_network_activity(config_file):
+    config = parse_yaml_config(config_file)
 
     # get the binaries for each layer
     binaries_for_layer = get_spikes_binaries_for_layer(config)
@@ -176,3 +175,8 @@ if __name__ == '__main__':
     data_for_layer, lines = make_data_for_layer_and_lines(binaries_for_layer, config)
 
     plot_data_and_lines(data_for_layer, lines, config)
+
+
+if __name__ == '__main__':
+    args = get_args()
+    plot_network_activity(args.config)
