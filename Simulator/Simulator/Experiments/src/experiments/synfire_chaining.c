@@ -49,7 +49,7 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 
 void synfire_space_exploration_connectivity_amplitude() {
 	connectivity_amplitude_space_exp config = { 0 };
-	config.exp_abs_path = "d:\\repositories\\Simulator\\experiments\\rerun_probability_plots\\exp2_normal";
+	config.exp_abs_path = "exp_path";
 	
 	config.connectivity_start = 0.025f;
 	config.connectivity_end = 1.0f;

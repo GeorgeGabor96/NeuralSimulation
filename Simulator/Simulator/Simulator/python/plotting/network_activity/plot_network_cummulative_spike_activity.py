@@ -2,9 +2,9 @@ import os
 import numpy as np
 from tqdm import tqdm
 
-from plot_network_spike_activity import get_args
-from plot_network_spike_activity import get_spikes_binaries_for_layer
-from plot_network_spike_activity import plot_data_and_lines
+from plotting.network_activity.plot_network_spike_activity import get_args
+from plotting.network_activity.plot_network_spike_activity import get_spikes_binaries_for_layer
+from plotting.network_activity.plot_network_spike_activity import plot_data_and_lines
 from utils.utils_config import parse_yaml_config
 from utils.utils_simulator import parse_array_file
 
@@ -101,9 +101,8 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
     return data_for_layer, lines
 
 
-if __name__ == '__main__':
-    args = get_args()
-    config = parse_yaml_config(args.config_file)
+def plot_network_population_coding(config_file):
+    config = parse_yaml_config(config_file)
 
     # get the binaries for each layer
     binaries_for_layer = get_spikes_binaries_for_layer(config)
@@ -112,4 +111,10 @@ if __name__ == '__main__':
     data_for_layer, lines = make_data_for_layer_and_lines(binaries_for_layer, config)
 
     plot_data_and_lines(data_for_layer, lines, config, file_name='cummulative_spikes.png')
+
+
+if __name__ == '__main__':
+    args = get_args()
+    plot_network_population_coding(args.config_file)
+
 

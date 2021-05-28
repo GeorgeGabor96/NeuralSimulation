@@ -2,10 +2,10 @@ import os
 import numpy as np
 from tqdm import tqdm
 
-from plot_network_spike_activity import get_args
-from plot_network_spike_activity import get_spikes_binaries_for_layer
-from plot_network_spike_activity import plot_data_and_lines
-from plot_network_cummulative_spike_activity import get_histogram_for_layer
+from plotting.network_activity.plot_network_spike_activity import get_args
+from plotting.network_activity.plot_network_spike_activity import get_spikes_binaries_for_layer
+from plotting.network_activity.plot_network_spike_activity import plot_data_and_lines
+from plotting.network_activity.plot_network_cummulative_spike_activity import get_histogram_for_layer
 from utils.utils_config import parse_yaml_config
 from utils.utils_simulator import parse_array_file
 from utils.utils_matplotlib import line_plot
@@ -122,9 +122,8 @@ def print_frequencyes_for_layers(data_for_layer, config):
                   title=layer_data['layer_name'])
 
 
-if __name__ == '__main__':
-    args = get_args()
-    config = parse_yaml_config(args.config_file)
+def plot_network_fourier(config_file):
+    config = parse_yaml_config(config_file)
 
     # get the binaries for each layer
     binaries_for_layer = get_spikes_binaries_for_layer(config)
@@ -138,3 +137,7 @@ if __name__ == '__main__':
     # create the network activity plot
     plot_data_and_lines(data_for_layer, lines, config, file_name='fourier.png', x_label='frequency', y_label='Layers', scatter=False)
 
+
+if __name__ == '__main__':
+    args = get_args()
+    plot_network_fourier(args.config_file)
