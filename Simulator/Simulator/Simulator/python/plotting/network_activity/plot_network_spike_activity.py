@@ -179,4 +179,4 @@ def plot_network_activity(config_file):
 
 if __name__ == '__main__':
     args = get_args()
-    plot_network_activity(args.config)
+    plot_network_activity(args.config_file)

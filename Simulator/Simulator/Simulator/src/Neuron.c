@@ -33,11 +33,15 @@ Status neuron_is_valid(Neuron* neuron) {
 		check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 	}
 	// check output synapses
+	// NOTE: DO not check for the validity of the output synapses, because in case of a recurrent synapses
+	// the previous layer that uses outputs of this neuron will free its inputs (this neurons outputs) before
+	// the current neuron is free, and in that case here the checks will fail
+	/*
 	for (i = 0; i < neuron->out_synapses_refs.length; ++i) {
 		synapse = *((Synapse**)array_get(&(neuron->out_synapses_refs), i));
 		check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 	}
-
+	*/
 	return TRUE;
 
 ERROR
@@ -424,7 +428,7 @@ Status neuron_step_force_spike(Neuron* neuron, uint32_t simulation_time) {
 
 	neuron->spike = TRUE;
 	neuron->u = neuron->n_class->u_rest;
-	neuron->last_spike_time = time;
+	neuron->last_spike_time = simulation_time;
 	neuron_update_out_synapses(neuron, simulation_time);
 
 	return SUCCESS;
