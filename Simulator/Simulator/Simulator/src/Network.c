@@ -395,10 +395,10 @@ Status network_compile(Network* network) {
 			check(synapse_class_is_valid(s_class) == TRUE, invalid_argument("s_class"));
 		}
 	}
-
 	// sort layers so every layer is after its inputs -> similar to a topological sort
 	// i is incremented only after layer i is in a valid order in the network->layers
 	// NOTE: multiple solutions for the same network
+	/*
 	for (i = 0; i < network->layers.length - 1; i++) {
 loop1:
 		layer = (Layer*)array_get(&(network->layers), i);
@@ -418,7 +418,7 @@ loop1:
 			}
 		}
 	}
-
+	*/
 	// link the layers
 	for (i = 0; i < network->layers.length; ++i) {
 		layer = (Layer*)array_get(&(network->layers), i);
