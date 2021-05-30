@@ -194,7 +194,7 @@ typedef struct SynfireInfo {
 } SynfireInfo;
 
 
-static inline SynfireInfo* get_layer_synfire_info(SpikeStatesForLayer* spike_states_for_layer) {
+static inline SynfireInfo* get_layer_synfire_info(SpikeStatesForLayer* spike_states_for_layer, BOOL stop_after_first) {
 	uint32_t neuron_idx = 0;
 	uint32_t time_idx = 0;
 	uint32_t* h_value = 0;
@@ -224,8 +224,12 @@ static inline SynfireInfo* get_layer_synfire_info(SpikeStatesForLayer* spike_sta
 	uint32_t min_spikes_in_window = 10;
 	uint32_t max_no_activity_duration = 10;
 
-	uint32_t start = 0;
-	uint32_t end = 0;
+	int64_t start = -1;
+	int64_t end = -1;
+	int64_t current_start = -1;
+	int64_t current_end = -1;
+	int64_t last_start = -1;		// save the start time of the last sync period (penultim)
+	int64_t last_end = -1;			// save the end time of the peultim sync period
 	uint32_t spikes_in_window = 0;
 	uint32_t window_start = 0;
 	uint32_t window_end = 0;
@@ -250,7 +254,9 @@ static inline SynfireInfo* get_layer_synfire_info(SpikeStatesForLayer* spike_sta
 		if (spikes_in_window >= min_spikes_in_window) {
 			// check if pulse starts
 			if (syncrony == FALSE) {
-				start = time_idx;
+				last_start = current_start;
+				last_end = current_end;
+				current_start = (int64_t)time_idx;
 				syncrony = TRUE;
 			}
 			last_syn_window = time_idx;
@@ -258,19 +264,34 @@ static inline SynfireInfo* get_layer_synfire_info(SpikeStatesForLayer* spike_sta
 		else if (syncrony == TRUE) {
 			// check if pulse ends, if more than 10 ms passed since last sync then its over
 			if (time_idx - last_syn_window > max_no_activity_duration) {
-				end = last_syn_window;
-				break;
+				current_end = (int64_t)last_syn_window;
+				syncrony = FALSE;
+				if (stop_after_first == TRUE) break;
 			}
 		}
-
 	}
 	array_destroy(spike_cumm_hist, NULL);
 
-	// modify @end if the activity doesn't end
-	if (syncrony == TRUE && end == 0) end = last_syn_window;
+	// modify @end if the activity doesn't end for the last sync period
+	// TODO do we need the second condition?
+	if (syncrony == TRUE && current_start > current_end) current_end = last_syn_window;
+
+	// the the maximum between current and last
+	if (last_end - last_start > current_end - current_start) {
+		end = last_end;
+		start = last_start;
+	}
+	else {
+		end = current_end;
+		start = current_start;
+	}
 
 	// if no syncrony no duration
-	if (syncrony == FALSE) syn_info->duration = 0;
+	if (start == -1) {
+		syn_info->duration = 0;
+		start = 0;
+		end = 0;
+	}
 	else syn_info->duration = (float)end - (float)start + 1.0f;
 
 	syn_info->mean_time = (float)start + syn_info->duration / 2.0f;
@@ -281,8 +302,8 @@ void callback_detect_synfire_activity_data_run_fp_duration(C_Data* data, Network
 	check(callback_detect_synfire_activity_data_is_valid(data) == TRUE, invalid_argument("data"));
 	check(network_is_valid(net) == TRUE, invalid_argument("net"));
 
-	SynfireInfo* layer_1_syn_info = get_layer_synfire_info(&(data->spike_states_first_layer));
-	SynfireInfo* layer_2_syn_info = get_layer_synfire_info(&(data->spike_states_second_layer));
+	SynfireInfo* layer_1_syn_info = get_layer_synfire_info(&(data->spike_states_first_layer), TRUE);
+	SynfireInfo* layer_2_syn_info = get_layer_synfire_info(&(data->spike_states_second_layer), FALSE);
 
 	const char* state = "STABLE";
 
