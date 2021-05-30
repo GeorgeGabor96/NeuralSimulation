@@ -33,11 +33,15 @@ Status neuron_is_valid(Neuron* neuron) {
 		check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 	}
 	// check output synapses
+	// NOTE: DO not check for the validity of the output synapses, because in case of a recurrent synapses
+	// the previous layer that uses outputs of this neuron will free its inputs (this neurons outputs) before
+	// the current neuron is free, and in that case here the checks will fail
+	/*
 	for (i = 0; i < neuron->out_synapses_refs.length; ++i) {
 		synapse = *((Synapse**)array_get(&(neuron->out_synapses_refs), i));
 		check(synapse_is_valid(synapse) == TRUE, invalid_argument("synapse"));
 	}
-
+	*/
 	return TRUE;
 
 ERROR
@@ -123,6 +127,17 @@ static inline float neuron_compute_psc(Neuron* neuron, uint32_t simulation_time)
 	}
 
 	return PSC;
+}
+
+
+static inline void neuron_update_inputs(Neuron* neuron, uint32_t simulation_time) {
+	uint32_t i = 0;
+	Synapse* synapse = NULL;
+
+	for (i = 0; i < neuron->in_synapses_refs.length; ++i) {
+		synapse = *((Synapse**)array_get(&(neuron->in_synapses_refs), i));
+		synapse_step(synapse, simulation_time);
+	}
 }
 
 
@@ -422,8 +437,10 @@ ERROR
 Status neuron_step_force_spike(Neuron* neuron, uint32_t simulation_time) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
+	neuron_update_inputs(neuron, simulation_time);
 	neuron->spike = TRUE;
 	neuron->u = neuron->n_class->u_rest;
+	neuron->last_spike_time = simulation_time;
 	neuron_update_out_synapses(neuron, simulation_time);
 
 	return SUCCESS;
@@ -436,7 +453,8 @@ ERROR
 Status neuron_step_inject_current(Neuron* neuron, float PSC, uint32_t simulation_time) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
-	neuron->PSC = PSC;
+	// simulate receiving exterior current plus the normal one
+	neuron->PSC = neuron_compute_psc(neuron, simulation_time) + PSC;
 	neuron->spike = neuron_update(neuron, simulation_time);
 	if (neuron->spike == TRUE) {
 		neuron_update_out_synapses(neuron, simulation_time);

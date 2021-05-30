@@ -39,6 +39,7 @@ typedef struct connectivity_amplitude_space_exp {
 
 	// callback values;
 	BOOL use_dump_net_callback;
+	BOOL use_synfire_ring;
 
 }connectivity_amplitude_space_exp;
 
@@ -49,14 +50,14 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 
 void synfire_space_exploration_connectivity_amplitude() {
 	connectivity_amplitude_space_exp config = { 0 };
-	config.exp_abs_path = "exp_path";
+	config.exp_abs_path = "path";
 	
 	config.connectivity_start = 0.025f;
 	config.connectivity_end = 1.0f;
 	config.connectivity_inc = 0.025f;
 
 	config.amplitude_start = 0.005f;
-	config.amplitude_end = 0.45f;
+	config.amplitude_end = 0.35f;
 	config.amplitude_inc = 0.01f;
 
 	config.min_ratio = 0.5f;
@@ -81,8 +82,13 @@ void synfire_space_exploration_connectivity_amplitude() {
 	config.pulse_spike_frequency = 0.05f;
 
 	config.use_dump_net_callback = FALSE;
+	config.use_synfire_ring = FALSE;
 
 	synfire_space_exploration_connectivity_amplitude_run_config(&config);
+
+	neuron_class_destroy(config.neuron_class);
+	synapse_class_destroy(config.synapse_exci_class);
+	synapse_class_destroy(config.synapse_inhi_class);
 }
 
 
@@ -124,10 +130,12 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 				net_config.s_exci_class->A = amplitude;
 				net_config.s_inhi_class = synapse_class_copy(config->synapse_inhi_class);
 				net_config.s_inhi_class->A = amplitude;
-				net = network_sequential_n_layers(&net_config);
+				// choose between regular network and ring network
+				if (config->use_synfire_ring == FALSE) net = network_sequential_n_layers(&net_config);
+				else net = network_sequential_ring_n_layers(&net_config);
 
 				// create data generator
-				data_gen = data_generator_spike_pulses_create(1, net, 10, 2000, config->pulse_duration, config->between_pulse_spike_frequency, config->pulse_spike_frequency, config->example_duration);
+				data_gen = data_generator_spike_pulses_create(1, net, 10, 1000000, config->pulse_duration, config->between_pulse_spike_frequency, config->pulse_spike_frequency, config->example_duration);
 
 				// create callbacks
 				memset(callback_result_folder, 0, 1024);

@@ -24,6 +24,45 @@ Network* network_3_L_3_3_3() {
 }
 
 
+static inline Array* get_array_of_layers(uint32_t n_layers, uint32_t n_neurons_per_layer, NeuronClass* n_class, const char* layer_name_template) {
+	Array* layers = array_create(n_layers, n_layers, sizeof(Layer));
+
+	char layer_name[256] = { 0 };
+	uint32_t i = 0;
+	Layer* layer = NULL;
+	for (i = 0; i <n_layers; ++i) {
+		memset(layer_name, 0, 256);
+		sprintf(layer_name, layer_name_template, i + 1);
+		layer = layer_create_fully_connected(n_neurons_per_layer, n_class, layer_name);
+		array_set(layers, i, layer);
+	}
+
+	return layers;
+}
+
+
+static inline void add_layers_in_net_helper(Network* net, Array* excitatory_layers, Array* inhibitory_layers, BOOL same_exci_inhi_length) {
+	// add layers in network
+	uint32_t i = 0;
+	Layer* exci_layer_i = (Layer*)array_get(excitatory_layers, 0);
+	Layer* inhi_layer_i = (Layer*)array_get(inhibitory_layers, 0);
+	network_add_layer_keep_valid(net, exci_layer_i, TRUE, FALSE);
+	network_add_layer_keep_valid(net, inhi_layer_i, TRUE, FALSE);
+	for (i = 1; i < excitatory_layers->length - 1; ++i) {
+		exci_layer_i = (Layer*)array_get(excitatory_layers, i);
+		inhi_layer_i = (Layer*)array_get(inhibitory_layers, i);
+		network_add_layer_keep_valid(net, exci_layer_i, FALSE, FALSE);
+		network_add_layer_keep_valid(net, inhi_layer_i, FALSE, FALSE);
+	}
+	exci_layer_i = (Layer*)array_get(excitatory_layers, i);
+	network_add_layer_keep_valid(net, exci_layer_i, FALSE, TRUE);
+	if (same_exci_inhi_length == TRUE) {
+		inhi_layer_i = (Layer*)array_get(inhibitory_layers, i);
+		network_add_layer_keep_valid(net, inhi_layer_i, FALSE, TRUE);
+	}
+}
+
+
 Network* network_sequential_n_layers(network_sequential_n_layers_config* config) {
 	// create network
 	Network* net = network_create();
@@ -40,25 +79,8 @@ Network* network_sequential_n_layers(network_sequential_n_layers_config* config)
 	Layer* exci_layer_i_m1 = NULL;
 	Layer* inhi_layer_i = NULL;
 	Layer* inhi_layer_i_m1 = NULL;
-	Array* excitatory_layers = array_create(config->n_layers, config->n_layers, sizeof(Layer));
-	Array* inhibitory_layers = array_create(config->n_layers - 1, config->n_layers - 1, sizeof(Layer));
-
-	// create excitatory neurons
-	char layer_name[256] = { 0 };
-	for (i = 0; i < config->n_layers; ++i) {
-		memset(layer_name, 0, 256);
-		sprintf(layer_name, "layer%.2d", i + 1);
-		exci_layer_i = layer_create_fully_connected(config->n_exci_neurons, n_class, layer_name);
-		array_set(excitatory_layers, i, exci_layer_i);
-	}
-
-	// create inhibitory neurons
-	for (i = 0; i < config->n_layers - 1; ++i) {
-		memset(layer_name, 0, 256);
-		sprintf(layer_name, "layer%.2d_inhi", i + 1);
-		inhi_layer_i = layer_create_fully_connected(config->n_inhi_neurons, n_class, layer_name);
-		array_set(inhibitory_layers, i, inhi_layer_i);
-	}
+	Array* excitatory_layers = get_array_of_layers(config->n_layers, config->n_exci_neurons, n_class, "layer%.2d");
+	Array* inhibitory_layers = get_array_of_layers(config->n_layers - 1, config->n_inhi_neurons, n_class, "layer%.2d_inhi");
 
 	// connect the layers
 	for (i = 1; i < config->n_layers - 1; ++i) {
@@ -79,18 +101,7 @@ Network* network_sequential_n_layers(network_sequential_n_layers_config* config)
 	layer_add_input_layer(exci_layer_i, inhi_layer_i_m1, inhibitory_s_class, config->connectivity, config->synapse_weight);
 	
 	// add layers in network
-	exci_layer_i = (Layer*)array_get(excitatory_layers, 0);
-	inhi_layer_i = (Layer*)array_get(inhibitory_layers, 0);
-	network_add_layer_keep_valid(net, exci_layer_i, TRUE, FALSE);
-	network_add_layer_keep_valid(net, inhi_layer_i, TRUE, FALSE);
-	for (i = 1; i < config->n_layers - 1; ++i) {
-		exci_layer_i = (Layer*)array_get(excitatory_layers, i);
-		inhi_layer_i = (Layer*)array_get(inhibitory_layers, i);
-		network_add_layer_keep_valid(net, exci_layer_i, FALSE, FALSE);
-		network_add_layer_keep_valid(net, inhi_layer_i, FALSE, FALSE);
-	}
-	exci_layer_i = (Layer*)array_get(excitatory_layers, i);
-	network_add_layer_keep_valid(net, exci_layer_i, FALSE, TRUE);
+	add_layers_in_net_helper(net, excitatory_layers, inhibitory_layers, FALSE);
 
 	// release the dummy memory
 	array_destroy(excitatory_layers, NULL);
@@ -103,6 +114,62 @@ Network* network_sequential_n_layers(network_sequential_n_layers_config* config)
 }
 
 
+Network* network_sequential_ring_n_layers(network_sequential_n_layers_config* config) {
+	// create network
+	Network* net = network_create();
+	network_add_neuron_class(net, config->n_class);
+	network_add_synapse_class(net, config->s_exci_class);
+	network_add_synapse_class(net, config->s_inhi_class);
+
+	NeuronClass* n_class = network_get_neuron_class_by_string(net, config->n_class->name);
+	SynapseClass* excitatory_s_class = network_get_synapse_class_by_string(net, config->s_exci_class->name);
+	SynapseClass* inhibitory_s_class = network_get_synapse_class_by_string(net, config->s_inhi_class->name);
+
+	uint32_t i = 0;
+	Layer* exci_layer_i = NULL;
+	Layer* exci_layer_i_m1 = NULL;
+	Layer* inhi_layer_i = NULL;
+	Layer* inhi_layer_i_m1 = NULL;
+	// because we want a ring we will but inhibitory neurons also on the last layer
+	Array* excitatory_layers = get_array_of_layers(config->n_layers, config->n_exci_neurons, n_class, "layer%.2d");
+	Array* inhibitory_layers = get_array_of_layers(config->n_layers, config->n_inhi_neurons, n_class, "layer%.2d_inhi");
+
+	// connect the layers
+	for (i = 1; i < config->n_layers; ++i) {
+		exci_layer_i = (Layer*)array_get(excitatory_layers, i);
+		exci_layer_i_m1 = (Layer*)array_get(excitatory_layers, i - 1);
+		inhi_layer_i = (Layer*)array_get(inhibitory_layers, i);
+		inhi_layer_i_m1 = (Layer*)array_get(inhibitory_layers, i - 1);
+
+		layer_add_input_layer(exci_layer_i, exci_layer_i_m1, excitatory_s_class, config->connectivity, config->synapse_weight);
+		layer_add_input_layer(exci_layer_i, inhi_layer_i_m1, inhibitory_s_class, config->connectivity, config->synapse_weight);
+		layer_add_input_layer(inhi_layer_i, exci_layer_i_m1, excitatory_s_class, config->connectivity, config->synapse_weight);
+		layer_add_input_layer(inhi_layer_i, inhi_layer_i_m1, inhibitory_s_class, config->connectivity, config->synapse_weight);
+	}
+	Layer* exci_layer_last = (Layer*)array_get(excitatory_layers, excitatory_layers->length - 1);
+	Layer* exci_layer_first = (Layer*)array_get(excitatory_layers, 0);
+	Layer* inhi_layer_last = (Layer*)array_get(inhibitory_layers, inhibitory_layers->length - 1);
+	Layer* inhi_layer_first = (Layer*)array_get(inhibitory_layers, 0);
+	layer_add_input_layer(exci_layer_first, exci_layer_last, excitatory_s_class, config->connectivity, config->synapse_weight);
+	layer_add_input_layer(exci_layer_first, inhi_layer_last, inhibitory_s_class, config->connectivity, config->synapse_weight);
+	layer_add_input_layer(inhi_layer_first, exci_layer_last, excitatory_s_class, config->connectivity, config->synapse_weight);
+	layer_add_input_layer(inhi_layer_first, inhi_layer_last, inhibitory_s_class, config->connectivity, config->synapse_weight);
+
+	// add layers in network
+	add_layers_in_net_helper(net, excitatory_layers, inhibitory_layers, TRUE);
+
+	// release the dummy memory, NULL because the network holds the inner infor of the layers
+	array_destroy(excitatory_layers, NULL);
+	array_destroy(inhibitory_layers, NULL);
+
+	// compile and show the network
+	network_compile(net);
+
+	return net;
+}
+
+
+// OBSOLETE
 Network* network_synfire_chain_10_layers(float connectivity, float amplitude, float s_strength, BOOL use_refract) {
 	// create network
 	Network* net = network_create();

@@ -293,7 +293,9 @@ Status layer_step_force_spikes(Layer* layer, ArrayBool* spikes, uint32_t time) {
 			neuron_step_force_spike(neuron, time);
 		}
 		else {
-			neuron->spike = FALSE;
+			// If the current time doesn't inject a spike for the neuron, let the neuron do its job
+			neuron_step(neuron, time);
+			//neuron->spike = FALSE;
 		}
 	}
 
