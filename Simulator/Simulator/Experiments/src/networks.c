@@ -135,7 +135,6 @@ Network* network_sequential_ring_n_layers(network_sequential_n_layers_config* co
 	Array* inhibitory_layers = get_array_of_layers(config->n_layers, config->n_inhi_neurons, n_class, "layer%.2d_inhi");
 
 	// connect the layers
-	// TODO this again can be moved in some kind of function to reduce code duplication
 	for (i = 1; i < config->n_layers; ++i) {
 		exci_layer_i = (Layer*)array_get(excitatory_layers, i);
 		exci_layer_i_m1 = (Layer*)array_get(excitatory_layers, i - 1);

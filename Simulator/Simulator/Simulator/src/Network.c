@@ -398,6 +398,7 @@ Status network_compile(Network* network) {
 	// sort layers so every layer is after its inputs -> similar to a topological sort
 	// i is incremented only after layer i is in a valid order in the network->layers
 	// NOTE: multiple solutions for the same network
+	// NOTE: This will never end for networks with cycles, for synfire ring it was removed
 	/*
 	for (i = 0; i < network->layers.length - 1; i++) {
 loop1:
