@@ -85,6 +85,10 @@ void synfire_space_exploration_connectivity_amplitude() {
 	config.use_synfire_ring = TRUE;
 
 	synfire_space_exploration_connectivity_amplitude_run_config(&config);
+
+	neuron_class_destroy(config.neuron_class);
+	synapse_class_destroy(config.synapse_exci_class);
+	synapse_class_destroy(config.synapse_inhi_class);
 }
 
 
@@ -131,7 +135,7 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 				else net = network_sequential_ring_n_layers(&net_config);
 
 				// create data generator
-				data_gen = data_generator_spike_pulses_create(1, net, 10, 90, config->pulse_duration, config->between_pulse_spike_frequency, config->pulse_spike_frequency, config->example_duration);
+				data_gen = data_generator_spike_pulses_create(1, net, 10, 1000000, config->pulse_duration, config->between_pulse_spike_frequency, config->pulse_spike_frequency, config->example_duration);
 
 				// create callbacks
 				memset(callback_result_folder, 0, 1024);

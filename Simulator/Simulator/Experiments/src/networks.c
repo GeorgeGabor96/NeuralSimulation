@@ -165,11 +165,9 @@ Network* network_sequential_ring_n_layers(network_sequential_n_layers_config* co
 
 	// compile and show the network
 	network_compile(net);
-	network_summary(net);
 
 	return net;
 }
-
 
 
 // OBSOLETE

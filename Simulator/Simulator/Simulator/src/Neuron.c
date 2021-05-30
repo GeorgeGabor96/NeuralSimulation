@@ -130,6 +130,17 @@ static inline float neuron_compute_psc(Neuron* neuron, uint32_t simulation_time)
 }
 
 
+static inline void neuron_update_inputs(Neuron* neuron, uint32_t simulation_time) {
+	uint32_t i = 0;
+	Synapse* synapse = NULL;
+
+	for (i = 0; i < neuron->in_synapses_refs.length; ++i) {
+		synapse = *((Synapse**)array_get(&(neuron->in_synapses_refs), i));
+		synapse_step(synapse, simulation_time);
+	}
+}
+
+
 /*************************************************************
 * NeuronClass Functionality
 *************************************************************/
@@ -426,6 +437,7 @@ ERROR
 Status neuron_step_force_spike(Neuron* neuron, uint32_t simulation_time) {
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
+	neuron_update_inputs(neuron, simulation_time);
 	neuron->spike = TRUE;
 	neuron->u = neuron->n_class->u_rest;
 	neuron->last_spike_time = simulation_time;
