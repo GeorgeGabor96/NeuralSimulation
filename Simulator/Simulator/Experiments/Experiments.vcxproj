@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\experiments\constant_current_experiment.c" />
+    <ClCompile Include="src\experiments\cortical_slabs.c" />
     <ClCompile Include="src\experiments\random_spikes_experiment.c" />
     <ClCompile Include="src\experiments\synfire_chaining.c" />
     <ClCompile Include="src\experiments\time_between_spikes_experiment.c" />

@@ -11,6 +11,7 @@ typedef struct network_sequential_n_layers_config {
 	uint32_t n_layers;
 	uint32_t n_exci_neurons;
 	uint32_t n_inhi_neurons;
+	float n_neurons_scale_step;
 	float connectivity;
 	float synapse_weight;
 	NeuronClass* n_class;

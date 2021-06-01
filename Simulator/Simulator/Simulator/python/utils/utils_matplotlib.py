@@ -162,7 +162,8 @@ class NetworkSpikesPlot:
 
         plt.axis('tight')
         os.makedirs(os.path.split(self.output_file)[0], exist_ok=True)
-        plt.savefig(self.output_file, dpi=100)
+        plt.tight_layout()
+        plt.savefig(self.output_file, dpi=200)
         reset_plot()
 
 
