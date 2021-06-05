@@ -386,6 +386,27 @@ ERROR
 }
 
 
+ArrayUint32* array_random_int_uint32(uint32_t length, uint32_t min, uint32_t max) {
+	check(length > 0, "@lenght == 0");
+	check(min <= max, "@min > @max");
+
+	ArrayUint32* random_uint32 = array_create(length, 0, sizeof(uint32_t));
+	check_memory(random_uint32);
+
+	uint32_t i = 0;
+	uint32_t random_value = 0;
+
+	for (i = 0; i < length; ++i) {
+		random_value = rand() % ((max + 1) - min) + min;
+		array_append(random_uint32, &random_value);
+	}
+
+	return random_uint32;
+ERROR
+	return NULL;
+}
+
+
 /*************************************
 * Statistics functions
 *************************************/

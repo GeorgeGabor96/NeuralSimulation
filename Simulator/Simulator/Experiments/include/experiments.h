@@ -19,4 +19,7 @@ void synfire_space_exploration_connectivity_amplitude();
 void cortical_slabs_exp_run();
 void cortical_slabs_exp_growing_net_run();
 
+// embedded synfire chains
+void embedded_synfire_chains_exp();
+
 #endif // __EXPERIMENTS_H__
