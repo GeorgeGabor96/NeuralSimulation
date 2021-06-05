@@ -1,0 +1,25 @@
+layers_folder: d:\repositories\Simulator\experiments\cortical_slabs\test_3_layers_500_10000_500_duration_500_refract\
+layers:
+- t_500/layer_3_exci
+- t_1000/layer_3_exci
+- t_1500/layer_3_exci
+- t_2000/layer_3_exci
+- t_2500/layer_3_exci
+- t_3000/layer_3_exci
+- t_3500/layer_3_exci
+- t_4000/layer_3_exci
+- t_4500/layer_3_exci
+- t_5000/layer_3_exci
+- t_5500/layer_3_exci
+- t_6000/layer_3_exci
+- t_6500/layer_3_exci
+- t_7000/layer_3_exci
+- t_7500/layer_3_exci
+- t_8000/layer_3_exci
+- t_8500/layer_3_exci
+- t_9000/layer_3_exci
+title: Fast Fourier Transform Normalized
+binaries_prefix: spikes
+color_for_inner_substring:
+  inhi: blue
+default_color: red

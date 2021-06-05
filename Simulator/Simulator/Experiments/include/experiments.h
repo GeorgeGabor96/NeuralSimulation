@@ -14,4 +14,9 @@ void time_between_spikes_experiment();
 // synfire chians
 void synfire_space_exploration_connectivity_amplitude();
 
+
+// cortical slabs
+void cortical_slabs_exp_run();
+void cortical_slabs_exp_growing_net_run();
+
 #endif // __EXPERIMENTS_H__

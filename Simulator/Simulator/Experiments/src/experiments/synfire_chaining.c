@@ -123,6 +123,7 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 				net_config.n_layers = 10;
 				net_config.n_exci_neurons = config->n_excitatory;
 				net_config.n_inhi_neurons = config->n_inhibitory;
+				net_config.n_neurons_scale_step = 1.0f;
 				net_config.connectivity = connectivity;
 				net_config.synapse_weight = 1.0f;
 				net_config.n_class = neuron_class_copy(config->neuron_class);

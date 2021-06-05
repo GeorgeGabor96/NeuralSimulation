@@ -76,8 +76,9 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
         fourier, freq = get_fourier(spike_histogram)
         x_points = []
         y_points = []
+        fourier_for_big_plot = fourier.copy() / fourier.max()
         for f in range(freq.shape[0]):
-            f_amplitude = fourier[f]
+            f_amplitude = fourier_for_big_plot[f]
             x_points.append(f)
             y_points.append(neuron_y_coord + f_amplitude)
 
@@ -112,9 +113,10 @@ def print_frequencyes_for_layers(data_for_layer, config):
         the configuration, should have the @layers_folder key
     '''
     layers_frequency_dir = os.path.join(config['layers_folder'], 'frequencies')
-    os.makedirs(layers_frequency_dir, exist_ok=True)
     for layer_data in data_for_layer:
-        line_plot(output_file=os.path.join(layers_frequency_dir, layer_data['layer_name'] + '.png'),
+        output_file = os.path.join(layers_frequency_dir, layer_data['layer_name'] + '.png')
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        line_plot(output_file=output_file,
                   x_data=layer_data['frequency'],
                   y_data=layer_data['fourier'],
                   x_label='Frequency',
