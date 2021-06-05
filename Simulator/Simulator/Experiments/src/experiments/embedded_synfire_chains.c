@@ -2,7 +2,7 @@
 #include "utils/MemoryManagement.h"
 #include <math.h>
 
-#define n 10000
+#define n 1000
 #define m 20     // minimum number of neurons selected for layer k
 #define M 200	 // maximum number of neurons selected for layer k
 
@@ -138,6 +138,68 @@ static inline Array* create_chains(uint32_t n_chains, Array* neuron_pool, uint32
 }
 
 
+static inline Array* get_spikes_for_neuron_pool(uint32_t n_neurons, Array* chains_input_neurons, uint32_t duration_per_chain, uint32_t pulse_duration, float spike_frequency) {
+	// return an array where every element is a ArrayBool, the spike value for at each time stamp
+	Array* spikes_for_neurons = array_create(n_neurons, 0, sizeof(ArrayBool*));
+	uint32_t total_duration = chains_input_neurons->length * duration_per_chain + duration_per_chain; // the pluse is just to let the system evolve without input
+	
+	// init everything with zeros
+	uint32_t neuron_idx = 0;
+	for (neuron_idx = 0; neuron_idx < n_neurons; ++neuron_idx) {
+		Array* no_spikes = array_zeros_bool(total_duration);
+		array_append(spikes_for_neurons, &no_spikes);
+	}
+
+	// add the spikes
+	uint32_t chain_idx = 0;
+	uint32_t chain_time_pulse_start = 0;
+	uint32_t time = 0;
+	Array* chain_input_neurons = NULL;
+	BOOL spike = TRUE;
+	for (chain_idx = 0; chain_idx < chains_input_neurons->length; ++chain_idx) {
+		chain_input_neurons = (ArrayUint32*)array_get(chains_input_neurons, chain_idx);
+
+		// find the time when the input for current chain should start
+		chain_time_pulse_start = chain_idx * duration_per_chain;
+		for (time = chain_time_pulse_start; time < chain_time_pulse_start + pulse_duration; ++time) {
+
+			// to over each neurons and add spikes
+			for (uint32_t neuron_chain_idx = 0; neuron_chain_idx < chain_input_neurons->length; ++neuron_chain_idx) {
+				// get actual neuron idx
+				uint32_t n_idx = *((uint32_t*)array_get(chain_input_neurons, neuron_chain_idx));
+				
+				// get the neuron array of values
+				Array* neuron_spikes = *((ArrayBool**)array_get(spikes_for_neurons, n_idx));
+
+				if ((double)rand() / (double)RAND_MAX <= spike_frequency) {
+					array_set(neuron_spikes, time, &spike);
+				}
+			}
+		}
+	}
+
+	return spikes_for_neurons;
+}
+
+
+static inline void dump_neurons_full_input(Array* spikes_for_neurons) {
+	char file_name[128] = { 0 };
+	String* file_path = NULL;
+	String* data_path = string_create("d:\\repositories\\Simulator\\experiments\\embedded_synchains\\input");
+	String* data_name = string_create("spikes");
+	for (uint32_t n_idx = 0; n_idx < spikes_for_neurons->length; ++n_idx) {
+		ArrayBool* spikes_for_neuron = *((ArrayBool**)array_get(spikes_for_neurons, n_idx));
+
+		sprintf(file_name, "spikes_N%u.bin", n_idx);
+		file_path = string_path_join_string_and_C(data_path, file_name);
+		array_bool_dump(spikes_for_neuron, file_path, data_name);
+		string_destroy(file_path);
+	}
+	string_destroy(data_name);
+	string_destroy(data_path);
+}
+
+
 void embedded_synfire_chains_exp() {
 	// create classes and neurons
 	NeuronClass* n_class = neuron_class_create("LIF_REFRACT", LIF_REFRACTORY_NEURON);
@@ -161,8 +223,19 @@ void embedded_synfire_chains_exp() {
 	}
 
 	// give them input
+	uint32_t duration_per_chain = 100;
+	uint32_t pulse_duration = 20;
+	float pulse_spike_frequency = 0.05f; // 50Hz
+	Array* spikes_for_neurons = get_spikes_for_neuron_pool(neuron_pool->length, chains_input_neurons, duration_per_chain, pulse_duration, pulse_spike_frequency);
+	dump_neurons_full_input(spikes_for_neurons);
+
 
 	// dump the net at every step
+
+
+	// infer loop
+	// tine minte ce a facut neuron cu append
+
 
 	// cleanup
 	for (uint32_t chain_idx = 0; chain_idx < chains_input_neurons->length; ++chain_idx) {
@@ -170,6 +243,12 @@ void embedded_synfire_chains_exp() {
 		array_reset(chain_input, NULL);
 	}
 	array_destroy(chains_input_neurons, NULL);
+	
+	for (uint32_t neuron_idx = 0; neuron_idx < spikes_for_neurons->length; ++neuron_idx) {
+		ArrayBool* spikes = *((ArrayBool**)array_get(spikes_for_neurons, neuron_idx));
+		array_destroy(spikes, NULL);
+	}
+	array_destroy(spikes_for_neurons, NULL);
 
 	array_destroy(neuron_pool, (ElemReset)neuron_reset);
 	neuron_class_destroy(n_class);

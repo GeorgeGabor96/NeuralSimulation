@@ -314,6 +314,20 @@ ERROR
 }
 
 
+ArrayBool* array_zeros_bool(uint32_t length) {
+	ArrayBool* array_b = (ArrayBool*)array_create(length, length, sizeof(BOOL));
+	check_memory(array_b);
+
+	BOOL false_v = FALSE;
+	uint32_t i = 0;
+	for (i = 0; i < length; ++i)
+		array_set(array_b, i, &false_v);
+
+ERROR
+	return array_b;
+}
+
+
 ArrayUint32* array_zeros_uint23(uint32_t length) {
 	ArrayUint32* array_u32 = (ArrayUint32*)array_create(length, length, sizeof(uint32_t));
 	check_memory(array_u32);

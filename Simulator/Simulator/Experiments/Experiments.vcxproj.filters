@@ -36,6 +36,9 @@
     <ClCompile Include="src\experiments\cortical_slabs.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\experiments\embedded_synfire_chains.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\experiments.h">
