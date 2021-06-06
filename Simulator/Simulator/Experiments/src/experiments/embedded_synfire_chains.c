@@ -32,6 +32,8 @@ static inline void dump_neurons_spikes(Array* spikes_for_neurons, const char* ou
 
 
 double get_gaussian_value() {
+	// http://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
+	// https://stackoverflow.com/questions/2325472/generate-random-numbers-following-a-normal-distribution-in-c-c
 	double y1 = (double)rand() / (double)RAND_MAX;
 	double y2 = (double)rand() / (double)RAND_MAX;
 
@@ -334,7 +336,7 @@ static inline Array* get_output_spikes_for_neuron_pool(uint32_t total_duration, 
 	// initialize the output containers
 	Array* neurons_output_spikes = array_create(neuron_pool->length, 0, sizeof(Array*));
 	for (n_idx = 0; n_idx < neuron_pool->length; ++n_idx) {
-		neuron_output_spikes = array_create(10, 0, sizeof(BOOL));
+		neuron_output_spikes = array_create(total_duration, 0, sizeof(BOOL));
 		array_append(neurons_output_spikes, &neuron_output_spikes);
 	}
 
