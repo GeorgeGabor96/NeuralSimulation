@@ -8,7 +8,6 @@
 #define M 200	 // maximum number of neurons selected for layer k
 
 
-
 typedef struct embedded_synfire_chains_config {
 	char* exp_path;
 	NeuronClass* n_class;
@@ -23,7 +22,13 @@ typedef struct embedded_synfire_chains_config {
 } embedded_synfire_chains_config;
 
 
+static inline void embedded_synfire_chains_exp_run(embedded_synfire_chains_config* config);
+static inline void embedded_synfire_chains_exp_dump_config(const char* file_path, embedded_synfire_chains_config* config);
 static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_config* config);
+static inline Array* create_neurons(uint32_t n_neurons, NeuronClass* n_class);
+static inline Array* get_spikes_for_neuron_pool(uint32_t total_duration, uint32_t n_neurons, Array* chains_input_neurons, embedded_synfire_chains_config* config);
+static inline Array* get_output_spikes_for_neuron_pool(uint32_t total_duration, Array* neuron_pool, Array* neurons_input_spikes);
+static inline void dump_neurons_spikes(Array* spikes_for_neurons, const char* output_folder);
 
 
 double get_gaussian_value() {
@@ -32,124 +37,6 @@ double get_gaussian_value() {
 
 	return cos(2.0 * 3.14 * y2) * sqrt(-2.0 * log(y1));
 }
-
-
-static inline Array* create_neurons(uint32_t n_neurons, NeuronClass* n_class) {
-	Array* neurons = array_create(n_neurons, n_neurons, sizeof(Neuron));
-
-	for (uint32_t i = 0; i < neurons->length; ++i) {
-		Neuron* neuron = (Neuron*)array_get(neurons, i);
-		neuron_init(neuron, n_class);
-	}
-
-	return neurons;
-}
-
-
-
-static inline Array* get_spikes_for_neuron_pool(uint32_t total_duration, uint32_t n_neurons, Array* chains_input_neurons, uint32_t duration_per_chain, uint32_t pulse_duration, float spike_frequency) {
-	// return an array where every element is a ArrayBool, the spike value for at each time stamp
-	Array* spikes_for_neurons = array_create(n_neurons, 0, sizeof(ArrayBool*));
-	
-	// init everything with zeros
-	uint32_t neuron_idx = 0;
-	for (neuron_idx = 0; neuron_idx < n_neurons; ++neuron_idx) {
-		Array* no_spikes = array_zeros_bool(total_duration);
-		array_append(spikes_for_neurons, &no_spikes);
-	}
-
-	// add the spikes
-	uint32_t chain_idx = 0;
-	uint32_t chain_time_pulse_start = 0;
-	uint32_t time = 0;
-	Array* chain_input_neurons = NULL;
-	BOOL spike = TRUE;
-	for (chain_idx = 0; chain_idx < chains_input_neurons->length; ++chain_idx) {
-		chain_input_neurons = (ArrayUint32*)array_get(chains_input_neurons, chain_idx);
-
-		// find the time when the input for current chain should start
-		chain_time_pulse_start = duration_per_chain + chain_idx * duration_per_chain;
-		for (time = chain_time_pulse_start; time < chain_time_pulse_start + pulse_duration; ++time) {
-
-			// to over each neurons and add spikes
-			for (uint32_t neuron_chain_idx = 0; neuron_chain_idx < chain_input_neurons->length; ++neuron_chain_idx) {
-				// get actual neuron idx
-				uint32_t n_idx = *((uint32_t*)array_get(chain_input_neurons, neuron_chain_idx));
-				
-				// get the neuron array of values
-				Array* neuron_spikes = *((ArrayBool**)array_get(spikes_for_neurons, n_idx));
-
-				if ((double)rand() / (double)RAND_MAX <= spike_frequency) {
-					array_set(neuron_spikes, time, &spike);
-				}
-			}
-		}
-	}
-
-	return spikes_for_neurons;
-}
-
-
-static inline Array* get_output_spikes_for_neuron_pool(uint32_t total_duration, Array* neuron_pool, Array* neurons_input_spikes) {
-	uint32_t n_idx = 0;
-	uint32_t time = 0;
-	Neuron* neuron = NULL;
-	ArrayBool* neuron_input_spikes = NULL;
-	ArrayBool* neuron_output_spikes = NULL;
-
-	// initialize the output containers
-	Array* neurons_output_spikes = array_create(neuron_pool->length, 0, sizeof(Array*));
-	for (n_idx = 0; n_idx < neuron_pool->length; ++n_idx) {
-		neuron_output_spikes = array_create(10, 0, sizeof(BOOL));
-		array_append(neurons_output_spikes, &neuron_output_spikes);
-	}
-	
-	// dump the net at every step
-	for (time = 0; time < total_duration; ++time) {
-		printf("%u\r", time);
-		// go over each neuron and neuron input
-		for (n_idx = 0; n_idx < neuron_pool->length; ++n_idx) {
-			neuron = (Neuron*)array_get(neuron_pool, n_idx);
-			neuron_input_spikes = *((ArrayBool**)array_get(neurons_input_spikes, n_idx));
-			if (*((BOOL*)array_get(neuron_input_spikes, time)) == TRUE) {
-				neuron_step_force_spike(neuron, time);
-			}
-			else {
-				neuron_step(neuron, time);
-			}
-		}
-
-		// get the output spikes of the neurons
-		for (n_idx = 0; n_idx < neuron_pool->length; ++n_idx) {
-			neuron = (Neuron*)array_get(neuron_pool, n_idx);
-			neuron_output_spikes = *((ArrayBool**)array_get(neurons_output_spikes, n_idx));
-			array_append(neuron_output_spikes, &(neuron->spike));
-		}
-	}
-
-	return neurons_output_spikes;
-
-}
-
-static inline void dump_neurons_spikes(Array* spikes_for_neurons, const char* output_folder) {
-	char file_name[128] = { 0 };
-	String* file_path = NULL;
-	String* data_path = string_create(output_folder);
-	String* data_name = string_create("spikes");
-	os_mkdir(output_folder);
-	for (uint32_t n_idx = 0; n_idx < spikes_for_neurons->length; ++n_idx) {
-		ArrayBool* spikes_for_neuron = *((ArrayBool**)array_get(spikes_for_neurons, n_idx));
-
-		sprintf(file_name, "spikes_N%u.bin", n_idx);
-		file_path = string_path_join_string_and_C(data_path, file_name);
-		array_bool_dump(spikes_for_neuron, file_path, data_name);
-		string_destroy(file_path);
-	}
-	string_destroy(data_name);
-	string_destroy(data_path);
-}
-
-
 
 
 void embedded_synfire_chains_exp() {
@@ -174,8 +61,14 @@ void embedded_synfire_chains_exp() {
 
 
 static inline void embedded_synfire_chains_exp_run(embedded_synfire_chains_config* config) {
-	// create classes and neurons
-	char output_folder_aux[1024] = { 0 };
+	char c_string_container[1024] = { 0 };
+	sprintf(c_string_container, "%s\\config.txt", config->exp_path);
+	embedded_synfire_chains_exp_dump_config(c_string_container, config);
+
+	// redirect stdout to a file
+	memset(c_string_container, 0, 1024);
+	sprintf(c_string_container, "%s\\stdout.txt", config->exp_path);
+	freopen(c_string_container, "a+", stdout);
 
 	// create a pool of neurons where the first @n neurons are excitatory and the next @n / 4 are inhibitory
 	Array* neuron_pool = create_neurons(config->n_exci_neurons + config->n_inhi_neurons, config->n_class);
@@ -192,23 +85,20 @@ static inline void embedded_synfire_chains_exp_run(embedded_synfire_chains_confi
 		printf("\n");
 	}
 
-	// give them input
-	uint32_t duration_per_chain = 200;
-	uint32_t pulse_duration = 20;
-	float pulse_spike_frequency = 0.05f; // 50Hz
-	uint32_t total_duration = duration_per_chain + chains_input_neurons->length * duration_per_chain + duration_per_chain;
-	Array* neurons_input_spikes = get_spikes_for_neuron_pool(total_duration, neuron_pool->length, chains_input_neurons, duration_per_chain, pulse_duration, pulse_spike_frequency);
+	// get the inputs
+	uint32_t total_duration = config->duration_per_chain + chains_input_neurons->length * config->duration_per_chain + config->duration_per_chain;
+	Array* neurons_input_spikes = get_spikes_for_neuron_pool(total_duration, neuron_pool->length, chains_input_neurons, config);
 
 	// perform infer loop and save spikes at every step
 	Array* neurons_output_spikes = get_output_spikes_for_neuron_pool(total_duration, neuron_pool, neurons_input_spikes);
 
 	// save the input and output
-	memset(output_folder_aux, 0, 1024);
-	sprintf(output_folder_aux, "%s\\input", config->exp_path);
-	dump_neurons_spikes(neurons_input_spikes, output_folder_aux);
-	memset(output_folder_aux, 0, 1024);
-	sprintf(output_folder_aux, "%s\\output", config->exp_path);
-	dump_neurons_spikes(neurons_output_spikes, output_folder_aux);
+	memset(c_string_container, 0, 1024);
+	sprintf(c_string_container, "%s\\input", config->exp_path);
+	dump_neurons_spikes(neurons_input_spikes, c_string_container);
+	memset(c_string_container, 0, 1024);
+	sprintf(c_string_container, "%s\\output", config->exp_path);
+	dump_neurons_spikes(neurons_output_spikes, c_string_container);
 
 	// cleanup
 	for (uint32_t chain_idx = 0; chain_idx < chains_input_neurons->length; ++chain_idx) {
@@ -232,50 +122,37 @@ static inline void embedded_synfire_chains_exp_run(embedded_synfire_chains_confi
 	array_destroy(neuron_pool, (ElemReset)neuron_reset);
 
 	memory_manage_report();
+
+	// close stdout
+	fclose(stdout);
 }
 
 
-static inline void embedded_synfire_chains_exp_dump_config(const char* file_path, cortical_slabs_exp_config* config) {
+static inline void embedded_synfire_chains_exp_dump_config(const char* file_path, embedded_synfire_chains_config* config) {
 	FILE* fp = fopen(file_path, "w");
 	if (fp == NULL) {
 		fprintf(stderr, "!!!!!Couldn't open %s for writting\n", file_path);
 		return;
 	}
-	String* n_class_desc = neuron_class_get_desc(config->neuron_class);
-	String* s_exci_class_desc = synapse_class_get_desc(config->synapse_exci_class);
-	String* s_inhi_class_desc = synapse_class_get_desc(config->synapse_inhi_class);
+	String* n_class_desc = neuron_class_get_desc(config->n_class);
+	String* s_exci_class_desc = synapse_class_get_desc(config->s_exci_class);
+	String* s_inhi_class_desc = synapse_class_get_desc(config->s_inhi_class);
 
-	char neuron_values[1024] = { 0 };
-	char neuron_values_aux[1024] = { 0 };
-	for (uint32_t i = 0; i < config->n_neurons_layer_1_cnt; ++i) {
-		sprintf(neuron_values_aux, "%s %d ", neuron_values, config->n_neurons_layer_1_steps[i]);
-		sprintf(neuron_values, "%s", neuron_values_aux);
-	}
-
-	fprintf(fp, "cortical_slabs_exp_dump_config\n\n"
-		"exp_abs_path: %s\n\n"
-		"n_layers: %u\n"
-		"n_neurons_layer_1_cnt: %u\n"
-		"n_neurons_layer_1_values: %s\n"
-		"n_neurons_layer_2: %u\n"
-		"connectivity: %f\n"
-		"amplitude: %f\n\n"
-		"percent_excitatory: %f\n"
-		"percent_inhibitory: %f\n\n"
-		"neuron_class: %s\n"
-		"synapse_exci_class: %s\n"
-		"synapse_inhi_class: %s\n\n"
-		"example_duration: %u\n"
-		"spike_frequency: %f\n"
-		"use_dump_net_callback: %d",
-		config->exp_abs_path,
-		config->n_layers,
-		config->n_neurons_layer_1_cnt, neuron_values,
-		config->n_neurons_layer_2, config->connectivity, config->amplitude,
-		config->percent_excitatory, config->percent_inhibitory,
+	fprintf(fp, "embedded_synfire_chains_config\n\n"
+		"exp_path: %s\n\n"
+		"n_class: %s\n"
+		"s_exci_class: %s\n"
+		"s_inhi_class: %s\n\n"
+		"n_exci_neurons: %u\n"
+		"n_inhi_neurons: %u\n"
+		"n_chains: %u\n\n"
+		"duration_per_chain: %u\n"
+		"pulse_duration: %u\n"
+		"pulse_spike_frequency: %f\n",
+		config->exp_path,
 		string_get_C_string(n_class_desc), string_get_C_string(s_exci_class_desc), string_get_C_string(s_inhi_class_desc),
-		config->example_duration, config->spike_frequency,
-		config->use_dump_net_callback
+		config->n_exci_neurons, config->n_inhi_neurons, config->n_chains,
+		config->duration_per_chain, config->pulse_duration, config->pulse_spike_frequency
 	);
 	fclose(fp);
 
@@ -284,8 +161,16 @@ static inline void embedded_synfire_chains_exp_dump_config(const char* file_path
 	string_destroy(s_inhi_class_desc);
 }
 
+static inline Array* create_neurons(uint32_t n_neurons, NeuronClass* n_class) {
+	Array* neurons = array_create(n_neurons, n_neurons, sizeof(Neuron));
 
+	for (uint32_t i = 0; i < neurons->length; ++i) {
+		Neuron* neuron = (Neuron*)array_get(neurons, i);
+		neuron_init(neuron, n_class);
+	}
 
+	return neurons;
+}
 
 static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_config* config) {
 	Array* chains_input_neurons = array_create(config->n_chains, 0, sizeof(Array));
@@ -395,4 +280,104 @@ static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_c
 	}
 
 	return chains_input_neurons;
+}
+
+static inline Array* get_spikes_for_neuron_pool(uint32_t total_duration, uint32_t n_neurons, Array* chains_input_neurons, embedded_synfire_chains_config* config) {
+	// return an array where every element is a ArrayBool, the spike value for at each time stamp
+	Array* spikes_for_neurons = array_create(n_neurons, 0, sizeof(ArrayBool*));
+
+	// init everything with zeros
+	uint32_t neuron_idx = 0;
+	for (neuron_idx = 0; neuron_idx < n_neurons; ++neuron_idx) {
+		Array* no_spikes = array_zeros_bool(total_duration);
+		array_append(spikes_for_neurons, &no_spikes);
+	}
+
+	// add the spikes
+	uint32_t chain_idx = 0;
+	uint32_t chain_time_pulse_start = 0;
+	uint32_t time = 0;
+	Array* chain_input_neurons = NULL;
+	BOOL spike = TRUE;
+	for (chain_idx = 0; chain_idx < chains_input_neurons->length; ++chain_idx) {
+		chain_input_neurons = (ArrayUint32*)array_get(chains_input_neurons, chain_idx);
+
+		// find the time when the input for current chain should start
+		chain_time_pulse_start = config->duration_per_chain + chain_idx * config->duration_per_chain;
+		for (time = chain_time_pulse_start; time < chain_time_pulse_start + config->pulse_duration; ++time) {
+
+			// to over each neurons and add spikes
+			for (uint32_t neuron_chain_idx = 0; neuron_chain_idx < chain_input_neurons->length; ++neuron_chain_idx) {
+				// get actual neuron idx
+				uint32_t n_idx = *((uint32_t*)array_get(chain_input_neurons, neuron_chain_idx));
+
+				// get the neuron array of values
+				Array* neuron_spikes = *((ArrayBool**)array_get(spikes_for_neurons, n_idx));
+
+				if ((double)rand() / (double)RAND_MAX <= config->pulse_spike_frequency) {
+					array_set(neuron_spikes, time, &spike);
+				}
+			}
+		}
+	}
+
+	return spikes_for_neurons;
+}
+
+static inline Array* get_output_spikes_for_neuron_pool(uint32_t total_duration, Array* neuron_pool, Array* neurons_input_spikes) {
+	uint32_t n_idx = 0;
+	uint32_t time = 0;
+	Neuron* neuron = NULL;
+	ArrayBool* neuron_input_spikes = NULL;
+	ArrayBool* neuron_output_spikes = NULL;
+
+	// initialize the output containers
+	Array* neurons_output_spikes = array_create(neuron_pool->length, 0, sizeof(Array*));
+	for (n_idx = 0; n_idx < neuron_pool->length; ++n_idx) {
+		neuron_output_spikes = array_create(10, 0, sizeof(BOOL));
+		array_append(neurons_output_spikes, &neuron_output_spikes);
+	}
+
+	// dump the net at every step
+	for (time = 0; time < total_duration; ++time) {
+		printf("%u\r", time);
+		// go over each neuron and neuron input
+		for (n_idx = 0; n_idx < neuron_pool->length; ++n_idx) {
+			neuron = (Neuron*)array_get(neuron_pool, n_idx);
+			neuron_input_spikes = *((ArrayBool**)array_get(neurons_input_spikes, n_idx));
+			if (*((BOOL*)array_get(neuron_input_spikes, time)) == TRUE) {
+				neuron_step_force_spike(neuron, time);
+			}
+			else {
+				neuron_step(neuron, time);
+			}
+		}
+
+		// get the output spikes of the neurons
+		for (n_idx = 0; n_idx < neuron_pool->length; ++n_idx) {
+			neuron = (Neuron*)array_get(neuron_pool, n_idx);
+			neuron_output_spikes = *((ArrayBool**)array_get(neurons_output_spikes, n_idx));
+			array_append(neuron_output_spikes, &(neuron->spike));
+		}
+	}
+
+	return neurons_output_spikes;
+}
+
+static inline void dump_neurons_spikes(Array* spikes_for_neurons, const char* output_folder) {
+	char file_name[128] = { 0 };
+	String* file_path = NULL;
+	String* data_path = string_create(output_folder);
+	String* data_name = string_create("spikes");
+	os_mkdir(output_folder);
+	for (uint32_t n_idx = 0; n_idx < spikes_for_neurons->length; ++n_idx) {
+		ArrayBool* spikes_for_neuron = *((ArrayBool**)array_get(spikes_for_neurons, n_idx));
+
+		sprintf(file_name, "spikes_N%u.bin", n_idx);
+		file_path = string_path_join_string_and_C(data_path, file_name);
+		array_bool_dump(spikes_for_neuron, file_path, data_name);
+		string_destroy(file_path);
+	}
+	string_destroy(data_name);
+	string_destroy(data_path);
 }
