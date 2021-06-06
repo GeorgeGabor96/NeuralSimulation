@@ -282,3 +282,32 @@ TestStatus array_float_get_gaussian_dist_test() {
 error:
 	return status;
 }
+
+
+TestStatus array_random_int_uint32_test() {
+	TestStatus status = TEST_FAILED;
+
+	uint32_t lenght = 1000;
+	uint32_t min_value = 10;
+	uint32_t max_value = 100;
+	ArrayUint32* random_uint32 = array_random_int_uint32(lenght, min_value, max_value);
+	assert(random_uint32 != NULL, null_argument("random_uint32"));
+	assert(random_uint32->element_size == sizeof(uint32_t), invalid_argument("random_uint32->element_size"));
+	assert(random_uint32->length == lenght, invalid_argument("random_uint32->lenght"));
+	assert(random_uint32->max_length == lenght, invalid_argument("random_uint32->max_lenght"));
+
+	uint32_t i = 0;
+	uint32_t value = 0;
+	for (i = 0; i < lenght; ++i) {
+		value = *((uint32_t*)array_get(random_uint32, i));
+		assert(value >= min_value, invalid_argument("value"));
+		assert(value <= max_value, invalid_argument("value"));
+	}
+	array_destroy(random_uint32, NULL);
+
+	assert(memory_leak() == FALSE, "Memory leak");
+	status = TEST_SUCCESS;
+
+error:
+	return status;
+}

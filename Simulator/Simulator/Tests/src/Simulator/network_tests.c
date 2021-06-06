@@ -43,45 +43,45 @@ TestStatus network_compile_general_use_case_test() {
 	layer_add_input_layer(l3, l2, s_class, 1.0f, 1.0f);
 	
 	/*----------network_add_layer----------*/
-	s_status = network_add_layer(network, l3, FALSE, TRUE);
-	assert(s_status == SUCCESS, "Couldn't add @l3");
+	s_status = network_add_layer(network, l1, TRUE, FALSE);
+	assert(s_status == SUCCESS, "Couldn't add l1");
 	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
-	assert(network->layers.length == 1, "@network->layers.length is %u, not 1", network->layers.length);
-	assert(network->input_names.length == 0, "@network->input_names.length is %u, not 0", network->input_names.length);
-	assert(network->output_names.length == 1, "@network->output_names.length is %u, not 1", network->output_names.length);
+	assert(network->layers.length == 1, "@network->layers.length is %u, not 3", network->layers.length);
+	assert(network->input_names.length == 1, "@network->input_names.length is %u, not 1", network->input_names.length);
+	assert(network->output_names.length == 0, "@network->output_names.length is %u, not 0", network->output_names.length);
 
 	s_status = network_add_layer(network, l2, FALSE, FALSE);
 	assert(s_status == SUCCESS, "Couldn't add @l2");
 	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
 	assert(network->layers.length == 2, "@network->layers.length is %u, not 2", network->layers.length);
-	assert(network->input_names.length == 0, "@network->input_names.length is %u, not 0", network->input_names.length);
-	assert(network->output_names.length == 1, "@network->output_names.length is %u, not 1", network->output_names.length);
+	assert(network->input_names.length == 1, "@network->input_names.length is %u, not 1", network->input_names.length);
+	assert(network->output_names.length == 0, "@network->output_names.length is %u, not 0", network->output_names.length);
 
-	s_status = network_add_layer(network, l1, TRUE, FALSE);
-	assert(s_status == SUCCESS, "Couldn't add l1");
+	s_status = network_add_layer(network, l3, FALSE, TRUE);
+	assert(s_status == SUCCESS, "Couldn't add @l3");
 	assert(network_is_valid(network) == TRUE, invalid_argument("network"));
-	assert(network->layers.length == 3, "@network->layers.length is %u, not 3", network->layers.length);
+	assert(network->layers.length == 3, "@network->layers.length is %u, not 1", network->layers.length);
 	assert(network->input_names.length == 1, "@network->input_names.length is %u, not 1", network->input_names.length);
 	assert(network->output_names.length == 1, "@network->output_names.length is %u, not 1", network->output_names.length);
 
 	/*----------network_get_layer_by_idx----------*/
-	l3 = network_get_layer_by_idx(network, 0);
-	assert(layer_is_valid(l3) == TRUE, invalid_argument("l3"));
-	assert(strcmp(layer_get_name(l3), name3) == 0, invalid_argument("l3->name"));
-	assert(l3->neurons.length == 1, invalid_argument("l3->neurons.length"));
-	assert(l3->is_input == FALSE, "@l3->is_input is TRUE");
-	
+	l1 = network_get_layer_by_idx(network, 0);
+	assert(layer_is_valid(l1) == TRUE, invalid_argument("l1"));
+	assert(strcmp(layer_get_name(l1), name1) == 0, invalid_argument("l1->name"));
+	assert(l1->neurons.length == 10, invalid_argument("l1->neurons.length"));
+	assert(l1->is_input == TRUE, "@1->is_input is FALSE");
+
 	l2 = network_get_layer_by_idx(network, 1);
 	assert(layer_is_valid(l2) == TRUE, invalid_argument("l2"));
 	assert(strcmp(layer_get_name(l2), name2) == 0, invalid_argument("l2->name"));
 	assert(l2->neurons.length == 100, invalid_argument("l2->neurons.length"));
 	assert(l2->is_input == FALSE, "@l2->is_input is TRUE");
 
-	l1 = network_get_layer_by_idx(network, 2);
-	assert(layer_is_valid(l1) == TRUE, invalid_argument("l1"));
-	assert(strcmp(layer_get_name(l1), name1) == 0, invalid_argument("l1->name"));
-	assert(l1->neurons.length == 10, invalid_argument("l1->neurons.length"));
-	assert(l1->is_input == TRUE, "@1->is_input is FALSE");
+	l3 = network_get_layer_by_idx(network, 2);
+	assert(layer_is_valid(l3) == TRUE, invalid_argument("l3"));
+	assert(strcmp(layer_get_name(l3), name3) == 0, invalid_argument("l3->name"));
+	assert(l3->neurons.length == 1, invalid_argument("l3->neurons.length"));
+	assert(l3->is_input == FALSE, "@l3->is_input is TRUE");
 
 	/*----------network_get_layer_by_name----------*/
 	layer = network_get_layer_by_name(network, name2);

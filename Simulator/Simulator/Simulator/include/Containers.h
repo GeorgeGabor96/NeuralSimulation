@@ -81,9 +81,11 @@ ArrayDouble* array_float_to_double(ArrayFloat* array_f, BOOL destroy_array_float
 ArrayFloat* array_arange_float(uint32_t length);
 ArrayFloat* array_ones_float(uint32_t length);
 ArrayBool* array_ones_bool(uint32_t length);
+ArrayBool* array_zeros_bool(uint32_t length);
 ArrayUint32* array_zeros_uint23(uint32_t length);
 Status array_of_arrays_init(Array* data, uint32_t length, size_t inner_element_size);
 Status array_of_arrays_reset(Array* data); // assumes primitives data types
+ArrayUint32* array_random_int_uint32(uint32_t length, uint32_t min, uint32_t max);
 
 // statictics functions
 typedef struct GaussianDist{

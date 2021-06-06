@@ -314,6 +314,20 @@ ERROR
 }
 
 
+ArrayBool* array_zeros_bool(uint32_t length) {
+	ArrayBool* array_b = (ArrayBool*)array_create(length, length, sizeof(BOOL));
+	check_memory(array_b);
+
+	BOOL false_v = FALSE;
+	uint32_t i = 0;
+	for (i = 0; i < length; ++i)
+		array_set(array_b, i, &false_v);
+
+ERROR
+	return array_b;
+}
+
+
 ArrayUint32* array_zeros_uint23(uint32_t length) {
 	ArrayUint32* array_u32 = (ArrayUint32*)array_create(length, length, sizeof(uint32_t));
 	check_memory(array_u32);
@@ -383,6 +397,27 @@ Status array_of_arrays_reset(Array* data) {
 
 ERROR
 	return FAIL;
+}
+
+
+ArrayUint32* array_random_int_uint32(uint32_t length, uint32_t min, uint32_t max) {
+	check(length > 0, "@lenght == 0");
+	check(min <= max, "@min > @max");
+
+	ArrayUint32* random_uint32 = array_create(length, 0, sizeof(uint32_t));
+	check_memory(random_uint32);
+
+	uint32_t i = 0;
+	uint32_t random_value = 0;
+
+	for (i = 0; i < length; ++i) {
+		random_value = rand() % ((max + 1) - min) + min;
+		array_append(random_uint32, &random_value);
+	}
+
+	return random_uint32;
+ERROR
+	return NULL;
 }
 
 
