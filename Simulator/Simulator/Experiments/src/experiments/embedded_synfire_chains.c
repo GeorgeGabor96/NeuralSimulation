@@ -3,7 +3,9 @@
 #include "utils/os.h"
 #include <math.h>
 
-#define n 10000
+#include "../utils/mathcpp.h"
+
+#define n 2000
 #define m 20     // minimum number of neurons selected for layer k
 #define M 200	 // maximum number of neurons selected for layer k
 
@@ -11,8 +13,9 @@
 typedef struct embedded_synfire_chains_config {
 	char* exp_path;
 	NeuronClass* n_class;
-	SynapseClass* s_exci_class;
-	SynapseClass* s_inhi_class;
+	SynapseClass* s_exci_class_EE;
+	SynapseClass* s_exci_class_EI;
+	SynapseClass* s_inhi_class_IE;
 	uint32_t n_exci_neurons;
 	uint32_t n_inhi_neurons;
 	uint32_t n_chains;
@@ -45,11 +48,17 @@ void embedded_synfire_chains_exp() {
 	embedded_synfire_chains_config config = { 0 };
 	config.exp_path = "d:\\repositories\\Simulator\\experiments\\embedded_synchains\\test\\";
 	config.n_class = neuron_class_create("LIF_REFRACT", LIF_REFRACTORY_NEURON);
-	config.s_exci_class = synapse_class_create("AMPA", 0.0f, 0.1f, 1, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1);
-	config.s_inhi_class = synapse_class_create("GABA_A", -90.0f, 0.1f, 6, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1);
+	os_mkdir(config.exp_path);
+	float a_g_ee = 0.0105f;
+	float a_g_ei = 0.0075f;
+	float a_g_ie = 0.03f;
+
+	config.s_exci_class_EE = synapse_class_create("AMPA_EE", 0.0f, a_g_ee, 1, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1);
+	config.s_exci_class_EI = synapse_class_create("AMPA_EI", 0.0f, a_g_ei, 1, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1);
+	config.s_inhi_class_IE = synapse_class_create("GABA_IE", -90.0f, a_g_ie, 6, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1);
 	config.n_exci_neurons = n;
 	config.n_inhi_neurons = n / 4;
-	config.n_chains = 10;
+	config.n_chains = 5;
 	config.duration_per_chain = 200;
 	config.pulse_duration = 20;
 	config.pulse_spike_frequency = 0.05f;
@@ -57,8 +66,9 @@ void embedded_synfire_chains_exp() {
 	embedded_synfire_chains_exp_run(&config);
 
 	neuron_class_destroy(config.n_class);
-	synapse_class_destroy(config.s_exci_class);
-	synapse_class_destroy(config.s_inhi_class);
+	synapse_class_destroy(config.s_exci_class_EE);
+	synapse_class_destroy(config.s_exci_class_EI);
+	synapse_class_destroy(config.s_inhi_class_IE);
 }
 
 
@@ -70,7 +80,7 @@ static inline void embedded_synfire_chains_exp_run(embedded_synfire_chains_confi
 	// redirect stdout to a file
 	memset(c_string_container, 0, 1024);
 	sprintf(c_string_container, "%s\\stdout.txt", config->exp_path);
-	freopen(c_string_container, "a+", stdout);
+	//freopen(c_string_container, "a+", stdout);
 
 	// create a pool of neurons where the first @n neurons are excitatory and the next @n / 4 are inhibitory
 	Array* neuron_pool = create_neurons(config->n_exci_neurons + config->n_inhi_neurons, config->n_class);
@@ -137,14 +147,16 @@ static inline void embedded_synfire_chains_exp_dump_config(const char* file_path
 		return;
 	}
 	String* n_class_desc = neuron_class_get_desc(config->n_class);
-	String* s_exci_class_desc = synapse_class_get_desc(config->s_exci_class);
-	String* s_inhi_class_desc = synapse_class_get_desc(config->s_inhi_class);
+	String* s_exci_class_EE_desc = synapse_class_get_desc(config->s_exci_class_EE);
+	String* s_exci_class_EI_desc = synapse_class_get_desc(config->s_exci_class_EI);
+	String* s_inhi_class_IE_desc = synapse_class_get_desc(config->s_inhi_class_IE);
 
 	fprintf(fp, "embedded_synfire_chains_config\n\n"
 		"exp_path: %s\n\n"
 		"n_class: %s\n"
-		"s_exci_class: %s\n"
-		"s_inhi_class: %s\n\n"
+		"s_exci_class_EE: %s\n"
+		"s_exci_class_EI: %s\n"
+		"s_inhi_class_IE: %s\n\n"
 		"n_exci_neurons: %u\n"
 		"n_inhi_neurons: %u\n"
 		"n_chains: %u\n\n"
@@ -152,15 +164,16 @@ static inline void embedded_synfire_chains_exp_dump_config(const char* file_path
 		"pulse_duration: %u\n"
 		"pulse_spike_frequency: %f\n",
 		config->exp_path,
-		string_get_C_string(n_class_desc), string_get_C_string(s_exci_class_desc), string_get_C_string(s_inhi_class_desc),
+		string_get_C_string(n_class_desc), string_get_C_string(s_exci_class_EE_desc), string_get_C_string(s_exci_class_EI_desc), string_get_C_string(s_inhi_class_IE_desc),
 		config->n_exci_neurons, config->n_inhi_neurons, config->n_chains,
 		config->duration_per_chain, config->pulse_duration, config->pulse_spike_frequency
 	);
 	fclose(fp);
 
 	string_destroy(n_class_desc);
-	string_destroy(s_exci_class_desc);
-	string_destroy(s_inhi_class_desc);
+	string_destroy(s_exci_class_EE_desc);
+	string_destroy(s_exci_class_EI_desc);
+	string_destroy(s_inhi_class_IE_desc);
 }
 
 static inline Array* create_neurons(uint32_t n_neurons, NeuronClass* n_class) {
@@ -176,7 +189,7 @@ static inline Array* create_neurons(uint32_t n_neurons, NeuronClass* n_class) {
 
 static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_config* config) {
 	Array* chains_input_neurons = array_create(config->n_chains, 0, sizeof(Array));
-
+	uint32_t n_synapses = 0;
 	for (uint32_t chain_idx = 0; chain_idx < config->n_chains; ++chain_idx) {
 		printf("Building chain %d\n", chain_idx);
 
@@ -211,9 +224,10 @@ static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_c
 					uint32_t idx_neuron_previous = *((uint32_t*)array_get(exci_idxs_previous, idx_neuron_connect));
 					Neuron* exci_neuron_previous = (Neuron*)array_get(neuron_pool, idx_neuron_previous);
 
-					Synapse* exci_synapse = synapse_create(config->s_exci_class, 1.0);
+					Synapse* exci_synapse = synapse_create(config->s_exci_class_EE, 1.0);
 					neuron_add_in_synapse(exci_neuron_current, exci_synapse);
 					neuron_add_out_synapse(exci_neuron_previous, exci_synapse);
+					n_synapses++;
 				}
 				array_destroy(neurons_to_connect, NULL);
 			}
@@ -233,9 +247,10 @@ static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_c
 					uint32_t exci_neuron_idx = *((uint32_t*)array_get(neurons_to_connect, exci_neuron_to_connect_idx));
 					Neuron* exci_neuron = (Neuron*)array_get(neuron_pool, exci_neuron_idx);
 
-					Synapse* inhi_synapse = synapse_create(config->s_inhi_class, 1.0);
+					Synapse* inhi_synapse = synapse_create(config->s_inhi_class_IE, 1.0);
 					neuron_add_in_synapse(exci_neuron, inhi_synapse);
 					neuron_add_out_synapse(inhi_neuron_current, inhi_synapse);
+					n_synapses++;
 				}
 				array_destroy(neurons_to_connect, NULL);
 
@@ -253,11 +268,11 @@ static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_c
 					uint32_t idx_neuron_previous = *((uint32_t*)array_get(exci_idxs_previous, idx_neuron_connect));
 					Neuron* exci_neuron_previous = (Neuron*)array_get(neuron_pool, idx_neuron_previous);
 
-					Synapse* exci_synapse = synapse_create(config->s_exci_class, 1.0);
+					Synapse* exci_synapse = synapse_create(config->s_exci_class_EI, 1.0);
 
 					neuron_add_in_synapse(inhi_neuron_current, exci_synapse);
 					neuron_add_out_synapse(exci_neuron_previous, exci_synapse);
-
+					n_synapses++;
 				}
 				array_destroy(neurons_to_connect, NULL);
 			}
@@ -268,9 +283,17 @@ static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_c
 			exci_idxs_previous = exci_idxs_current;
 
 			// update the @n_k variable for the next layer
-			double r_value = get_gaussian_value();
-			if (r_value < 0) r_value = -r_value;
-			n_k = (int)((get_gaussian_value() + 1.0) * n_k);
+			//double r_value = get_gaussian_value();
+			//if (r_value < 0) r_value = -r_value;
+			//n_k = (int)((get_gaussian_value() * 0.5 + 1.0) * n_k);
+			double alpha = 0.1;
+			double sigma = 4.0;
+			double gamma_value = get_gamma_sample(alpha, sigma * sqrt(n_k / alpha));
+			// gamma_value = n_k - n + sigma * sqrt(alpha * n_k)
+			n_k = (int)((double)n_k + sigma * sqrt(alpha * n_k) - gamma_value);
+
+			//n_k = (int)(get_gamma_sample(0.1, 4.0, n) * n_k);
+			//printf("%lf\n", get_gamma_sample(0.1, 4.0, n));
 		}
 
 		// free the last exci neurons of the chain
@@ -280,6 +303,8 @@ static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_c
 		array_append(chains_input_neurons, input_neurons);
 		free(input_neurons);
 	}
+
+	printf("Number of synapses created %u\n", n_synapses);
 
 	return chains_input_neurons;
 }
