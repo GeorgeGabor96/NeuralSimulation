@@ -239,7 +239,7 @@ static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_c
 	for (uint32_t chain_idx = 0; chain_idx < config->n_chains; ++chain_idx) {
 		printf("Building chain %d\n", chain_idx);
 
-		// to construct a chain start with n_k = (m + M) / 2
+		// Original paper used n_k = m  for the first layer, but also n_k = (m + M) / 2 could be used
 		// and construct succesive layers until the number of neurons per
 		// layer is too big or too small
 		uint32_t n_k = config->n_exci_min_neurons; //(config->n_exci_max_neurons + config->n_exci_min_neurons) / 2;
@@ -251,6 +251,8 @@ static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_c
 		uint32_t n_layer = 0;
 
 		while (n_k >= config->n_exci_min_neurons && n_k <= config->n_exci_max_neurons) {
+			// For this experiment where I checked the results visualy I just limited the number of layer to be at most 10
+			// for simplicity
 			if (n_layer > 9) break;
 			n_layer++;
 
