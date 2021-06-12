@@ -64,11 +64,11 @@ double get_gaussian_value() {
 
 void embedded_synfire_chains_exp() {
 	embedded_synfire_chains_config config = { 0 };
-	config.exp_path = "d:\\repositories\\Simulator\\experiments\\embedded_synchains\\exp_debug_2\\";
+	config.exp_path = "d:\\repositories\\Simulator\\experiments\\embedded_synchains\\exp_debug_2000n_10_chains_gamma_from_min\\";
 	config.n_class = neuron_class_create("LIF_REFRACT", LIF_REFRACTORY_NEURON);
 	os_mkdir(config.exp_path);
-	config.a_g_ee = 0.02f; //0.0105f;
-	config.a_g_ei = 0.01f; // 0.0075f;
+	config.a_g_ee = 0.025f; //0.0105f;
+	config.a_g_ei = 0.015f; // 0.0075f;
 	config.a_g_ie = 0.01f; // 0.03f;
 
 	config.s_exci_class_EE = synapse_class_create("AMPA_EE", 0.0f, config.a_g_ee, 1, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1);
@@ -83,9 +83,9 @@ void embedded_synfire_chains_exp() {
 	config.duration_per_chain = 200;
 	config.pulse_duration = 20;
 	config.pulse_spike_frequency = 0.1f;
-	config.use_gamma = FALSE;
+	config.use_gamma = TRUE;
 	config.alpha = 0.1;
-	config.sigma = 2.0;
+	config.sigma = 3.0;
 
 	embedded_synfire_chains_exp_run(&config);
 
@@ -104,7 +104,7 @@ static inline void embedded_synfire_chains_exp_run(embedded_synfire_chains_confi
 	// redirect stdout to a file
 	memset(c_string_container, 0, 1024);
 	sprintf(c_string_container, "%s\\stdout.txt", config->exp_path);
-	//freopen(c_string_container, "w", stdout);
+	freopen(c_string_container, "w", stdout);
 
 	// create a pool of neurons where the first @n neurons are excitatory and the next @n / 4 are inhibitory
 	Array* neuron_pool = create_neurons(config->n_exci_neurons + config->n_inhi_neurons, config->n_class);
@@ -242,7 +242,7 @@ static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_c
 		// to construct a chain start with n_k = (m + M) / 2
 		// and construct succesive layers until the number of neurons per
 		// layer is too big or too small
-		uint32_t n_k = (config->n_exci_max_neurons + config->n_exci_min_neurons) / 2;
+		uint32_t n_k = config->n_exci_min_neurons; //(config->n_exci_max_neurons + config->n_exci_min_neurons) / 2;
 		ArrayUint32* inhi_idxs_current = NULL;
 		ArrayUint32* exci_idxs_current = NULL;
 		ArrayUint32* exci_idxs_previous = array_create(1, 0, sizeof(uint32_t));
