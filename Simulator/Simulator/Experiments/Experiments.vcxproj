@@ -167,11 +167,13 @@
     <ClCompile Include="src\experiments\time_between_spikes_experiment.c" />
     <ClCompile Include="src\main.c" />
     <ClCompile Include="src\networks.c" />
+    <ClCompile Include="src\utils\mathcpp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\config_exp.h" />
     <ClInclude Include="include\experiments.h" />
     <ClInclude Include="include\networks.h" />
+    <ClInclude Include="src\utils\mathcpp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
