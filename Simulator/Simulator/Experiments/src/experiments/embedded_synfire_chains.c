@@ -413,6 +413,7 @@ static inline Array* get_spikes_for_neuron_pool(uint32_t total_duration, uint32_
 static inline void get_output_for_neuron_pool(uint32_t total_duration, Array* neuron_pool, Array* neurons_input_spikes, neurons_outputs* outputs) {
 	uint32_t n_idx = 0;
 	uint32_t time = 0;
+	float PSC = 0.0f;
 	Neuron* neuron = NULL;
 	ArrayBool* neuron_input_spikes = NULL;
 	ArrayBool* neuron_output_spikes = NULL;
@@ -459,7 +460,8 @@ static inline void get_output_for_neuron_pool(uint32_t total_duration, Array* ne
 			array_append(neuron_output_voltages, &(neuron->u));
 
 			neuron_input_currents = *((ArrayFloat**)array_get(outputs->currents, n_idx));
-			array_append(neuron_input_currents, &(neuron->PSC));
+			PSC = neuron->EPSC + neuron->IPSC;
+			array_append(neuron_input_currents, &PSC);
 		}
 	}
 }

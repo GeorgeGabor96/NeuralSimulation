@@ -77,7 +77,10 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
     # so take the first one and see
     array_file = os.path.join(config['layers_folder'], binaries_for_layer[0]['layer_name'], binaries_for_layer[0]['binaries'][0])
     neuron_data = parse_array_file(array_file)
-    n_times = neuron_data['data'].shape[0]
+
+    # Dirty overwrite
+    new_max_times = 201
+    n_times = new_max_times - 1 #neuron_data['data'].shape[0]
 
     data_for_layer = []
     lines = [dict(x_coord=[0, n_times], y_coord=[0, 0])]
@@ -94,6 +97,9 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
             # read data of the neuron
             array_file = os.path.join(config['layers_folder'], layer['layer_name'], binary)
             neuron_data = parse_array_file(array_file)
+
+            # Dirty filtering
+            neuron_data['data'] = neuron_data['data'][:new_max_times]
 
             # need to extract the times of the spikes
             spike_times = np.where(neuron_data['data'] == 1)[0]
@@ -174,7 +180,7 @@ def plot_network_activity(config_file):
     # make data for each layer, also need the separation lines
     data_for_layer, lines = make_data_for_layer_and_lines(binaries_for_layer, config)
 
-    plot_data_and_lines(data_for_layer, lines, config)
+    plot_data_and_lines(data_for_layer, lines, config, x_label='t (ms)', y_label='Nivel')
 
 
 if __name__ == '__main__':

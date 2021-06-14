@@ -81,8 +81,8 @@ Network* network_sequential_n_layers(network_sequential_n_layers_config* config)
 	Layer* exci_layer_i_m1 = NULL;
 	Layer* inhi_layer_i = NULL;
 	Layer* inhi_layer_i_m1 = NULL;
-	Array* excitatory_layers = get_array_of_layers(config->n_layers, config->n_exci_neurons, config->n_neurons_scale_step, n_class, "layer%.2d");
-	Array* inhibitory_layers = get_array_of_layers(config->n_layers - 1, config->n_inhi_neurons, config->n_neurons_scale_step, n_class, "layer%.2d_inhi");
+	Array* excitatory_layers = get_array_of_layers(config->n_layers, config->n_exci_neurons, config->n_neurons_scale_step, n_class, "nivel%.2d");
+	Array* inhibitory_layers = get_array_of_layers(config->n_layers - 1, config->n_inhi_neurons, config->n_neurons_scale_step, n_class, "nivel%.2d_inhi");
 
 	// connect the layers
 	for (i = 1; i < config->n_layers - 1; ++i) {
@@ -133,8 +133,8 @@ Network* network_sequential_ring_n_layers(network_sequential_n_layers_config* co
 	Layer* inhi_layer_i = NULL;
 	Layer* inhi_layer_i_m1 = NULL;
 	// because we want a ring we will but inhibitory neurons also on the last layer
-	Array* excitatory_layers = get_array_of_layers(config->n_layers, config->n_exci_neurons, config->n_neurons_scale_step, n_class, "layer%.2d");
-	Array* inhibitory_layers = get_array_of_layers(config->n_layers, config->n_inhi_neurons, config->n_neurons_scale_step, n_class, "layer%.2d_inhi");
+	Array* excitatory_layers = get_array_of_layers(config->n_layers, config->n_exci_neurons, config->n_neurons_scale_step, n_class, "nivel%.2d");
+	Array* inhibitory_layers = get_array_of_layers(config->n_layers, config->n_inhi_neurons, config->n_neurons_scale_step, n_class, "nivel%.2d_inhi");
 
 	// connect the layers
 	for (i = 1; i < config->n_layers; ++i) {

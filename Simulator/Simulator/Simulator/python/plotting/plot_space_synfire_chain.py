@@ -6,7 +6,7 @@ from tqdm import tqdm
 import numpy as np
 
 from utils.utils_config import parse_yaml_config
-from utils.utils_matplotlib import scatter_plot
+from utils.utils_matplotlib import scatter_plot, scatter_plot_contour
 
 
 def get_args():
@@ -45,9 +45,8 @@ def get_synfire_state(txt_file):
     return state
 
 
-if __name__ == '__main__':
-    args = get_args()
-    config = parse_yaml_config(args.config_file)
+def make_space_plot(config_file):
+    config = parse_yaml_config(config_file)
 
     # find all txt files
     txt_files = [f for f in os.listdir(config['experiments_folder'])
@@ -74,8 +73,23 @@ if __name__ == '__main__':
         points_for_state[state]['x'] = np.array(points_for_state[state]['x'])
         points_for_state[state]['y'] = np.array(points_for_state[state]['y'])
 
-    scatter_plot(output_file=os.path.join(config['experiments_folder'], 'synfire_chain_space_plot.png'),
-                 groups=points_for_state,
-                 title=config['title'],
-                 x_label=config['variable1'],
-                 y_label=config['variable2'])
+
+    # ugly solution for romanian
+    points_for_state_rom = dict()
+    points_for_state_rom['UNKNOWN'] = points_for_state['UNKNOWN']
+    points_for_state_rom['SUPRESIE'] = points_for_state['NO_ACTIVITY']
+    points_for_state_rom['STABILITATE'] = points_for_state['STABLE']
+    points_for_state_rom['AMPLIFICARE'] = points_for_state['EPILEPSY']
+
+    scatter_plot_contour(output_file=os.path.join(config['experiments_folder'], 'synfire_chain_space_plot.png'),
+                 groups=points_for_state_rom,
+                 title=None,  #config['title'],
+                 x_label='conectivitate',  #config['variable1'],
+                 y_label='amplitudine')  #config['variable2'])
+
+
+
+
+if __name__ == '__main__':
+    args = get_args()
+    make_space_plot(args.config_file)

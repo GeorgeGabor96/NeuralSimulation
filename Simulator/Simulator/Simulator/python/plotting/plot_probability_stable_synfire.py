@@ -8,9 +8,12 @@ sys.path.append(os.path.join(os.path.realpath(__file__).split('python')[0], 'pyt
 
 from plotting.plot_space_synfire_chain import get_variables_values
 from plotting.plot_space_synfire_chain import get_synfire_state
+from plot_space_synfire_chain import make_space_plot
 
 from utils.utils_config import parse_yaml_config
 from utils.utils_matplotlib import scatter_plot_with_colorscheme
+from utils.utils_matplotlib import histogram_plot
+from utils.utils_matplotlib import scatter_plot_interpolated_with_colorscheme
 
 
 def get_args():
@@ -44,9 +47,21 @@ def run_plot_space_synfire_chain(trial_folder, config):
         yaml.dump(plot_config, fp)
 
     # call the plotter
-    os.system('plot_space_synfire_chain.py --config_file {}'.format(config_file))
+    make_space_plot(config_file)
+    #os.system('plot_space_synfire_chain.py --config_file {}'.format(config_file))
 
     os.remove(config_file)
+
+
+def get_ratio_value(txt_file):
+    with open(txt_file, 'r') as fp:
+        lines = fp.readlines()
+        lines = [line for line in lines]
+
+    ratio_line = lines[1]
+    tokens = ratio_line.split(' ')
+    ratio = tokens[-1]
+    return float(ratio)
 
 
 if __name__ == '__main__':
@@ -74,8 +89,8 @@ if __name__ == '__main__':
             variable_values = get_variables_values(txt_file=os.path.basename(txt_file),
                                                    variable1_name=config['variable1'],
                                                    variable2_name=config['variable2'])
-
             state = get_synfire_state(os.path.join(config['trials_folder'], txt_file))
+            ratio = get_ratio_value(os.path.join(config['trials_folder'], txt_file))
             x_values.append(variable_values[config['variable1']])
             y_values.append(variable_values[config['variable2']])
             state_values.append(state)
@@ -93,6 +108,7 @@ if __name__ == '__main__':
                 else:
                     trails_info[current_key]['unknown_cnt'] += 1
                 trails_info[current_key]['cnt'] += 1
+                trails_info[current_key]['ratio'] += ratio
             else:
                 trails_info[current_key] = {
                     'x': x_value,
@@ -101,7 +117,8 @@ if __name__ == '__main__':
                     'no_activity_cnt': 1 if state == 'NO_ACTIVITY' else 0,
                     'epilepsy_cnt': 1 if state == 'EPILEPSY' else 0,
                     'unknown_cnt': 1 if state == 'UNKNOWN' else 0,
-                    'cnt': 1
+                    'cnt': 1,
+                    'ratio': ratio
                 }
 
     n_points = len(trails_info.keys())
@@ -111,6 +128,7 @@ if __name__ == '__main__':
     epilepsy_probs = np.zeros((n_points,))
     no_activity_probs = np.zeros((n_points,))
     unknown_probs = np.zeros((n_points,))
+    ratio_means = np.zeros((n_points,))
 
     for i, key in enumerate(trails_info.keys()):
         point_data = trails_info[key]
@@ -121,6 +139,7 @@ if __name__ == '__main__':
         epilepsy_probs[i] = point_data['epilepsy_cnt'] / point_data['cnt']
         no_activity_probs[i] = point_data['no_activity_cnt'] / point_data['cnt']
         unknown_probs[i] = point_data['unknown_cnt'] / point_data['cnt']
+        ratio_means[i] = point_data['ratio'] / point_data['cnt']
 
     sep = config['csv_sep']
     with open(os.path.join(config['trials_folder'], 'values.csv'), 'w') as fp:
@@ -133,26 +152,47 @@ if __name__ == '__main__':
                      str(epilepsy_probs[i]) + sep +
                      str(unknown_probs[i]) + '\n')
 
-    scatter_plot_with_colorscheme(os.path.join(config['trials_folder'], 'stable_p.png'),
+    scatter_plot_interpolated_with_colorscheme(os.path.join(config['trials_folder'], 'rations.png'),
+                                  x_values, y_values, ratio_means,
+                                  title=None,  #'Raportul mediu',
+                                  x_label='conectivitate',
+                                  y_label='amplitudine',
+                                  cmap='jet',
+                                  nlines=500)
+
+    scatter_plot_interpolated_with_colorscheme(os.path.join(config['trials_folder'], 'stable_p.png'),
                                   x_values, y_values, stable_probs,
-                                  title='Probability of stable activity',
-                                  x_label=config['variable1'],
-                                  y_label=config['variable2'])
+                                  title=None,  #'Probabilitatea de stabilitate',  #'Probability of stable activity',
+                                  x_label='conectivitate',  #config['variable1'],
+                                  y_label='amplitudine',  #config['variable2'])
+                                  nlines=20)
 
-    scatter_plot_with_colorscheme(os.path.join(config['trials_folder'], 'epilepsy_p.png'),
+    scatter_plot_interpolated_with_colorscheme(os.path.join(config['trials_folder'], 'epilepsy_p.png'),
                                   x_values, y_values, epilepsy_probs,
-                                  title='Probability of epileptic activity',
-                                  x_label=config['variable1'],
-                                  y_label=config['variable2'])
+                                  title=None,  #'Probabilitatea de amplificare',  #'Probability of epileptic activity',
+                                  x_label='conectivitate',  #config['variable1'],
+                                  y_label='amplitudine',  #config['variable2'])
+                                  nlines=20)
 
-    scatter_plot_with_colorscheme(os.path.join(config['trials_folder'], 'no_activity_p.png'),
+    scatter_plot_interpolated_with_colorscheme(os.path.join(config['trials_folder'], 'no_activity_p.png'),
                                   x_values, y_values, no_activity_probs,
-                                  title='Probability of no activity',
-                                  x_label=config['variable1'],
-                                  y_label=config['variable2'])
+                                  title=None,  #'Probabilitatea de supresie',   #'Probability of no activity',
+                                  x_label='conectivitate',  #config['variable1'],
+                                  y_label='amplitudine',  #config['variable2'])
+                                  nlines=20)
 
-    scatter_plot_with_colorscheme(os.path.join(config['trials_folder'], 'unknown_p.png'),
+    scatter_plot_interpolated_with_colorscheme(os.path.join(config['trials_folder'], 'unknown_p.png'),
                                   x_values, y_values, unknown_probs,
-                                  title='Probability of unknown',
-                                  x_label=config['variable1'],
-                                  y_label=config['variable2'])
+                                  title=None,  #'Probability of unknown',
+                                  x_label='conectivitate',  #config['variable1'],
+                                  y_label='amplitudine',  #config['variable2'])
+                                  nlines=20)
+
+    # draw stable probability histogram
+    histogram_plot(output_file=os.path.join(config['trials_folder'], 'stable_histogram.png'),
+                   data=stable_probs,
+                   x_label='Propabilitate',
+                   y_label='Aparitii')
+    with open(os.path.join(config['trials_folder'], 'stable_histogram_stats.txt'), 'w') as fp:
+        fp.write('Mean:' + str(np.mean(stable_probs)) + '\n')
+        fp.write('STD:' + str(np.std(stable_probs)) + '\n')

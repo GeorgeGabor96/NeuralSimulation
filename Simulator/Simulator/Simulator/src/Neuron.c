@@ -65,13 +65,13 @@ const char* neuron_type_C_string(NeuronType type) {
 /*************************************************************
 * UPDATE functions for neurons
 *************************************************************/
-static inline BOOL neuron_update(Neuron* neuron, uint32_t time) {
+static inline BOOL neuron_update(Neuron* neuron, uint32_t time, float PSC) {
 	BOOL spike = FALSE;
 	
 	switch (neuron->n_class->type)
 	{
 	case LIF_NEURON:
-		neuron->u = neuron->n_class->u_factor * neuron->u + neuron->n_class->free_factor + neuron->n_class->i_factor * neuron->PSC;
+		neuron->u = neuron->n_class->u_factor * neuron->u + neuron->n_class->free_factor + neuron->n_class->i_factor * PSC;
 		// check for spike
 		if (neuron->u >= neuron->n_class->u_th) {
 			neuron->u = neuron->n_class->u_rest;
@@ -85,7 +85,7 @@ static inline BOOL neuron_update(Neuron* neuron, uint32_t time) {
 			spike = FALSE;
 		}
 		else {
-			neuron->u = neuron->n_class->u_factor * neuron->u + neuron->n_class->free_factor + neuron->n_class->i_factor * neuron->PSC;
+			neuron->u = neuron->n_class->u_factor * neuron->u + neuron->n_class->free_factor + neuron->n_class->i_factor * PSC;
 			if (neuron->u >= neuron->n_class->u_th) {
 				neuron->u = neuron->n_class->u_rest;
 				neuron->last_spike_time = time;		// update last spike time
@@ -116,17 +116,29 @@ ERROR
 
 
 static inline float neuron_compute_psc(Neuron* neuron, uint32_t simulation_time) {
-	float PSC = 0.0f;
-	uint32_t i = 0ui32;
+	float EPSC = 0.0f;
+	float IPSC = 0.0f;
+	float current = 0.0f;
+	uint32_t i = 0;
 	Synapse* synapse = NULL;
 
 	for (i = 0u; i < neuron->in_synapses_refs.length; i++) {
 		synapse = *((Synapse**)array_get(&(neuron->in_synapses_refs), i));
-		PSC += synapse_compute_PSC(synapse, neuron->u);
+		current = synapse_compute_PSC(synapse, neuron->u);
+		
+		// check if inhibitory of excitatory current
+		if (current >= 0) EPSC += current;
+		else IPSC += current;
+
 		synapse_step(synapse, simulation_time);
 	}
 
-	return PSC;
+	// update neuron state
+	neuron->EPSC = EPSC;
+	neuron->IPSC = IPSC;
+
+	// return the sum
+	return EPSC + IPSC;
 }
 
 
@@ -314,7 +326,8 @@ Status neuron_init(Neuron* neuron, NeuronClass* neuron_class) {
 
 	neuron->n_class = neuron_class;
 	neuron->u = neuron_class->u_rest;
-	neuron->PSC = 0.0f;
+	neuron->EPSC = 0.0f;
+	neuron->IPSC = 0.0f;
 	neuron->last_spike_time = 0;
 	neuron->spike = FALSE;
 
@@ -336,7 +349,8 @@ void neuron_reset(Neuron* neuron) {
 	array_reset(&(neuron->in_synapses_refs), synapse_destroy_2p);
 	array_reset(&(neuron->out_synapses_refs), NULL);
 	neuron->n_class = NULL;
-	neuron->PSC = 0.0f;
+	neuron->EPSC = 0.0f;
+	neuron->IPSC = 0.0f;
 	neuron->spike = FALSE;
 	neuron->u = 0.0f;
 	neuron->last_spike_time = 0;
@@ -421,8 +435,8 @@ Status neuron_step(Neuron* neuron, uint32_t simulation_time) {
 	Status status = FAIL;
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
-	neuron->PSC = neuron_compute_psc(neuron, simulation_time);
-	neuron->spike = neuron_update(neuron, simulation_time);
+	float PSC = neuron_compute_psc(neuron, simulation_time);
+	neuron->spike = neuron_update(neuron, simulation_time, PSC);
 	if (neuron->spike == TRUE) {
 		neuron_update_out_synapses(neuron, simulation_time);
 	}
@@ -454,8 +468,8 @@ Status neuron_step_inject_current(Neuron* neuron, float PSC, uint32_t simulation
 	check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
 
 	// simulate receiving exterior current plus the normal one
-	neuron->PSC = neuron_compute_psc(neuron, simulation_time) + PSC;
-	neuron->spike = neuron_update(neuron, simulation_time);
+	float total_PSC = neuron_compute_psc(neuron, simulation_time) + PSC;
+	neuron->spike = neuron_update(neuron, simulation_time, total_PSC);
 	if (neuron->spike == TRUE) {
 		neuron_update_out_synapses(neuron, simulation_time);
 	}
