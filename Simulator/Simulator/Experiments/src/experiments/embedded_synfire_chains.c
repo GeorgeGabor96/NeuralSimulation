@@ -9,6 +9,8 @@
 #define m 20     // minimum number of neurons selected for layer k
 #define M 60	 // maximum number of neurons selected for layer k
 
+typedef enum first_layer_conf{ MIN_MODE = 0, MEAN_MODE = 1 } first_layer_conf;
+
 
 typedef struct embedded_synfire_chains_config {
 	char* exp_path;
@@ -30,6 +32,8 @@ typedef struct embedded_synfire_chains_config {
 	float pulse_spike_frequency;
 
 	BOOL use_gamma;
+	BOOL use_gaussian;
+	first_layer_conf layer_mode;
 	double alpha;
 	double sigma;
 } embedded_synfire_chains_config;
@@ -40,12 +44,17 @@ typedef struct neurons_outputs {
 	Array* currents;
 } neurons_outputs;
 
+typedef struct chains_data {
+	Array* chain_inputs;
+	Array* chain_lengths;
+} chains_data;
+
 
 static inline void embedded_synfire_chains_exp_run(embedded_synfire_chains_config* config);
 static inline void embedded_synfire_chains_exp_dump_config(const char* file_path, embedded_synfire_chains_config* config);
-static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_config* config);
+static inline chains_data* create_chains(Array* neuron_pool, embedded_synfire_chains_config* config);
 static inline Array* create_neurons(uint32_t n_neurons, NeuronClass* n_class);
-static inline Array* get_spikes_for_neuron_pool(uint32_t total_duration, uint32_t n_neurons, Array* chains_input_neurons, embedded_synfire_chains_config* config);
+static inline Array* get_spikes_for_neuron_pool(uint32_t total_duration, uint32_t n_neurons, chains_data* ch_data, embedded_synfire_chains_config* config);
 static inline void get_output_for_neuron_pool(uint32_t total_duration, Array* neuron_pool, Array* neurons_input_spikes, neurons_outputs* outputs);
 static inline void dump_neurons_spikes(Array* spikes_for_neurons, const char* output_folder);
 static inline void dump_neurons_voltages(Array* voltages_for_neurons, const char* output_folder);
@@ -64,7 +73,7 @@ double get_gaussian_value() {
 
 void embedded_synfire_chains_exp() {
 	embedded_synfire_chains_config config = { 0 };
-	config.exp_path = "d:\\repositories\\Simulator\\experiments\\embedded_synchains\\exp_debug_2000n_10_chains_gamma_from_min\\";
+	config.exp_path = "d:\\repositories\\Simulator\\experiments\\embedded_synchains\\final_ro\\exp_2000n_15_chains_uniform_max_10\\";
 	config.n_class = neuron_class_create("LIF_REFRACT", LIF_REFRACTORY_NEURON);
 	os_mkdir(config.exp_path);
 	config.a_g_ee = 0.025f; //0.0105f;
@@ -79,13 +88,15 @@ void embedded_synfire_chains_exp() {
 	config.n_exci_max_neurons = M;
 	config.n_connections_per_neuron = m;
 	config.n_inhi_neurons = n / 4;
-	config.n_chains = 10;
+	config.n_chains = 15;
 	config.duration_per_chain = 200;
 	config.pulse_duration = 20;
 	config.pulse_spike_frequency = 0.1f;
-	config.use_gamma = TRUE;
+	config.use_gamma = FALSE;
+	config.use_gaussian = FALSE;
+	config.layer_mode = MIN_MODE;
 	config.alpha = 0.1;
-	config.sigma = 3.0;
+	config.sigma = 4.0;
 
 	embedded_synfire_chains_exp_run(&config);
 
@@ -110,10 +121,10 @@ static inline void embedded_synfire_chains_exp_run(embedded_synfire_chains_confi
 	Array* neuron_pool = create_neurons(config->n_exci_neurons + config->n_inhi_neurons, config->n_class);
 
 	// create the chains
-	Array* chains_input_neurons = create_chains(neuron_pool, config);
-	for (uint32_t chain_idx = 0; chain_idx < chains_input_neurons->length; ++chain_idx) {
+	chains_data* ch_data = create_chains(neuron_pool, config);
+	for (uint32_t chain_idx = 0; chain_idx < ch_data->chain_inputs->length; ++chain_idx) {
 		printf("For chain %d\n", chain_idx);
-		Array* chain_input = (Array*)array_get(chains_input_neurons, chain_idx);
+		Array* chain_input = (Array*)array_get(ch_data->chain_inputs, chain_idx);
 		for (uint32_t chain_input_idx = 0; chain_input_idx < chain_input->length; ++chain_input_idx) {
 			uint32_t neuron_idx = *((uint32_t*)array_get(chain_input, chain_input_idx));
 			printf("%d ", neuron_idx);
@@ -122,8 +133,13 @@ static inline void embedded_synfire_chains_exp_run(embedded_synfire_chains_confi
 	}
 
 	// get the inputs
-	uint32_t total_duration = config->duration_per_chain + chains_input_neurons->length * config->duration_per_chain + config->duration_per_chain;
-	Array* neurons_input_spikes = get_spikes_for_neuron_pool(total_duration, neuron_pool->length, chains_input_neurons, config);
+	uint32_t total_duration = config->duration_per_chain;
+	for (uint32_t chain_idx = 0; chain_idx < ch_data->chain_lengths->length; ++chain_idx) {
+		uint32_t chain_length = *((uint32_t*)array_get(ch_data->chain_lengths, chain_idx));
+		total_duration += 20 * chain_length;
+	}
+	total_duration += config->duration_per_chain;
+	Array* neurons_input_spikes = get_spikes_for_neuron_pool(total_duration, neuron_pool->length, ch_data, config);
 
 	// perform infer loop and save spikes at every step
 	neurons_outputs outputs = { 0 };
@@ -138,20 +154,24 @@ static inline void embedded_synfire_chains_exp_run(embedded_synfire_chains_confi
 	dump_neurons_spikes(outputs.spikes, c_string_container);
 	dump_neurons_voltages(outputs.voltages, c_string_container);
 	dump_neurons_currents(outputs.currents, c_string_container);
+	
 
 	// cleanup
-	for (uint32_t chain_idx = 0; chain_idx < chains_input_neurons->length; ++chain_idx) {
-		Array* chain_input = (Array*)array_get(chains_input_neurons, chain_idx);
+	for (uint32_t chain_idx = 0; chain_idx < ch_data->chain_inputs->length; ++chain_idx) {
+		Array* chain_input = (Array*)array_get(ch_data->chain_inputs, chain_idx);
 		array_reset(chain_input, NULL);
 	}
-	array_destroy(chains_input_neurons, NULL);
+	array_destroy(ch_data->chain_inputs, NULL);
+	array_destroy(ch_data->chain_lengths, NULL);
+	free(ch_data);
+	
 	
 	for (uint32_t neuron_idx = 0; neuron_idx < neurons_input_spikes->length; ++neuron_idx) {
 		ArrayBool* spikes = *((ArrayBool**)array_get(neurons_input_spikes, neuron_idx));
 		array_destroy(spikes, NULL);
 	}
 	array_destroy(neurons_input_spikes, NULL);
-
+	
 	// destroy outputs
 	for (uint32_t neuron_idx = 0; neuron_idx < outputs.spikes->length; ++neuron_idx) {
 		ArrayBool* spikes = *((ArrayBool**)array_get(outputs.spikes, neuron_idx));
@@ -205,14 +225,18 @@ static inline void embedded_synfire_chains_exp_dump_config(const char* file_path
 		"pulse_spike_frequency: %f\n\n"
 		"use_gamma: %u\n"
 		"alpha: %lf\n"
-		"sigma: %lf\n",
+		"sigma: %lf\n\n"
+		"use_gaussian: %u\n\n"
+		"first_layer_mode: %u\n",
 		config->exp_path,
 		string_get_C_string(n_class_desc), string_get_C_string(s_exci_class_EE_desc), string_get_C_string(s_exci_class_EI_desc), string_get_C_string(s_inhi_class_IE_desc),
 		config->a_g_ee, config->a_g_ei, config->a_g_ie,
 		config->n_exci_neurons, config->n_inhi_neurons, config->n_chains,
 		config->n_exci_min_neurons, config->n_exci_max_neurons, config->n_connections_per_neuron,
 		config->duration_per_chain, config->pulse_duration, config->pulse_spike_frequency,
-		config->use_gamma, config->alpha, config->sigma
+		config->use_gamma, config->alpha, config->sigma, 
+		config->use_gaussian,
+		config->layer_mode
 	);
 	fclose(fp);
 
@@ -233,16 +257,26 @@ static inline Array* create_neurons(uint32_t n_neurons, NeuronClass* n_class) {
 	return neurons;
 }
 
-static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_config* config) {
-	Array* chains_input_neurons = array_create(config->n_chains, 0, sizeof(Array));
+static inline chains_data* create_chains(Array* neuron_pool, embedded_synfire_chains_config* config) {
+	chains_data* ch_data = malloc(sizeof(chains_data), "create_chains");
+	ch_data->chain_inputs = array_create(config->n_chains, 0, sizeof(Array));
+	ch_data->chain_lengths = array_create(config->n_chains, 0, sizeof(uint32_t));
 	uint32_t n_synapses = 0;
+	float n_layers_total = 0.0f;
 	for (uint32_t chain_idx = 0; chain_idx < config->n_chains; ++chain_idx) {
 		printf("Building chain %d\n", chain_idx);
 
 		// Original paper used n_k = m  for the first layer, but also n_k = (m + M) / 2 could be used
 		// and construct succesive layers until the number of neurons per
 		// layer is too big or too small
-		uint32_t n_k = config->n_exci_min_neurons; //(config->n_exci_max_neurons + config->n_exci_min_neurons) / 2;
+		uint32_t n_k = 0;
+		if (config->layer_mode == MIN_MODE) {
+			n_k = config->n_exci_min_neurons; //(config->n_exci_max_neurons + config->n_exci_min_neurons) / 2;
+		}
+		else if (config->layer_mode == MEAN_MODE) {
+			n_k = (config->n_exci_max_neurons + config->n_exci_min_neurons ) / 2;
+		}
+		
 		ArrayUint32* inhi_idxs_current = NULL;
 		ArrayUint32* exci_idxs_current = NULL;
 		ArrayUint32* exci_idxs_previous = array_create(1, 0, sizeof(uint32_t));
@@ -347,6 +381,9 @@ static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_c
 				// gamma_value = n_k - n + sigma * sqrt(alpha * n_k)
 				n_k = (int)((double)n_k + sigma * sqrt(alpha * n_k) - gamma_value);
 			}
+			else if (config->use_gaussian == TRUE) {
+				n_k = (int)((get_gaussian_value() * 0.5 + 1.0) * n_k);
+			}
 			else {
 				n_k = (uint32_t)(((double)rand() / (double)RAND_MAX) * (double)(config->n_exci_max_neurons - config->n_exci_min_neurons) + config->n_exci_min_neurons);
 			}
@@ -354,20 +391,25 @@ static inline Array* create_chains(Array* neuron_pool, embedded_synfire_chains_c
 			//printf("%lf\n", get_gamma_sample(0.1, 4.0, n));
 		}
 
+		// Get the number of layers for the experiment
+		n_layers_total += (float)n_layer;
+		array_append(ch_data->chain_lengths, &n_layer);
+
 		// free the last exci neurons of the chain
 		array_destroy(exci_idxs_current, NULL);
 
 		// save the chain inputs and do a shallow free
-		array_append(chains_input_neurons, input_neurons);
+		array_append(ch_data->chain_inputs, input_neurons);
 		free(input_neurons);
 	}
 
 	printf("Number of synapses created %u\n", n_synapses);
+	printf("Mean number of layers per chain: %f\n", n_layers_total / (float)(config->n_chains));
 
-	return chains_input_neurons;
+	return ch_data;
 }
 
-static inline Array* get_spikes_for_neuron_pool(uint32_t total_duration, uint32_t n_neurons, Array* chains_input_neurons, embedded_synfire_chains_config* config) {
+static inline Array* get_spikes_for_neuron_pool(uint32_t total_duration, uint32_t n_neurons, chains_data* ch_data, embedded_synfire_chains_config* config) {
 	// return an array where every element is a ArrayBool, the spike value for at each time stamp
 	Array* spikes_for_neurons = array_create(n_neurons, 0, sizeof(ArrayBool*));
 
@@ -384,11 +426,15 @@ static inline Array* get_spikes_for_neuron_pool(uint32_t total_duration, uint32_
 	uint32_t time = 0;
 	Array* chain_input_neurons = NULL;
 	BOOL spike = TRUE;
-	for (chain_idx = 0; chain_idx < chains_input_neurons->length; ++chain_idx) {
-		chain_input_neurons = (ArrayUint32*)array_get(chains_input_neurons, chain_idx);
+	uint32_t time_c = config->duration_per_chain;
+	uint32_t chain_length = 0;
+	for (chain_idx = 0; chain_idx < ch_data->chain_inputs->length; ++chain_idx) {
+		chain_input_neurons = (ArrayUint32*)array_get(ch_data->chain_inputs, chain_idx);
 
 		// find the time when the input for current chain should start
-		chain_time_pulse_start = config->duration_per_chain + chain_idx * config->duration_per_chain;
+		chain_time_pulse_start = time_c;
+		chain_length = *((uint32_t*)array_get(ch_data->chain_lengths, chain_idx));
+		time_c += 20 * chain_length;
 		for (time = chain_time_pulse_start; time < chain_time_pulse_start + config->pulse_duration; ++time) {
 
 			// to over each neurons and add spikes

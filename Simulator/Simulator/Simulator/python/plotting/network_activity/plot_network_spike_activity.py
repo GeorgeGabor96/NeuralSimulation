@@ -79,8 +79,8 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
     neuron_data = parse_array_file(array_file)
 
     # Dirty overwrite
-    new_max_times = 201
-    n_times = new_max_times - 1 #neuron_data['data'].shape[0]
+    new_max_times = 1001
+    n_times = neuron_data['data'].shape[0]
 
     data_for_layer = []
     lines = [dict(x_coord=[0, n_times], y_coord=[0, 0])]
@@ -99,7 +99,7 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
             neuron_data = parse_array_file(array_file)
 
             # Dirty filtering
-            neuron_data['data'] = neuron_data['data'][:new_max_times]
+            neuron_data['data'] = neuron_data['data']
 
             # need to extract the times of the spikes
             spike_times = np.where(neuron_data['data'] == 1)[0]
@@ -107,6 +107,9 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
             spike_y_coord = np.hstack((spike_y_coord, np.ones(spike_times.shape) * neuron_y_coord))
 
             neuron_y_coord += 1
+
+        # for romanian
+        layer['layer_name'] = layer['layer_name'].replace('layer', 'nivel')
 
         data_for_layer.append(dict(layer_name=layer['layer_name'],
                                    label_tick=int(neuron_y_coord - n_neurons / 2),
@@ -153,7 +156,7 @@ def plot_data_and_lines(data_for_layer, lines, config, file_name='network.png', 
     spikes_plotter = NetworkSpikesPlot(output_file=os.path.join(config['layers_folder'], file_name),
                                        title=config['title'],
                                        x_label=x_label,
-                                       y_label=y_label,
+                                       y_label=None,
                                        scatter=scatter)
 
     # plot the lines
@@ -162,7 +165,11 @@ def plot_data_and_lines(data_for_layer, lines, config, file_name='network.png', 
 
     # plot the layers
     for layer in data_for_layer:
-        spikes_plotter.plot_points(layer_name=layer['layer_name'],
+        if layer['layer_name'] == 'input':
+            layer_name = 'intrare'
+        else:
+            layer_name = 'activitate'
+        spikes_plotter.plot_points(layer_name=layer_name,
                                    label_tick=layer['label_tick'],
                                    x_coord=layer['spike_x_coord'],
                                    y_coord=layer['spike_y_coord'],
@@ -180,6 +187,9 @@ def plot_network_activity(config_file):
     # make data for each layer, also need the separation lines
     data_for_layer, lines = make_data_for_layer_and_lines(binaries_for_layer, config)
 
+
+    if 'title' not in config.keys():
+        config['title'] = None
     plot_data_and_lines(data_for_layer, lines, config, x_label='t (ms)', y_label='Nivel')
 
 

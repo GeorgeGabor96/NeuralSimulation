@@ -41,10 +41,10 @@ void cortical_slabs_exp_run_config(cortical_slabs_exp_config* config);
 
 void cortical_slabs_exp_run() {
 	cortical_slabs_exp_config config = { 0 };
-	config.exp_abs_path = "d:\\repositories\\Simulator\\experiments\\cortical_slabs\\final";
+	config.exp_abs_path = "d:\\repositories\\Simulator\\experiments\\cortical_slabs\\final_ro";
 
-	config.n_layers = 3;
-	config.n_neurons_layer_1_cnt = 13;
+	config.n_layers = 2;
+	config.n_neurons_layer_1_cnt = 8;
 	config.n_neurons_layer_1_steps = malloc(sizeof(uint32_t) * config.n_neurons_layer_1_cnt);
 	config.n_neurons_layer_1_steps[0] = 100;
 	config.n_neurons_layer_1_steps[1] = 150;
@@ -54,11 +54,6 @@ void cortical_slabs_exp_run() {
 	config.n_neurons_layer_1_steps[5] = 1500;
 	config.n_neurons_layer_1_steps[6] = 2000;
 	config.n_neurons_layer_1_steps[7] = 3000;
-	config.n_neurons_layer_1_steps[8] = 4000;
-	config.n_neurons_layer_1_steps[9] = 5000;
-	config.n_neurons_layer_1_steps[10] = 6000;
-	config.n_neurons_layer_1_steps[11] = 7000;
-	config.n_neurons_layer_1_steps[12] = 8000;
 	config.n_neurons_layer_2 = 100;
 	config.percent_excitatory = 0.8f;
 	config.percent_inhibitory = 0.2f;
@@ -69,7 +64,7 @@ void cortical_slabs_exp_run() {
 
 	// for non-refract
 	config.connectivity = 0.3f;
-	config.amplitude = 0.06f;
+	config.amplitude = 0.10f;
 
 	config.neuron_class = neuron_class_create("LIF_NEURON", LIF_NEURON);
 	//config.neuron_class = neuron_class_create("LIF_NEURON_REFRAC", LIF_REFRACTORY_NEURON);
@@ -79,7 +74,7 @@ void cortical_slabs_exp_run() {
 	//config.synapse_exci_class = synapse_class_create("CONDUCTANCE_10_TAU", 0.0, 1.0f, 10, 10, CONDUCTANCE_SYNAPSE, 1);
 	//config.synapse_inhi_class = synapse_class_create("CONDUCTANCE_10_TAU", 0.0, 1.0f, 10, 10, CONDUCTANCE_SYNAPSE, 1);
 
-	config.example_duration = 500;
+	config.example_duration = 300;
 	config.spike_frequency = 0.005f;  // 5HZ per second similar to the cortex
 
 	config.use_dump_net_callback = TRUE;
@@ -302,7 +297,7 @@ Growing network experiment
 ********************************************/
 void cortical_slabs_exp_growing_net_run() {
 	cortical_slabs_exp_growing_net_config config = { 0 };
-	config.exp_abs_path = "d:\\repositories\\Simulator\\experiments\\cortical_slabs\\final";
+	config.exp_abs_path = "d:\\repositories\\Simulator\\experiments\\cortical_slabs\\final_ro";
 
 	config.n_neurons_start = 100;
 	config.n_neurons_scale_step = 1.5f;
@@ -310,21 +305,21 @@ void cortical_slabs_exp_growing_net_run() {
 	config.percent_inhibitory = 0.2f;
 	// for refract
 	config.connectivity = 0.3f;
-	config.amplitude = 0.1f;
+	config.amplitude = 0.11f;
 
 	// for non-refract
 	//config.connectivity = 0.3f;
-	//config.amplitude = 0.10f;
+	//config.amplitude = 0.13f;
 
-	//config.neuron_class = neuron_class_create("LIF_NEURON", LIF_NEURON);
-	config.neuron_class = neuron_class_create("LIF_NEURON_REFRAC", LIF_REFRACTORY_NEURON);
+	config.neuron_class = neuron_class_create("LIF_NEURON", LIF_NEURON);
+	//config.neuron_class = neuron_class_create("LIF_NEURON_REFRAC", LIF_REFRACTORY_NEURON);
 
-	config.synapse_exci_class = synapse_class_create("AMPA", 0.0f, 1.0f, 1, 2, VOLTAGE_DEPENDENT_SYNAPSE, 1);
-	config.synapse_inhi_class = synapse_class_create("GABA_A", -90.0f, 1.0f, 6, 2, VOLTAGE_DEPENDENT_SYNAPSE, 1);
+	config.synapse_exci_class = synapse_class_create("AMPA", 0.0f, config.amplitude, 1, 2, VOLTAGE_DEPENDENT_SYNAPSE, 1);
+	config.synapse_inhi_class = synapse_class_create("GABA_A", -90.0f, config.amplitude, 6, 2, VOLTAGE_DEPENDENT_SYNAPSE, 1);
 	//config.synapse_exci_class = synapse_class_create("CONDUCTANCE_10_TAU", 0.0, 1.0f, 10, 10, CONDUCTANCE_SYNAPSE, 1);
 	//config.synapse_inhi_class = synapse_class_create("CONDUCTANCE_10_TAU", 0.0, 1.0f, 10, 10, CONDUCTANCE_SYNAPSE, 1);
 
-	config.example_duration = 500;
+	config.example_duration = 300;
 	config.spike_frequency = 0.005f;  // 5HZ per second similar to the cortex
 
 	config.use_dump_net_callback = TRUE;
@@ -356,7 +351,7 @@ void ccortical_slabs_exp_growing_net_run_config(cortical_slabs_exp_growing_net_c
 	cortical_slabs_exp_growing_net_dump_config(config_file, config);
 
 	network_sequential_n_layers_config net_config = { 0 };
-	net_config.n_layers = 10;
+	net_config.n_layers = 7;
 	net_config.n_exci_neurons = (int)((float)(config->n_neurons_start) * config->percent_excitatory);
 	net_config.n_inhi_neurons = (int)((float)(config->n_neurons_start) * config->percent_inhibitory);
 	net_config.n_neurons_scale_step = config->n_neurons_scale_step;
@@ -364,10 +359,8 @@ void ccortical_slabs_exp_growing_net_run_config(cortical_slabs_exp_growing_net_c
 	net_config.synapse_weight = 1.0f;
 	net_config.n_class = neuron_class_copy(config->neuron_class);
 	net_config.s_exci_class = synapse_class_copy(config->synapse_exci_class);
-	net_config.s_exci_class->A = config->amplitude;
 	net_config.s_inhi_class = synapse_class_copy(config->synapse_inhi_class);
-	net_config.s_inhi_class->A = config->amplitude;
-	Network* net = network_sequential_n_layers(&net_config);
+	Network* net = network_sequential_n_layers_synapse_normalization(&net_config);
 	network_summary(net);
 	// create data
 	DataGenerator* data_gen = data_generator_random_spikes_create(1, net, config->spike_frequency, config->example_duration);

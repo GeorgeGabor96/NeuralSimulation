@@ -110,6 +110,8 @@ def plot_network_population_coding(config_file):
     # make data for each layer, also need the separation lines
     data_for_layer, lines = make_data_for_layer_and_lines(binaries_for_layer, config)
 
+    if 'title' not in config.keys():
+        config['title'] = None
     plot_data_and_lines(data_for_layer, lines, config, file_name='cummulative_spikes.png')
 
 

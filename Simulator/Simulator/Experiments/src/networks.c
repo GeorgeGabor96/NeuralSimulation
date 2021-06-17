@@ -116,6 +116,95 @@ Network* network_sequential_n_layers(network_sequential_n_layers_config* config)
 }
 
 
+static inline Array* get_array_of_synapses_normalized(uint32_t n_s_classes, float s_factor, SynapseClass* s_class_base, Network* net, char* s_class_name_template) {
+	Array* s_classes = array_create(n_s_classes, n_s_classes, sizeof(SynapseClass*));
+
+	char synapse_class_name[256] = { 0 };
+	uint32_t i = 0;
+	float amplitude = s_class_base->A;
+	SynapseClass* s_class = NULL;
+
+	array_set(s_classes, 0, &s_class_base);
+	for (i = 1; i < n_s_classes; ++i) {
+		memset(synapse_class_name, 0, 256);
+		sprintf(synapse_class_name, s_class_name_template, i);
+		s_class = synapse_class_copy(s_class_base);
+		s_class->A = amplitude * s_factor;
+		s_class->name = string_create(synapse_class_name);
+		array_set(s_classes, i, &s_class);
+		amplitude = s_class->A;
+	}
+
+	for (i = 0; i < n_s_classes; ++i) {
+		s_class = *((SynapseClass**)array_get(s_classes, i));
+		printf("%f\n", s_class->A);
+		network_add_synapse_class(net, s_class);
+	}
+
+	return s_classes;
+}
+
+Network* network_sequential_n_layers_synapse_normalization(network_sequential_n_layers_config* config) {
+	// create network
+	Network* net = network_create();
+	network_add_neuron_class(net, config->n_class);
+
+	NeuronClass* n_class = network_get_neuron_class_by_string(net, config->n_class->name);
+
+	uint32_t i = 0;
+	Layer* exci_layer_i = NULL;
+	Layer* exci_layer_i_m1 = NULL;
+	SynapseClass* exci_s_class = NULL;
+	Layer* inhi_layer_i = NULL;
+	Layer* inhi_layer_i_m1 = NULL;
+	SynapseClass* inhi_s_class = NULL;
+	Array* excitatory_layers = get_array_of_layers(config->n_layers, config->n_exci_neurons, config->n_neurons_scale_step, n_class, "nivel%.2d");
+	Array* inhibitory_layers = get_array_of_layers(config->n_layers - 1, config->n_inhi_neurons, config->n_neurons_scale_step, n_class, "nivel%.2d_inhi");
+
+	// this will keep pointers to the actual synapse classes
+	Array* excitatory_synapses = get_array_of_synapses_normalized(config->n_layers - 1, 1 / config->n_neurons_scale_step, config->s_exci_class, net, "exci_class_%u");
+	Array* inhibitory_synapses = get_array_of_synapses_normalized(config->n_layers - 1, 1 / config->n_neurons_scale_step, config->s_inhi_class, net, "inhi_class_%u");
+
+	// connect the layers
+	for (i = 1; i < config->n_layers - 1; ++i) {
+		exci_layer_i = (Layer*)array_get(excitatory_layers, i);
+		exci_layer_i_m1 = (Layer*)array_get(excitatory_layers, i - 1);
+		exci_s_class = *((SynapseClass**)array_get(excitatory_synapses, i - 1));
+		inhi_layer_i = (Layer*)array_get(inhibitory_layers, i);
+		inhi_layer_i_m1 = (Layer*)array_get(inhibitory_layers, i - 1);
+		inhi_s_class = *((SynapseClass**)array_get(inhibitory_synapses, i - 1));
+
+
+		layer_add_input_layer(exci_layer_i, exci_layer_i_m1, exci_s_class, config->connectivity, config->synapse_weight);
+		layer_add_input_layer(exci_layer_i, inhi_layer_i_m1, inhi_s_class, config->connectivity, config->synapse_weight);
+		layer_add_input_layer(inhi_layer_i, exci_layer_i_m1, exci_s_class, config->connectivity, config->synapse_weight);
+		layer_add_input_layer(inhi_layer_i, inhi_layer_i_m1, inhi_s_class, config->connectivity, config->synapse_weight);
+	}
+	exci_layer_i = (Layer*)array_get(excitatory_layers, i);
+	exci_layer_i_m1 = (Layer*)array_get(excitatory_layers, i - 1);
+	exci_s_class = *((SynapseClass**)array_get(excitatory_synapses, i - 1));
+	inhi_layer_i_m1 = (Layer*)array_get(inhibitory_layers, i - 1);
+	inhi_s_class = *((SynapseClass**)array_get(inhibitory_synapses, i - 1));
+
+	layer_add_input_layer(exci_layer_i, exci_layer_i_m1, exci_s_class, config->connectivity, config->synapse_weight);
+	layer_add_input_layer(exci_layer_i, inhi_layer_i_m1, inhi_s_class, config->connectivity, config->synapse_weight);
+
+	// add layers in network
+	add_layers_in_net_helper(net, excitatory_layers, inhibitory_layers, FALSE);
+
+	// release the dummy memory
+	array_destroy(excitatory_layers, NULL);
+	array_destroy(inhibitory_layers, NULL);
+	array_destroy(excitatory_synapses, NULL);
+	array_destroy(inhibitory_synapses, NULL);
+
+	// compile and show the network
+	network_compile(net);
+
+	return net;
+}
+
+
 Network* network_sequential_ring_n_layers(network_sequential_n_layers_config* config) {
 	// create network
 	Network* net = network_create();

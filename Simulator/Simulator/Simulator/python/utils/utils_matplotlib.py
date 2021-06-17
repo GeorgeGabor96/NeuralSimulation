@@ -91,7 +91,7 @@ class NetworkSpikesPlot:
             title of the plot
         """
         reset_plot()
-        plt.figure(figsize=(10, 10))
+        plt.figure(figsize=(15, 10))
         self.scatter = scatter
         self.output_file = output_file
         self.title = title
@@ -155,7 +155,8 @@ class NetworkSpikesPlot:
         plt.xlabel(self.xlabel, fontsize=25)
         set_x_ticks(self.min_x_value, self.max_x_value)
 
-        plt.ylabel(self.ylabel, fontsize=25)
+        if self.ylabel is not None:
+            plt.ylabel(self.ylabel, fontsize=25)
         plt.yticks(ticks=self.y_ticks, labels=self.layer_names, fontsize=14)
 
         plt.title(self.title, fontsize=25)
