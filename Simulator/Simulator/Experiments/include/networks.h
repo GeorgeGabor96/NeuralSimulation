@@ -21,5 +21,6 @@ typedef struct network_sequential_n_layers_config {
 
 Network* network_sequential_n_layers(network_sequential_n_layers_config* config);
 Network* network_sequential_ring_n_layers(network_sequential_n_layers_config* config);
+Network* network_sequential_n_layers_synapse_normalization(network_sequential_n_layers_config* config);
 
 #endif // __NETWORKS_H__

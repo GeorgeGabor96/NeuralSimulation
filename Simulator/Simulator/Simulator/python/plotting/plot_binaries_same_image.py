@@ -21,6 +21,9 @@ def plot_binaries(args, config):
     datas = []
     labels = []
 
+    if 'title' not in config.keys():
+        config['title'] = None
+
     for i in range(len(config['binaries'])):
         binary_file = os.path.join(config['common_path'], config['binaries'][i])
         sim_array = parse_array_file(binary_file)

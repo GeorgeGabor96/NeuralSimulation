@@ -376,6 +376,7 @@ ArrayFloat* layer_get_psc(Layer* layer) {
 	ArrayFloat* currents = NULL;
 	Neuron* neuron = NULL;
 	uint32_t i = 0;
+	float PSC = 0.0f;
 	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
 	
 	currents = array_create(layer->neurons.length, 0, sizeof(float));
@@ -383,7 +384,49 @@ ArrayFloat* layer_get_psc(Layer* layer) {
 	for (i = 0; i < layer->neurons.length; ++i) {
 		neuron = (Neuron*)array_get(&(layer->neurons), i);
 		check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
-		array_append(currents, &(neuron->PSC));
+		PSC = neuron->EPSC + neuron->IPSC;
+		array_append(currents, &PSC);
+	}
+
+	return currents;
+ERROR
+	if (currents != NULL) array_destroy(currents, NULL);
+	return NULL;
+}
+
+
+ArrayFloat* layer_get_epsc(Layer* layer) {
+	ArrayFloat* currents = NULL;
+	Neuron* neuron = NULL;
+	uint32_t i = 0;
+	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+
+	currents = array_create(layer->neurons.length, 0, sizeof(float));
+	check(array_is_valid(currents) == TRUE, invalid_argument("currents"));
+	for (i = 0; i < layer->neurons.length; ++i) {
+		neuron = (Neuron*)array_get(&(layer->neurons), i);
+		check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
+		array_append(currents, &(neuron->EPSC));
+	}
+
+	return currents;
+ERROR
+	if (currents != NULL) array_destroy(currents, NULL);
+	return NULL;
+}
+
+ArrayFloat* layer_get_ipsc(Layer* layer) {
+	ArrayFloat* currents = NULL;
+	Neuron* neuron = NULL;
+	uint32_t i = 0;
+	check(layer_is_valid(layer) == TRUE, invalid_argument("layer"));
+
+	currents = array_create(layer->neurons.length, 0, sizeof(float));
+	check(array_is_valid(currents) == TRUE, invalid_argument("currents"));
+	for (i = 0; i < layer->neurons.length; ++i) {
+		neuron = (Neuron*)array_get(&(layer->neurons), i);
+		check(neuron_is_valid(neuron) == TRUE, invalid_argument("neuron"));
+		array_append(currents, &(neuron->IPSC));
 	}
 
 	return currents;
