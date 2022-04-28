@@ -1,25 +1,25 @@
-layers_folder: d:\repositories\Simulator\experiments\synfire_chain_callback\r_1_connectivity_0.5000_amplitude_0.1000\coonectivity_0.5000_amplitude_0.1000\
+layers_folder: d:\repositories\Simulator\experiments\rerun_probability_plots\debug_80_20_nice\t0\conectivitate_0.2250_amplitudine_0.7000\
 layers:
-- layer01
-- layer01_inhi
-- layer02
-- layer02_inhi
-- layer03
-- layer03_inhi
-- layer04
-- layer04_inhi
-- layer05
-- layer05_inhi
-- layer06
-- layer06_inhi
-- layer07
-- layer07_inhi
-- layer08
-- layer08_inhi
-- layer09
-- layer09_inhi
-- layer10
-title: activity
+- nivel01
+- nivel01_inhi
+- nivel02
+- nivel02_inhi
+- nivel03
+- nivel03_inhi
+- nivel04
+- nivel04_inhi
+- nivel05
+- nivel05_inhi
+- nivel06
+- nivel06_inhi
+- nivel07
+- nivel07_inhi
+- nivel08
+- nivel08_inhi
+- nivel09
+- nivel09_inhi
+- nivel10
+title: "connectivity=0.225 amplitude=0.7"
 binaries_prefix: spikes
 color_for_inner_substring:
   inhi: blue

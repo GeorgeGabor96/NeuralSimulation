@@ -84,8 +84,8 @@ def make_space_plot(config_file):
     scatter_plot_contour(output_file=os.path.join(config['experiments_folder'], 'synfire_chain_space_plot.png'),
                  groups=points_for_state_rom,
                  title=None,  #config['title'],
-                 x_label='conectivitate',  #config['variable1'],
-                 y_label='amplitudine')  #config['variable2'])
+                 x_label=config['variable1'],  #config['variable1'],
+                 y_label=config['variable2'])  #config['variable2'])
 
 
 

@@ -40,7 +40,7 @@ typedef struct NeuronClass {
 #define LIF_U_REST	-65.0f 
 #define LIF_R		10.0f
 #define LIF_C		1.0f
-#define LIF_REFRACT (uint32_t)5
+#define LIF_REFRACT (uint32_t)2
 
 /*
 1. neuron_class != NULL

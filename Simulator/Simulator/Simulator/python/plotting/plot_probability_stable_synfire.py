@@ -12,7 +12,7 @@ from plot_space_synfire_chain import make_space_plot
 
 from utils.utils_config import parse_yaml_config
 from utils.utils_matplotlib import scatter_plot_with_colorscheme
-from utils.utils_matplotlib import histogram_plot
+from utils.utils_matplotlib import histogram_plot, bar_chart
 from utils.utils_matplotlib import scatter_plot_interpolated_with_colorscheme
 
 
@@ -155,44 +155,56 @@ if __name__ == '__main__':
     scatter_plot_interpolated_with_colorscheme(os.path.join(config['trials_folder'], 'rations.png'),
                                   x_values, y_values, ratio_means,
                                   title=None,  #'Raportul mediu',
-                                  x_label='conectivitate',
-                                  y_label='amplitudine',
+                                  x_label=config['variable1'],
+                                  y_label=config['variable2'],
                                   cmap='jet',
                                   nlines=500)
 
     scatter_plot_interpolated_with_colorscheme(os.path.join(config['trials_folder'], 'stable_p.png'),
                                   x_values, y_values, stable_probs,
                                   title=None,  #'Probabilitatea de stabilitate',  #'Probability of stable activity',
-                                  x_label='conectivitate',  #config['variable1'],
-                                  y_label='amplitudine',  #config['variable2'])
+                                  x_label=config['variable1'],  #config['variable1'],
+                                  y_label=config['variable2'],  #config['variable2'])
                                   nlines=20)
 
     scatter_plot_interpolated_with_colorscheme(os.path.join(config['trials_folder'], 'epilepsy_p.png'),
                                   x_values, y_values, epilepsy_probs,
                                   title=None,  #'Probabilitatea de amplificare',  #'Probability of epileptic activity',
-                                  x_label='conectivitate',  #config['variable1'],
-                                  y_label='amplitudine',  #config['variable2'])
+                                  x_label=config['variable1'],  #config['variable1'],
+                                  y_label=config['variable2'],  #config['variable2'])
                                   nlines=20)
 
     scatter_plot_interpolated_with_colorscheme(os.path.join(config['trials_folder'], 'no_activity_p.png'),
                                   x_values, y_values, no_activity_probs,
                                   title=None,  #'Probabilitatea de supresie',   #'Probability of no activity',
-                                  x_label='conectivitate',  #config['variable1'],
-                                  y_label='amplitudine',  #config['variable2'])
+                                  x_label=config['variable1'],  #config['variable1'],
+                                  y_label=config['variable2'],  #config['variable2'])
                                   nlines=20)
 
     scatter_plot_interpolated_with_colorscheme(os.path.join(config['trials_folder'], 'unknown_p.png'),
                                   x_values, y_values, unknown_probs,
                                   title=None,  #'Probability of unknown',
-                                  x_label='conectivitate',  #config['variable1'],
-                                  y_label='amplitudine',  #config['variable2'])
+                                  x_label=config['variable1'],  #config['variable1'],
+                                  y_label=config['variable2'],  #config['variable2'])
                                   nlines=20)
 
     # draw stable probability histogram
+    hist_x_data, hist_y_data = np.unique(stable_probs, return_counts=True)
+    percentages = hist_y_data / stable_probs.shape[0]
+    bar_chart(output_file=os.path.join(config['trials_folder'], 'stable_histogram_bars.png'),
+                x_values=hist_x_data,
+                y_values=hist_y_data,
+                bar_values=percentages,
+                x_label='Probability',
+                y_label='Count')
     histogram_plot(output_file=os.path.join(config['trials_folder'], 'stable_histogram.png'),
                    data=stable_probs,
-                   x_label='Propabilitate',
-                   y_label='Aparitii')
+                   x_label='Probability',
+                   y_label='Count')
     with open(os.path.join(config['trials_folder'], 'stable_histogram_stats.txt'), 'w') as fp:
         fp.write('Mean:' + str(np.mean(stable_probs)) + '\n')
         fp.write('STD:' + str(np.std(stable_probs)) + '\n')
+        fp.write('Chance - Occurances - Percentage\n')
+        for i in range(hist_x_data.shape[0]):
+            fp.write(str(hist_x_data[i]) + ' - ' + str(hist_y_data[i]) + ' - ' + str(percentages[i]) + '\n')
+        fp.write('Total cases: ' + str(np.sum(hist_y_data)) + '\n')

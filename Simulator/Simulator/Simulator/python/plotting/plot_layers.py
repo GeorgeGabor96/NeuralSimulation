@@ -24,15 +24,15 @@ if __name__ == '__main__':
         # for romanian
         sim_array = dict()
         if sim_array_aux['name'] == 'voltage':
-            sim_array['name'] = 'u (mV)'
+            sim_array['name'] = 'voltage (mV)'
         elif sim_array_aux['name'] == 'spikes':
-            sim_array['name'] = 'descarcari'
+            sim_array['name'] = 'spikes'
         elif sim_array_aux['name'] == 'PSC':
-            sim_array['name'] = 'CPS (nA)'
+            sim_array['name'] = 'PSC (nA)'
         elif sim_array_aux['name'] == 'IPSC':
-            sim_array['name'] = 'CPSI (nA)'
+            sim_array['name'] = 'IPSC (nA)'
         elif sim_array_aux['name'] == 'EPSC':
-            sim_array['name'] = 'CPSE (nA)'
+            sim_array['name'] = 'EPSC (nA)'
         sim_array['data'] = sim_array_aux['data']
         n_times = 201
 
@@ -42,6 +42,6 @@ if __name__ == '__main__':
         line_plot(output_file=os.path.join(output_folder, file_name),
                   y_data=[sim_array['data'][:n_times]],
                   line_label=None,  #[sim_array['name']],
-                  x_label='t (ms)',
+                  x_label='time (ms)',
                   y_label=sim_array['name'],
                   title=None)  #file_name.split('.')[0])

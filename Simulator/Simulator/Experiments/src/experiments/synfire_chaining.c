@@ -50,21 +50,21 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 
 void synfire_space_exploration_connectivity_amplitude() {
 	connectivity_amplitude_space_exp config = { 0 };
-	config.exp_abs_path = "d:\\repositories\\Simulator\\experiments\\experiments_imrpovements_final\\synfire_chains\\synfire_plots\\refract_ro";
+	config.exp_abs_path = "d:\\repositories\\Simulator\\experiments\\rerun_probability_plots\\debug_90_10_nice_2_refract";
 	
-	config.connectivity_start = 0.35f;
-	config.connectivity_end = 0.35f;
+	config.connectivity_start = 0.025f;
+	config.connectivity_end = 1.0f;
 	config.connectivity_inc = 0.025f;
 
-	config.amplitude_start = 0.1f;
-	config.amplitude_end = 0.2f;
+	config.amplitude_start = 0.025f;
+	config.amplitude_end = 1.0f;
 	config.amplitude_inc = 0.025f;
 
 	config.min_ratio = 0.5f;
 	config.max_ratio = 2.0f;
 
-	config.n_excitatory = 80;
-	config.n_inhibitory = 20;
+	config.n_excitatory = 90;
+	config.n_inhibitory = 10;
 
 	//config.neuron_class = neuron_class_create("LIF_NEURON", LIF_NEURON);
 	config.neuron_class = neuron_class_create("LIF_NEURON_REFRAC", LIF_REFRACTORY_NEURON);
@@ -74,14 +74,14 @@ void synfire_space_exploration_connectivity_amplitude() {
 	//config.synapse_exci_class = synapse_class_create("CONDUCTANCE_10_TAU", 0.0, 1.0f, 10, 10, CONDUCTANCE_SYNAPSE, 1);
 	//config.synapse_inhi_class = synapse_class_create("CONDUCTANCE_10_TAU", 0.0, 1.0f, 10, 10, CONDUCTANCE_SYNAPSE, 1);
 
-	config.n_trials = 1;
+	config.n_trials = 6;
 
-	config.example_duration = 1000;
+	config.example_duration = 300;
 	config.pulse_duration = 20;
 	config.between_pulse_spike_frequency = 0.0f;
 	config.pulse_spike_frequency = 0.05f;
 
-	config.use_dump_net_callback = TRUE;
+	config.use_dump_net_callback = FALSE;
 	config.use_synfire_ring = FALSE;
 
 	synfire_space_exploration_connectivity_amplitude_run_config(&config);

@@ -1,0 +1,26 @@
+binaries_prefix: spikes
+color_for_inner_substring:
+  inhi: blue
+default_color: red
+layers:
+- nivel01
+- nivel01_inhi
+- nivel02
+- nivel02_inhi
+- nivel03
+- nivel03_inhi
+- nivel04
+- nivel04_inhi
+- nivel05
+- nivel05_inhi
+- nivel06
+- nivel06_inhi
+- nivel07
+- nivel07_inhi
+- nivel08
+- nivel08_inhi
+- nivel09
+- nivel09_inhi
+- nivel10
+layers_folder: d:\repositories\Simulator\experiments\experiments_imrpovements_final\synfire_chains\synfire_plots\refract_ro\t0\conectivitate_0.3500_amplitudine_0.0250
+title: conectivitate_0.3500_amplitudine_0.0250

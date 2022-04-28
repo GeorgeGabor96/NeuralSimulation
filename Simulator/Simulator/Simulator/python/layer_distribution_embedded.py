@@ -1,39 +1,10 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from utils.utils_matplotlib import set_x_ticks, set_y_ticks
+from utils.utils_matplotlib import set_x_ticks, set_y_ticks, bar_chart
 
-input_file = 'd:/repositories/Simulator/experiments/embedded_synchains/final_ro/exp_2000n_1000_chains_gaussian_from_min_no_limit/stdout.txt'
-output_folder = 'd:/repositories/Simulator/experiments/embedded_synchains/final_ro/exp_2000n_1000_chains_gaussian_from_min_no_limit'
-
-
-def bar_chart(output_file, x_values, y_values, bar_values):
-    x_values_min = x_values.min()
-    x_values_max = x_values.max()
-    plt.figure(figsize=(15, 10))
-    set_x_ticks(n_layers_min, n_layers_max, n_ticks=x_values_max - x_values_min)
-    set_y_ticks(0, n_layers_count.max())
-    plt.xlabel('Numar nivele', fontsize=25)
-    plt.ylabel('Numar aparitii', fontsize=25)
-
-    graph = plt.bar(x_values, y_values)
-
-    i = 0
-    for p in graph:
-        width = p.get_width()
-        height = p.get_height()
-        x, y = p.get_xy()
-
-        plt.text(x + width/2,
-                 y + height * 1.01,
-                 str(bar_values[i]),
-                 ha='center',
-                 weight='bold',
-                 fontdict={'size':13})
-        i += 1
-
-    plt.tight_layout()
-    plt.savefig(output_file, dpi=200)
+input_file = 'd:/repositories/Simulator/experiments/embedded_synchains/final_ro/exp_2000n_1000_chains_gaussian_from_min_no_limit_new/stdout.txt'
+output_folder = 'd:/repositories/Simulator/experiments/embedded_synchains/final_ro/exp_2000n_1000_chains_gaussian_from_min_no_limit_new'
 
 
 with open(input_file, 'r') as fp:
@@ -86,7 +57,7 @@ total_chains = np.sum(n_layers_count)
 for i in range(n_layers_count.shape[0]):
     percentages.append(str(n_layers_count[i] / total_chains) + '%')
 
-bar_chart(os.path.join(output_folder, 'layers_distribution.png'), n_layers_values, n_layers_count, percentages)
+bar_chart(os.path.join(output_folder, 'layers_distribution.png'), n_layers_values, n_layers_count, percentages, x_label='Numar nivele', y_label='Numar aparitii')
 with open(os.path.join(output_folder, 'layers_distribution.txt'), 'w') as fp:
     fp.write('N_layers - Occurances - Percentage\n')
     for i in range(n_layers_values.shape[0]):

@@ -89,6 +89,8 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
 
         neuron_y_coord += len(layer['binaries'])
 
+        # for romanian
+        layer['layer_name'] = layer['layer_name'].replace('layer', 'nivel')
         data_for_layer.append(dict(layer_name=layer['layer_name'],
                                    label_tick=int(neuron_y_coord - n_neurons / 2),
                                    spike_x_coord=x_points,
@@ -112,7 +114,7 @@ def plot_network_population_coding(config_file):
 
     if 'title' not in config.keys():
         config['title'] = None
-    plot_data_and_lines(data_for_layer, lines, config, file_name='cummulative_spikes.png')
+    plot_data_and_lines(data_for_layer, lines, config, x_label='t (ms)', y_label='Nivel', file_name='cummulative_spikes.png')
 
 
 if __name__ == '__main__':

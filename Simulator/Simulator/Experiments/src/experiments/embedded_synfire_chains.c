@@ -73,7 +73,7 @@ double get_gaussian_value() {
 
 void embedded_synfire_chains_exp() {
 	embedded_synfire_chains_config config = { 0 };
-	config.exp_path = "d:\\repositories\\Simulator\\experiments\\embedded_synchains\\final_ro\\exp_2000n_15_chains_uniform_max_10\\";
+	config.exp_path = "d:\\repositories\\Simulator\\experiments\\embedded_synchains\\final_ro\\exp_2000n_1000_chains_gaussian_from_min_no_limit_new\\";
 	config.n_class = neuron_class_create("LIF_REFRACT", LIF_REFRACTORY_NEURON);
 	os_mkdir(config.exp_path);
 	config.a_g_ee = 0.025f; //0.0105f;
@@ -88,12 +88,12 @@ void embedded_synfire_chains_exp() {
 	config.n_exci_max_neurons = M;
 	config.n_connections_per_neuron = m;
 	config.n_inhi_neurons = n / 4;
-	config.n_chains = 15;
+	config.n_chains = 1000;
 	config.duration_per_chain = 200;
 	config.pulse_duration = 20;
 	config.pulse_spike_frequency = 0.1f;
 	config.use_gamma = FALSE;
-	config.use_gaussian = FALSE;
+	config.use_gaussian = TRUE;
 	config.layer_mode = MIN_MODE;
 	config.alpha = 0.1;
 	config.sigma = 4.0;
@@ -131,7 +131,7 @@ static inline void embedded_synfire_chains_exp_run(embedded_synfire_chains_confi
 		}
 		printf("\n");
 	}
-
+	return;
 	// get the inputs
 	uint32_t total_duration = config->duration_per_chain;
 	for (uint32_t chain_idx = 0; chain_idx < ch_data->chain_lengths->length; ++chain_idx) {
@@ -287,7 +287,7 @@ static inline chains_data* create_chains(Array* neuron_pool, embedded_synfire_ch
 		while (n_k >= config->n_exci_min_neurons && n_k <= config->n_exci_max_neurons) {
 			// For this experiment where I checked the results visualy I just limited the number of layer to be at most 10
 			// for simplicity
-			if (n_layer > 9) break;
+			//if (n_layer > 9) break;
 			n_layer++;
 
 			printf("Build layer with %d exci neurons\n", n_k);
@@ -382,7 +382,8 @@ static inline chains_data* create_chains(Array* neuron_pool, embedded_synfire_ch
 				n_k = (int)((double)n_k + sigma * sqrt(alpha * n_k) - gamma_value);
 			}
 			else if (config->use_gaussian == TRUE) {
-				n_k = (int)((get_gaussian_value() * 0.5 + 1.0) * n_k);
+				//n_k = (int)((get_gaussian_value() * 0.5 + 1.0) * n_k);
+				n_k = (int)get_gaussian_sample((double)n_k, config->sigma * sqrt(n_k));
 			}
 			else {
 				n_k = (uint32_t)(((double)rand() / (double)RAND_MAX) * (double)(config->n_exci_max_neurons - config->n_exci_min_neurons) + config->n_exci_min_neurons);

@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 
 
 def reset_plot():
@@ -28,7 +29,8 @@ def set_x_ticks(x_min, x_max, n_ticks=8, rotation=0):
     """
     x_step = (x_max - x_min) / float(n_ticks)
     if x_step != 0.0:
-        plt.xticks(np.arange(start=x_min, stop=x_max + x_step, step=x_step), rotation=rotation, fontsize=15)
+        #plt.gca().xaxis.set_major_formatter(mticker.FormatStrFormatter('%.3f'))
+        plt.xticks(np.arange(start=x_min, stop=x_max + x_step, step=x_step), rotation=rotation, fontsize=25)
 
 
 def set_y_ticks(y_min, y_max, n_ticks=8, rotation=0):
@@ -47,7 +49,8 @@ def set_y_ticks(y_min, y_max, n_ticks=8, rotation=0):
     """
     y_step = (y_max - y_min) / float(n_ticks)
     if y_step != 0.0:
-        plt.yticks(np.arange(start=y_min, stop=y_max + y_step, step=y_step), rotation=rotation, fontsize=15)
+        plt.gca().yaxis.set_major_formatter(mticker.FormatStrFormatter('%.3f'))
+        plt.yticks(np.arange(start=y_min, stop=y_max + y_step, step=y_step), rotation=rotation, fontsize=25)
 
 
 def set_legend():
@@ -91,7 +94,7 @@ class NetworkSpikesPlot:
             title of the plot
         """
         reset_plot()
-        plt.figure(figsize=(15, 10))
+        plt.figure(figsize=(10, 10))
         self.scatter = scatter
         self.output_file = output_file
         self.title = title
@@ -152,14 +155,14 @@ class NetworkSpikesPlot:
         """
         Plots the network activity plot based on the info gathered in the for the @plot_line and @plot_points
         """
-        plt.xlabel(self.xlabel, fontsize=25)
+        plt.xlabel(self.xlabel, fontsize=30)
         set_x_ticks(self.min_x_value, self.max_x_value)
 
         if self.ylabel is not None:
-            plt.ylabel(self.ylabel, fontsize=25)
-        plt.yticks(ticks=self.y_ticks, labels=self.layer_names, fontsize=14)
+            plt.ylabel(self.ylabel, fontsize=30)
+        plt.yticks(ticks=self.y_ticks, labels=self.layer_names, fontsize=19)
 
-        plt.title(self.title, fontsize=25)
+        plt.title(self.title, fontsize=30)
 
         plt.axis('tight')
         os.makedirs(os.path.split(self.output_file)[0], exist_ok=True)
@@ -198,7 +201,7 @@ def line_plot(output_file, y_data, x_label, y_label, title=None, x_data=None, li
         if str it will be put in a list
         each element represents the label for one line
     """
-    plt.figure(figsize=(15, 10))
+    plt.figure(figsize=(17, 10))
 
     if isinstance(y_data, list) is False:
         y_data = [y_data]
@@ -233,9 +236,9 @@ def line_plot(output_file, y_data, x_label, y_label, title=None, x_data=None, li
 
     plt.grid(True, linestyle='--')
     if title is not None:
-        plt.title(title, fontsize=20)
-    plt.xlabel(x_label, fontsize=25)
-    plt.ylabel(y_label, fontsize=25)
+        plt.title(title, fontsize=30)
+    plt.xlabel(x_label, fontsize=40)
+    plt.ylabel(y_label, fontsize=40)
     plt.tight_layout()
 
     plt.savefig(output_file, dpi=100)
@@ -378,12 +381,12 @@ def histogram_plot(output_file, data, x_label, y_label, title=None):
     """
     plt.figure(figsize=(15, 10))
 
-    plt.hist(data, bins=10)
+    plt.hist(data, bins=11)
 
     if title is not None:
         plt.title(title, fontsize=35)
 
-    set_x_ticks(0, 1.0, 10)
+    set_x_ticks(0, 1.0, 11)
     plt.xlabel(x_label, fontsize=30)
     plt.ylabel(y_label, fontsize=30)
     plt.tight_layout()
@@ -442,18 +445,23 @@ def scatter_plot_interpolated_with_colorscheme(output_file, x_data, y_data, c_da
     zi = np.clip(zi, 0, c_data.max())
     plt.contourf(xi, yi, zi, nlines, cmap=cmap)
     if use_colorbar is True:
-        plt.colorbar()
+        cbar = plt.colorbar()
+        c_data_min = c_data.min()
+        c_data_max = c_data.max()
+        cbar.set_ticks(np.linspace(c_data_min, c_data_max, 11))
+        ticks = np.linspace(c_data_min, c_data_max, 11)
+        ticks = ['{:.2f}'.format(ticks[i]) for i in range(ticks.shape[0])]
+        cbar.set_ticklabels(ticks)
+        cbar.ax.tick_params(labelsize=22)
 
     plt.scatter(x_data, y_data, c='black', marker='.', s=10)
 
-
     set_x_ticks(x_min, x_max)
     set_y_ticks(y_min, y_max)
-
     if title is not None:
         plt.title(title, fontsize=35)
-    plt.xlabel(x_label, fontsize=30)
-    plt.ylabel(y_label, fontsize=30)
+    plt.xlabel(x_label, fontsize=40)
+    plt.ylabel(y_label, fontsize=40)
     plt.tight_layout()
 
     plt.savefig(output_file, dpi=100)
@@ -542,3 +550,31 @@ def scatter_plot_contour(output_file, groups, x_label, y_label, title=None):
     '''
 
 
+def bar_chart(output_file, x_values, y_values, bar_values, x_label, y_label):
+    x_values_min = x_values.min()
+    x_values_max = x_values.max()
+    plt.figure(figsize=(15, 10))
+    #x_values_str = [str(x_values[i]) for i in range(x_values.shape[0])]
+
+    graph = plt.bar(x_values, y_values, width=0.09)
+    i = 0
+    for p in graph:
+        width = p.get_width()
+        height = p.get_height()
+        x, y = p.get_xy()
+
+        plt.text(x + width/2,
+                 y + height * 1.01,
+                 str(bar_values[i]),
+                 ha='center',
+                 weight='bold',
+                 fontdict={'size':13})
+        i += 1
+
+    set_x_ticks(x_values_min, x_values_max, n_ticks=x_values.shape[0]-1)
+    set_y_ticks(0, y_values.max())
+    plt.xlabel(x_label, fontsize=25)
+    plt.ylabel(y_label, fontsize=25)
+    plt.tight_layout()
+    plt.savefig(output_file, dpi=200)
+    reset_plot()
