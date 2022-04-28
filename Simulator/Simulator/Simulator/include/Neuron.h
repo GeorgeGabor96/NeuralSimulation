@@ -40,7 +40,7 @@ typedef struct NeuronClass {
 #define LIF_U_REST	-65.0f 
 #define LIF_R		10.0f
 #define LIF_C		1.0f
-#define LIF_REFRACT (uint32_t)5
+#define LIF_REFRACT (uint32_t)2
 
 /*
 1. neuron_class != NULL
@@ -65,7 +65,8 @@ typedef struct Neuron {
 	Array in_synapses_refs;	  // references to input synapses
 	Array out_synapses_refs;  // references to output synapses
 	float u;
-	float PSC;		 		  // the PSC value that determined the current @u and @spike values
+	float EPSC;		 		  // the EPSC value that determined the current @u and @spike values
+	float IPSC;				  // the IPSC value that determined the current @u and @spike values
 	uint32_t last_spike_time;	// for neurons with refractory period
 	BOOL spike;
 } Neuron;

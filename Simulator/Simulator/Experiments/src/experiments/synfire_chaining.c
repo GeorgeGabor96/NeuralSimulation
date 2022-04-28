@@ -50,33 +50,33 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 
 void synfire_space_exploration_connectivity_amplitude() {
 	connectivity_amplitude_space_exp config = { 0 };
-	config.exp_abs_path = "path";
+	config.exp_abs_path = "d:\\repositories\\Simulator\\experiments\\rerun_probability_plots\\debug_90_10_nice_2_refract";
 	
 	config.connectivity_start = 0.025f;
 	config.connectivity_end = 1.0f;
 	config.connectivity_inc = 0.025f;
 
-	config.amplitude_start = 0.005f;
-	config.amplitude_end = 0.35f;
-	config.amplitude_inc = 0.01f;
+	config.amplitude_start = 0.025f;
+	config.amplitude_end = 1.0f;
+	config.amplitude_inc = 0.025f;
 
 	config.min_ratio = 0.5f;
 	config.max_ratio = 2.0f;
 
-	config.n_excitatory = 80;
-	config.n_inhibitory = 20;
+	config.n_excitatory = 90;
+	config.n_inhibitory = 10;
 
-	config.neuron_class = neuron_class_create("LIF_NEURON", LIF_NEURON);
-	//config.neuron_class = neuron_class_create("LIF_NEURON_REFRAC", LIF_REFRACTORY_NEURON);
+	//config.neuron_class = neuron_class_create("LIF_NEURON", LIF_NEURON);
+	config.neuron_class = neuron_class_create("LIF_NEURON_REFRAC", LIF_REFRACTORY_NEURON);
 
 	config.synapse_exci_class = synapse_class_create("AMPA", 0.0f, 1.0f, 1, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1);
 	config.synapse_inhi_class = synapse_class_create("GABA_A", -90.0f, 1.0f, 6, 10, VOLTAGE_DEPENDENT_SYNAPSE, 1);
 	//config.synapse_exci_class = synapse_class_create("CONDUCTANCE_10_TAU", 0.0, 1.0f, 10, 10, CONDUCTANCE_SYNAPSE, 1);
 	//config.synapse_inhi_class = synapse_class_create("CONDUCTANCE_10_TAU", 0.0, 1.0f, 10, 10, CONDUCTANCE_SYNAPSE, 1);
 
-	config.n_trials = 10;
+	config.n_trials = 6;
 
-	config.example_duration = 1000;
+	config.example_duration = 300;
 	config.pulse_duration = 20;
 	config.between_pulse_spike_frequency = 0.0f;
 	config.pulse_spike_frequency = 0.05f;
@@ -140,12 +140,12 @@ void synfire_space_exploration_connectivity_amplitude_run_config(connectivity_am
 
 				// create callbacks
 				memset(callback_result_folder, 0, 1024);
-				sprintf(callback_result_folder, "%s\\connectivity_%.4f_amplitude_%.4f.txt", result_trial_folder, connectivity, amplitude);
+				sprintf(callback_result_folder, "%s\\conectivitate_%.4f_amplitudine_%.4f.txt", result_trial_folder, connectivity, amplitude);
 				synfire_detect_cb = callback_detect_synfire_activity_create(net, SYNFIRE_FP_DURATION, 4, net->layers.length - 1, config->min_ratio, config->max_ratio, callback_result_folder);
 
 				if (config->use_dump_net_callback == TRUE) {
 					memset(callback_result_folder, 0, 1024);
-					sprintf(callback_result_folder, "%s\\coonectivity_%.4f_amplitude_%.4f", result_trial_folder, connectivity, amplitude);
+					sprintf(callback_result_folder, "%s\\conectivitate_%.4f_amplitudine_%.4f", result_trial_folder, connectivity, amplitude);
 					net_dump_cb = callback_dump_network_create(net, callback_result_folder);
 				}
 				// create simulator and run it

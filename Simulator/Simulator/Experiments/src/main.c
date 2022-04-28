@@ -5,7 +5,7 @@ const char* result_base_folder = "..\\..\\..\\..\\experiments";
 
 int main() {
 	srand(time(0));
-	embedded_synfire_chains_exp();
+	synfire_space_exploration_connectivity_amplitude();
 
 	return 0;
 }

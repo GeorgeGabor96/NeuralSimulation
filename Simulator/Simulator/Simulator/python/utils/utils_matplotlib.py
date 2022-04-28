@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 
 
 def reset_plot():
@@ -12,7 +13,7 @@ def reset_plot():
     plt.close()
 
 
-def set_x_ticks(x_min, x_max, n_ticks=40, rotation=90):
+def set_x_ticks(x_min, x_max, n_ticks=8, rotation=0):
     """
     :param x_min: float
         the minimum value for the x axis
@@ -28,10 +29,11 @@ def set_x_ticks(x_min, x_max, n_ticks=40, rotation=90):
     """
     x_step = (x_max - x_min) / float(n_ticks)
     if x_step != 0.0:
-        plt.xticks(np.arange(start=x_min, stop=x_max + x_step, step=x_step), rotation=rotation)
+        #plt.gca().xaxis.set_major_formatter(mticker.FormatStrFormatter('%.3f'))
+        plt.xticks(np.arange(start=x_min, stop=x_max + x_step, step=x_step), rotation=rotation, fontsize=25)
 
 
-def set_y_ticks(y_min, y_max, n_ticks=30, rotation=0):
+def set_y_ticks(y_min, y_max, n_ticks=8, rotation=0):
     """
     :param y_min: float
         the minimum value for the y axis
@@ -47,14 +49,15 @@ def set_y_ticks(y_min, y_max, n_ticks=30, rotation=0):
     """
     y_step = (y_max - y_min) / float(n_ticks)
     if y_step != 0.0:
-        plt.yticks(np.arange(start=y_min, stop=y_max + y_step, step=y_step), rotation=rotation)
+        plt.gca().yaxis.set_major_formatter(mticker.FormatStrFormatter('%.3f'))
+        plt.yticks(np.arange(start=y_min, stop=y_max + y_step, step=y_step), rotation=rotation, fontsize=25)
 
 
 def set_legend():
     """
     Sets the legend outside the figure in the upper left corner
     """
-    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.legend(loc='upper right', prop={'size':20})
 
 
 def get_min_max(c_min, c_max, array):
@@ -91,7 +94,7 @@ class NetworkSpikesPlot:
             title of the plot
         """
         reset_plot()
-        plt.figure(figsize=(15, 10))
+        plt.figure(figsize=(10, 10))
         self.scatter = scatter
         self.output_file = output_file
         self.title = title
@@ -152,13 +155,14 @@ class NetworkSpikesPlot:
         """
         Plots the network activity plot based on the info gathered in the for the @plot_line and @plot_points
         """
-        plt.xlabel(self.xlabel)
+        plt.xlabel(self.xlabel, fontsize=30)
         set_x_ticks(self.min_x_value, self.max_x_value)
 
-        plt.ylabel(self.ylabel)
-        plt.yticks(ticks=self.y_ticks, labels=self.layer_names)
+        if self.ylabel is not None:
+            plt.ylabel(self.ylabel, fontsize=30)
+        plt.yticks(ticks=self.y_ticks, labels=self.layer_names, fontsize=19)
 
-        plt.title(self.title)
+        plt.title(self.title, fontsize=30)
 
         plt.axis('tight')
         os.makedirs(os.path.split(self.output_file)[0], exist_ok=True)
@@ -167,7 +171,7 @@ class NetworkSpikesPlot:
         reset_plot()
 
 
-def line_plot(output_file, y_data, x_label, y_label, title, x_data=None, line_label=None):
+def line_plot(output_file, y_data, x_label, y_label, title=None, x_data=None, line_label=None):
     """
     Plots multiple lines on the same plot with different colors
 
@@ -197,7 +201,7 @@ def line_plot(output_file, y_data, x_label, y_label, title, x_data=None, line_la
         if str it will be put in a list
         each element represents the label for one line
     """
-    plt.figure(figsize=(15, 10))
+    plt.figure(figsize=(17, 10))
 
     if isinstance(y_data, list) is False:
         y_data = [y_data]
@@ -231,9 +235,10 @@ def line_plot(output_file, y_data, x_label, y_label, title, x_data=None, line_la
         set_legend()
 
     plt.grid(True, linestyle='--')
-    plt.title(title, fontsize=20)
-    plt.xlabel(x_label, fontsize=20)
-    plt.ylabel(y_label, fontsize=20)
+    if title is not None:
+        plt.title(title, fontsize=30)
+    plt.xlabel(x_label, fontsize=40)
+    plt.ylabel(y_label, fontsize=40)
     plt.tight_layout()
 
     plt.savefig(output_file, dpi=100)
@@ -241,7 +246,7 @@ def line_plot(output_file, y_data, x_label, y_label, title, x_data=None, line_la
     reset_plot()
 
 
-def scatter_plot(output_file, groups, title, x_label, y_label):
+def scatter_plot(output_file, groups, x_label, y_label, title=None):
     """
     This will plot multiple groups of points, each with a different color
 
@@ -289,9 +294,10 @@ def scatter_plot(output_file, groups, title, x_label, y_label):
     set_y_ticks(y_min, y_max)
     set_legend()
 
-    plt.title(title, fontsize=20)
-    plt.xlabel(x_label, fontsize=20)
-    plt.ylabel(y_label, fontsize=20)
+    if title is not None:
+        plt.title(title, fontsize=35)
+    plt.xlabel(x_label, fontsize=30)
+    plt.ylabel(y_label, fontsize=30)
     plt.tight_layout()
 
     plt.savefig(output_file, dpi=100)
@@ -299,7 +305,7 @@ def scatter_plot(output_file, groups, title, x_label, y_label):
     reset_plot()
 
 
-def scatter_plot_with_colorscheme(output_file, x_data, y_data, c_data, title, x_label, y_label, cmap='BuGn'):
+def scatter_plot_with_colorscheme(output_file, x_data, y_data, c_data, x_label, y_label, title=None, cmap='BuGn'):
     """
     This will create a 2D plot where every point will have a color on a colormap
     Usefull to show properties of points like probabilities
@@ -342,9 +348,10 @@ def scatter_plot_with_colorscheme(output_file, x_data, y_data, c_data, title, x_
     set_x_ticks(x_min, x_max)
     set_y_ticks(y_min, y_max)
 
-    plt.title(title, fontsize=20)
-    plt.xlabel(x_label, fontsize=20)
-    plt.ylabel(y_label, fontsize=20)
+    if title is not None:
+        plt.title(title, fontsize=35)
+    plt.xlabel(x_label, fontsize=30)
+    plt.ylabel(y_label, fontsize=30)
     plt.tight_layout()
 
     plt.savefig(output_file, dpi=100)
@@ -352,3 +359,222 @@ def scatter_plot_with_colorscheme(output_file, x_data, y_data, c_data, title, x_
     reset_plot()
 
 
+def histogram_plot(output_file, data, x_label, y_label, title=None):
+    """
+    This will create a 2D plot with a histogram for the @data paramter
+    Usefull to to compare distributions
+
+    :param output_file: str
+        path to the file that will be the image
+
+    :param data: np array
+        1D array of x values
+
+    :param x_label: str
+        label for the x axis
+
+    :param y_label: str
+        label for the y axis
+
+    :param title: str
+        title of the plot
+    """
+    plt.figure(figsize=(15, 10))
+
+    plt.hist(data, bins=11)
+
+    if title is not None:
+        plt.title(title, fontsize=35)
+
+    set_x_ticks(0, 1.0, 11)
+    plt.xlabel(x_label, fontsize=30)
+    plt.ylabel(y_label, fontsize=30)
+    plt.tight_layout()
+
+    plt.savefig(output_file, dpi=100)
+
+    reset_plot()
+
+
+def scatter_plot_interpolated_with_colorscheme(output_file, x_data, y_data, c_data, x_label, y_label, title=None, use_colorbar=True, cmap='BuGn', nlines=500, method='cubic'):
+    """
+    This will create a 2D plot where every point will have a color on a colormap
+    Usefull to show properties of points like probabilities
+
+    :param output_file: str
+        path to the file that will be the image
+
+    :param x_data: np array
+        1D array of x values
+
+    :param y_data: np array
+        1D array of y values
+
+    :param c_data: np array
+        1D array of values, represent 'indexes' of colors for the x, y points
+        if 2 (x, y) points have the same c_data they will have the same color
+
+    :param title: str
+        title of the plot
+
+    :param x_label: str
+        label for the x axis
+
+    :param y_label: str
+        label for the y axis
+
+    :param cmap: str
+        matplotlib colorma name
+    """
+    plt.figure(figsize=(15, 10))
+
+    x_min = x_data.min()
+    x_max = x_data.max()
+    y_min = y_data.min()
+    y_max = y_data.max()
+
+    x_epsilon = (x_max - x_min) / 100
+    y_epsilon = (y_max - y_min) / 100
+    xi = np.linspace(x_min - x_epsilon, x_max + x_epsilon, 100)  #np.arange(x_min, x_max, 0.01)
+    yi = np.linspace(y_min - y_epsilon, y_max + y_epsilon, 100)  #arange(y_min, y_max, 0.01)
+
+    xi, yi = np.meshgrid(xi, yi)
+
+    from scipy.interpolate import griddata
+    zi = griddata((x_data, y_data), c_data, (xi, yi), method=method)
+    zi = np.clip(zi, 0, c_data.max())
+    plt.contourf(xi, yi, zi, nlines, cmap=cmap)
+    if use_colorbar is True:
+        cbar = plt.colorbar()
+        c_data_min = c_data.min()
+        c_data_max = c_data.max()
+        cbar.set_ticks(np.linspace(c_data_min, c_data_max, 11))
+        ticks = np.linspace(c_data_min, c_data_max, 11)
+        ticks = ['{:.2f}'.format(ticks[i]) for i in range(ticks.shape[0])]
+        cbar.set_ticklabels(ticks)
+        cbar.ax.tick_params(labelsize=22)
+
+    plt.scatter(x_data, y_data, c='black', marker='.', s=10)
+
+    set_x_ticks(x_min, x_max)
+    set_y_ticks(y_min, y_max)
+    if title is not None:
+        plt.title(title, fontsize=35)
+    plt.xlabel(x_label, fontsize=40)
+    plt.ylabel(y_label, fontsize=40)
+    plt.tight_layout()
+
+    plt.savefig(output_file, dpi=100)
+
+    reset_plot()
+
+
+def scatter_plot_contour(output_file, groups, x_label, y_label, title=None):
+    """
+    This will plot multiple groups of points, each with a different color
+
+    :param output_file: str
+        path to the file where to save the plot
+
+    :param groups: dict
+        each key represents the label for one group of points
+        each values is a dictionary like:
+        {
+            'x': x coordinates for the x axis
+            'y': y coordinates for the y axis
+        }
+
+    :param title: str
+        title of the plot
+
+    :param x_label: str
+        label for the x axis
+
+    :param y_label: str
+        label for the y axis
+    """
+    plt.figure(figsize=(15, 10))
+
+    x_min = 1e+15
+    x_max = -1e+15
+    y_min = 1e+15
+    y_max = -1e+15
+
+    x_data = np.zeros((0,))
+    y_data = np.zeros((0,))
+    z_data = np.zeros((0,))
+
+    for i, group_name in enumerate(groups.keys()):
+        group_data = groups[group_name]
+
+        x_data_aux = group_data['x']
+        y_data_aux = group_data['y']
+        x_data = np.hstack((x_data, x_data_aux))
+        y_data = np.hstack((y_data, y_data_aux))
+        z_data = np.hstack((z_data, np.ones(x_data_aux.shape) * i))
+        continue
+
+    scatter_plot_interpolated_with_colorscheme(output_file=output_file,
+                                               x_data=x_data,
+                                               y_data=y_data,
+                                               c_data=z_data,
+                                               x_label=x_label,
+                                               y_label=y_label,
+                                               title=title,
+                                               nlines=2,
+                                               cmap='jet',
+                                               method='nearest',
+                                               use_colorbar=False)
+
+    '''
+        if x_data.shape[0] == 0:
+            continue
+
+        plt.contour(x_data, y_data, i, label=group_name)
+        x_min, x_max = get_min_max(x_min, x_max, x_data)
+        y_min, y_max = get_min_max(y_min, y_max, y_data)
+
+    set_x_ticks(x_min, x_max)
+    set_y_ticks(y_min, y_max)
+    set_legend()
+
+    if title is not None:
+        plt.title(title, fontsize=35)
+    plt.xlabel(x_label, fontsize=30)
+    plt.ylabel(y_label, fontsize=30)
+    plt.tight_layout()
+
+    plt.savefig(output_file, dpi=100)
+
+    reset_plot()
+    '''
+
+
+def bar_chart(output_file, x_values, y_values, bar_values, x_label, y_label):
+    x_values_min = x_values.min()
+    x_values_max = x_values.max()
+    plt.figure(figsize=(15, 10))
+    #x_values_str = [str(x_values[i]) for i in range(x_values.shape[0])]
+
+    graph = plt.bar(x_values, y_values, width=0.09)
+    i = 0
+    for p in graph:
+        width = p.get_width()
+        height = p.get_height()
+        x, y = p.get_xy()
+
+        plt.text(x + width/2,
+                 y + height * 1.01,
+                 str(bar_values[i]),
+                 ha='center',
+                 weight='bold',
+                 fontdict={'size':13})
+        i += 1
+
+    set_x_ticks(x_values_min, x_values_max, n_ticks=x_values.shape[0]-1)
+    set_y_ticks(0, y_values.max())
+    plt.xlabel(x_label, fontsize=25)
+    plt.ylabel(y_label, fontsize=25)
+    plt.tight_layout()
+    plt.savefig(output_file, dpi=200)
+    reset_plot()

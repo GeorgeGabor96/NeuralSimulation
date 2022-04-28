@@ -127,6 +127,8 @@ use these to get the output of the network
 ArrayBool* layer_get_spikes(Layer* layer);
 ArrayFloat* layer_get_voltages(Layer* layer);
 ArrayFloat* layer_get_psc(Layer* layer);
+ArrayFloat* layer_get_epsc(Layer* layer);
+ArrayFloat* layer_get_ipsc(Layer* layer);
 
 // utilizty functions
 void layer_summary(Layer* layer);

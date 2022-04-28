@@ -33,6 +33,7 @@ def get_fourier(signal):
     fourier = np.fft.fft(signal)
     freq = np.fft.fftfreq(len(signal)) * len(signal)
     mask = freq > 0
+    # get the magnitude of the fft
     fourier = 2.0 * np.abs(fourier / len(signal))
 
     return fourier[mask], freq[mask]
@@ -76,7 +77,7 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
         fourier, freq = get_fourier(spike_histogram)
         x_points = []
         y_points = []
-        fourier_for_big_plot = fourier.copy() / fourier.max()
+        fourier_for_big_plot = fourier.copy() / (fourier.max() + 1e-10)
         for f in range(freq.shape[0]):
             f_amplitude = fourier_for_big_plot[f]
             x_points.append(f)
@@ -84,6 +85,9 @@ def make_data_for_layer_and_lines(binaries_for_layer, config):
 
         x_points = np.array(x_points)
         y_points = np.array(y_points)
+
+        # for romanian
+        layer['layer_name'] = layer['layer_name'].replace('layer', 'nivel')
 
         new_neuron_y_coord = y_points.max()
         data_for_layer.append(dict(layer_name=layer['layer_name'],
@@ -119,8 +123,8 @@ def print_frequencyes_for_layers(data_for_layer, config):
         line_plot(output_file=output_file,
                   x_data=layer_data['frequency'],
                   y_data=layer_data['fourier'],
-                  x_label='Frequency',
-                  y_label='Amplitude',
+                  x_label='Frecventa',  #'Frequency',
+                  y_label='Magnitudine',  #'Amplitude',
                   title=layer_data['layer_name'])
 
 
@@ -137,7 +141,9 @@ def plot_network_fourier(config_file):
     print_frequencyes_for_layers(data_for_layer, config)
 
     # create the network activity plot
-    plot_data_and_lines(data_for_layer, lines, config, file_name='fourier.png', x_label='frequency', y_label='Layers', scatter=False)
+    if 'title' not in config.keys():
+        config['title'] = None
+    plot_data_and_lines(data_for_layer, lines, config, file_name='fourier.png', x_label='Frecventa', y_label='Nivel', scatter=False)
 
 
 if __name__ == '__main__':

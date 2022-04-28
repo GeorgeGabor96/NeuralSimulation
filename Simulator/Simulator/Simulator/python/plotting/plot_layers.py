@@ -19,14 +19,29 @@ if __name__ == '__main__':
     bin_files = get_file_with_extension(args.dump_folder, 'bin')
 
     for bin_file in bin_files:
-        sim_array = parse_array_file(bin_file)
+        sim_array_aux = parse_array_file(bin_file)
+
+        # for romanian
+        sim_array = dict()
+        if sim_array_aux['name'] == 'voltage':
+            sim_array['name'] = 'voltage (mV)'
+        elif sim_array_aux['name'] == 'spikes':
+            sim_array['name'] = 'spikes'
+        elif sim_array_aux['name'] == 'PSC':
+            sim_array['name'] = 'PSC (nA)'
+        elif sim_array_aux['name'] == 'IPSC':
+            sim_array['name'] = 'IPSC (nA)'
+        elif sim_array_aux['name'] == 'EPSC':
+            sim_array['name'] = 'EPSC (nA)'
+        sim_array['data'] = sim_array_aux['data']
+        n_times = 201
 
         output_folder, file_name = os.path.split(bin_file)
         file_name = file_name.replace('bin', 'png')
 
         line_plot(output_file=os.path.join(output_folder, file_name),
-                  y_data=[sim_array['data']],
-                  line_label=[sim_array['name']],
-                  x_label='time',
+                  y_data=[sim_array['data'][:n_times]],
+                  line_label=None,  #[sim_array['name']],
+                  x_label='time (ms)',
                   y_label=sim_array['name'],
-                  title=file_name.split('.')[0])
+                  title=None)  #file_name.split('.')[0])
